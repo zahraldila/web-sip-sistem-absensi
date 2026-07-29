@@ -2,17 +2,17 @@
 
 ## Tujuan
 
-Dokumen ini menjelaskan strategi penggunaan branch pada repository **SIP Sistem Absensi** agar proses pengembangan lebih terstruktur, meminimalkan konflik, dan memudahkan kolaborasi antar anggota tim.
+Dokumen ini menjelaskan aturan penggunaan branch pada repository **SIP Sistem Absensi** agar proses pengembangan lebih terstruktur, konsisten, dan memudahkan kolaborasi antar anggota tim.
 
 ---
 
 ## Struktur Branch
 
-Repository ini menggunakan beberapa jenis branch sebagai berikut:
+Repository ini menggunakan branch sebagai berikut:
 
 | Branch | Fungsi |
 |---------|--------|
-| `main` | Menyimpan versi aplikasi yang stabil dan siap digunakan. |
+| `main` | Menyimpan versi aplikasi yang sudah stabil dan siap digunakan. |
 | `develop` | Branch utama yang digunakan selama proses pengembangan. |
 | `feature/*` | Digunakan untuk mengembangkan fitur baru. |
 | `hotfix/*` | Digunakan untuk memperbaiki bug yang bersifat mendesak (jika diperlukan). |
@@ -21,57 +21,54 @@ Repository ini menggunakan beberapa jenis branch sebagai berikut:
 
 ## Aturan Penggunaan Branch
 
-### 1. Branch `main`
+### Branch `main`
 
-- Digunakan untuk menyimpan versi aplikasi yang sudah stabil.
-- Tidak digunakan untuk pengembangan fitur baru.
-- Perubahan pada branch ini dilakukan setelah fitur pada branch `develop` dinyatakan siap.
+- Digunakan untuk menyimpan versi aplikasi yang stabil.
+- Tidak digunakan untuk pengembangan fitur secara langsung.
 
----
-
-### 2. Branch `develop`
+### Branch `develop`
 
 - Menjadi branch utama selama proses pengembangan.
-- Seluruh fitur baru akan dikembangkan dari branch ini.
-- Branch ini akan terus diperbarui selama proses development berlangsung.
+- Menjadi dasar dalam pembuatan branch `feature/*`.
+
+### Branch `feature/*`
+
+- Digunakan untuk mengembangkan satu fitur tertentu.
+- Dibuat dari branch `develop`.
+- Setelah fitur selesai, perubahan digabungkan kembali ke branch `develop`.
+- Branch dapat dihapus setelah proses penggabungan selesai.
+
+### Branch `hotfix/*`
+
+- Digunakan apabila ditemukan bug yang perlu segera diperbaiki.
+- Digunakan sesuai kebutuhan proyek.
 
 ---
 
-### 3. Branch `feature/*`
+## Penamaan Branch
 
-Digunakan untuk mengembangkan satu fitur tertentu.
-
-Format penamaan:
+Gunakan format berikut:
 
 ```
-feature/nama-fitur
+feature/<modul>-<fitur>
 ```
 
 Contoh:
 
-```
-feature/backend-auth
-feature/mobile-attendance
-feature/web-admin-approval
-feature/tv-dashboard-popup
-```
-
-Setelah fitur selesai dikembangkan, perubahan akan digabungkan kembali ke branch `develop`.
-
----
-
-### 4. Branch `hotfix/*`
-
-Digunakan apabila ditemukan bug yang perlu segera diperbaiki.
-
-Contoh:
-
-```
-hotfix/login-error
-hotfix/nfc-validation
-```
-
-Branch ini hanya digunakan jika diperlukan.
+| Modul | Contoh Branch |
+|--------|---------------|
+| Backend | `feature/backend-auth` |
+| Backend | `feature/backend-attendance` |
+| Backend | `feature/backend-report` |
+| Mobile | `feature/mobile-login` |
+| Mobile | `feature/mobile-attendance` |
+| Mobile | `feature/mobile-profile` |
+| Web Admin | `feature/web-admin-dashboard` |
+| Web Admin | `feature/web-admin-approval` |
+| Web Admin | `feature/web-admin-employee` |
+| TV Dashboard | `feature/tv-dashboard-monitoring` |
+| TV Dashboard | `feature/tv-dashboard-popup` |
+| TV Dashboard | `feature/tv-dashboard-summary` |
 
 ---
 
@@ -92,4 +89,7 @@ main
 
 ## Catatan
 
-Strategi branch ini dapat disesuaikan dengan kebutuhan proyek seiring perkembangan proses pengembangan.
+- Setiap developer hanya bekerja pada branch yang menjadi tanggung jawabnya.
+- Hindari melakukan pengembangan langsung pada branch `main`.
+- Penamaan branch harus mengikuti format yang telah ditentukan agar mudah dikenali oleh seluruh anggota tim.
+- Strategi branch ini dapat diperbarui sesuai kebutuhan dan perkembangan proyek.
