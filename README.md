@@ -1,35 +1,49 @@
-# SIP Sistem Absensi
+# Web SIP Sistem Absensi
 
+Repository ini digunakan untuk pengembangan **Web SIP Sistem Absensi** PT Selada Indonesia Produktif.
 
-Sistem Absensi PT Selada Indonesia Produktif merupakan aplikasi yang dirancang untuk membantu proses pencatatan kehadiran pegawai secara digital. Sistem ini mendukung pencatatan absensi menggunakan NFC serta menyediakan dashboard monitoring secara real-time, aplikasi mobile untuk pegawai, dan web admin untuk pengelolaan data.
+Web SIP Sistem Absensi terdiri dari dua bagian utama, yaitu:
 
-## Repository Structure
+- **Web Admin**, digunakan oleh administrator untuk mengelola data pegawai, absensi, pengajuan, laporan, dan pengaturan sistem.
+- **TV Dashboard**, digunakan untuk menampilkan informasi absensi secara real-time pada layar monitor atau TV di lingkungan perusahaan.
 
-```
-sip-sistem-absensi/
-│
-├── backend/         # Backend API
-├── mobile/          # Mobile Application
-├── web-admin/       # Web Application for Administrator
-├── tv-dashboard/    # Real-time Dashboard for TV Display
-├── docs/            # Project Documentation
-│
-├── README.md
-└── CONTRIBUTING.md
-```
+---
+
+## Fitur Utama
+
+### Web Admin
+
+- Dashboard Admin
+- Manajemen Data Pegawai
+- Monitoring Absensi
+- Persetujuan Pengajuan (Izin, Cuti, WFH, Dinas, dll.)
+- Rekap dan Laporan Absensi
+- Pengaturan Sistem
+
+### TV Dashboard
+
+- Monitoring Kehadiran Secara Real-Time
+- Total Pegawai Hadir
+- Daftar Pegawai Hadir
+- Popup Informasi Pegawai Saat Melakukan Absensi
+- Informasi Tanggal dan Waktu
+
+---
 
 ## Branch Strategy
 
-| Branch | Description |
-|---------|-------------|
-| `main` | Stable branch / Production |
-| `develop` | Main development branch |
-| `feature/*` | Feature development |
-| `hotfix/*` | Emergency bug fixes (if needed) |
+| Branch | Fungsi |
+|---------|--------|
+| `main` | Menyimpan versi aplikasi yang stabil. |
+| `develop` | Branch utama untuk proses pengembangan. |
+| `feature/*` | Digunakan untuk pengembangan fitur baru. |
+| `hotfix/*` | Digunakan untuk perbaikan bug yang bersifat mendesak (jika diperlukan). |
+
+---
 
 ## Development Workflow
 
-```
+```text
 feature/*
    │
    ▼
@@ -39,23 +53,27 @@ develop
 main
 ```
 
+---
+
 ## Documentation
 
-Project documentation will be stored inside the `docs/` directory, including:
+Dokumentasi proyek tersedia pada folder `docs/`, meliputi:
 
 - Git Workflow
 - Branch Strategy
 - Deployment Plan
 - Environment Configuration
-- Docker Guide
-- CI/CD Plan
+
+---
 
 ## Project Status
 
-🚧 Currently in Requirement Analysis & System Design Phase.
+🚧 Saat ini proyek masih berada pada tahap **Requirement Analysis** dan **System Design**.
 
-Development, deployment, and CI/CD configuration will be implemented in the next project phases.
+---
 
 ## Team
 
-KP/PKL PT Selada Indonesia Produktif
+Kerja Praktik (KP/PKL)
+
+PT Selada Indonesia Produktif
