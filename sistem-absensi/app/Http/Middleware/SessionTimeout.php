@@ -16,13 +16,18 @@ class SessionTimeout
         if (Auth::check()) {
             $last = Session::get('lastActivityTime');
             $now = time();
+
             if ($last && ($now - $last) > $this->timeout) {
                 Auth::logout();
-                Session::flush();
-                return redirect('/login')->withErrors(['message' => 'Session expired. Please login again.']);
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect('/login')->withErrors(['message' => 'Sesi Anda telah berakhir. Silakan login kembali.']);
             }
+
             Session::put('lastActivityTime', $now);
         }
+
         return $next($request);
     }
 }

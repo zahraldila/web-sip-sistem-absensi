@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function () {
     Route::get('/', function () {
-        return view('admin.dashboard');
+        return view('admin.index');
     })->name('admin.dashboard');
 
     // Admin resource routes (placeholders)

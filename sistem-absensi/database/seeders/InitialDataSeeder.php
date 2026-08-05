@@ -16,6 +16,7 @@ class InitialDataSeeder extends Seeder
         ], [
             'name' => 'Administrator',
             'password' => bcrypt('password'),
+            'role' => 'Admin',
         ]);
 
         // Placeholder for creating sample employees

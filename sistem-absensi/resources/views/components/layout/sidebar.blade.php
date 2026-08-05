@@ -283,33 +283,39 @@
     {{-- ========================= --}}
     <div class="p-5">
 
-        <button
-            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
+            <button
+                type="submit"
+                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
 
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 17l5-5-5-5"/>
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12H9"/>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
 
-            </svg>
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M16 17l5-5-5-5"/>
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 12H9"/>
 
-            Logout
+                </svg>
 
-        </button>
+                Logout
+
+            </button>
+
+        </form>
 
     </div>
 
