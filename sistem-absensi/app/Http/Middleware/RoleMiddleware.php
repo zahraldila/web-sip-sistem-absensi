@@ -18,7 +18,7 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        if ($user->role !== $role) {
+        if (strtolower($user->role) !== strtolower($role)) {
             abort(403, 'Unauthorized');
         }
 

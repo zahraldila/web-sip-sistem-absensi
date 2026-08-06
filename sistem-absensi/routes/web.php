@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('admin.index');
+    return redirect()->route('admin.dashboard');
+});
+
+Route::get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
 });
 
 // Load additional route groups if present (admin, pegawai, auth)

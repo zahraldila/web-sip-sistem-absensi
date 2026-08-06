@@ -3,23 +3,33 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Pegawai;
+use App\Models\Akun;
 
 class InitialDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create admin user if not exists
-        User::firstOrCreate([
-            'email' => 'admin@selada.local'
+        // Seed data pegawai id = 5 sesuai spesifikasi
+        $pegawai = Pegawai::updateOrCreate([
+            'id' => 5,
         ], [
-            'name' => 'Administrator',
-            'password' => bcrypt('password'),
-            'role' => 'Admin',
+            'nama' => 'Admin HR',
+            'email' => 'admin@selada.id',
+            'jabatan' => 'HR Manager',
+            'divisi' => 'HR',
         ]);
 
-        // Placeholder for creating sample employees
-        // Employee::factory()->count(5)->create();
+        // Seed data akun admin terhubung ke pegawai_id = 5
+        Akun::updateOrCreate([
+            'username' => 'admin',
+        ], [
+            'password' => Hash::make('123456'),
+            'role' => 'admin',
+            'pegawai_id' => $pegawai->id,
+        ]);
     }
 }
+

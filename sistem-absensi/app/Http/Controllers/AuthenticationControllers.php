@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Models\Akun;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthenticationControllers extends Controller
 {
     /**
-     * Proses login admin.
-     * - Validasi form (via LoginRequest)
-     * - Attempt autentikasi dengan rate limiting implicit
-     * - Regenerate session (mencegah session fixation)
-     * - Set lastActivityTime untuk session timeout
+     * Proses login admin / user.
+     * - Validasi ke tabel akun (username / email pegawai)
+     * - Verifikasi password
+     * - Login via Auth::login
+     * - Regenerate session & simpan info session (akun_id, pegawai_id, role, nama_pegawai)
      * - Redirect ke dashboard admin
      *
      * @param LoginRequest $request
@@ -21,16 +23,38 @@ class AuthenticationControllers extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $credentials = $request->validated();
+        $loginInput = $request->input('email');
+        $password = $request->input('password');
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Mencari akun berdasarkan username atau email pegawai
+        $akun = Akun::where('username', $loginInput)
+            ->orWhereHas('pegawai', function ($query) use ($loginInput) {
+                $query->where('email', $loginInput);
+            })
+            ->first();
+
+        if (! $akun || ! Hash::check($password, $akun->password)) {
             return back()
-                ->withErrors(['email' => 'Email atau password yang Anda masukkan salah.'])
+                ->withErrors(['email' => 'Username/Email atau password yang Anda masukkan salah.'])
                 ->onlyInput('email');
         }
 
+        // Login user
+        Auth::login($akun, $request->boolean('remember'));
+
+        // Regenerate session untuk keamanan
         $request->session()->regenerate();
         $request->session()->put('lastActivityTime', time());
+
+        // Menyimpan informasi user/pegawai ke dalam session Laravel
+        $pegawai = $akun->pegawai;
+        session([
+            'akun_id' => $akun->id,
+            'pegawai_id' => $akun->pegawai_id,
+            'role' => $akun->role,
+            'nama_pegawai' => $pegawai ? $pegawai->nama : null,
+            'email_pegawai' => $pegawai ? $pegawai->email : null,
+        ]);
 
         return redirect()->intended(route('admin.dashboard'));
     }

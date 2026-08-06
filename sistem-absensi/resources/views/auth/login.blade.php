@@ -10,8 +10,7 @@
         <img
             src="{{ asset('images/logo-sip.png') }}"
             alt="Logo SIP"
-            class="h-20 w-20 rounded-2xl object-cover shadow-lg"
-        />
+            class="h-20 w-20 rounded-2xl object-cover shadow-lg" />
     </div>
 
     {{-- Heading --}}
@@ -20,17 +19,17 @@
 
     {{-- Status / Error --}}
     @if (session('status'))
-        <div class="mt-5 rounded-xl bg-green-50 px-4 py-2 text-sm text-green-700">
-            {{ session('status') }}
-        </div>
+    <div class="mt-5 rounded-xl bg-green-50 px-4 py-2 text-sm text-green-700">
+        {{ session('status') }}
+    </div>
     @endif
 
     @if ($errors->any())
-        <div class="mt-5 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-700">
-            @foreach ($errors->all() as $error)
-                <p>{{ $error }}</p>
-            @endforeach
-        </div>
+    <div class="mt-5 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-700">
+        @foreach ($errors->all() as $error)
+        <p>{{ $error }}</p>
+        @endforeach
+    </div>
     @endif
 
     <form method="POST" action="{{ url('/login') }}" class="mt-8 space-y-5" x-data="{ showPassword: false }">
@@ -41,7 +40,7 @@
             <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">email:</label>
             <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
                 </svg>
                 <input
                     type="email"
@@ -51,8 +50,7 @@
                     required
                     autofocus
                     placeholder="admin@spi.co.id"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0"
-                />
+                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
             </div>
         </div>
 
@@ -61,8 +59,8 @@
             <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password:</label>
             <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                    <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 0 1 8 0v4" />
                 </svg>
                 <input
                     :type="showPassword ? 'text' : 'password'"
@@ -70,16 +68,15 @@
                     id="password"
                     required
                     placeholder="............"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0"
-                />
+                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
                 <button type="button" @click="showPassword = !showPassword" class="shrink-0 text-slate-400 hover:text-slate-600">
                     <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
-                        <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                        <circle cx="12" cy="12" r="3" stroke-width="2" />
                     </svg>
                     <svg x-show="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-cloak>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l22 22"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l22 22" />
                     </svg>
                 </button>
             </div>
@@ -97,8 +94,7 @@
         {{-- Submit --}}
         <button
             type="submit"
-            class="w-full rounded-2xl bg-[#123D91] py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#0F3277] active:scale-95"
-        >
+            class="w-full rounded-2xl bg-[#123D91] py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#0F3277] active:scale-95">
             Masuk
         </button>
 

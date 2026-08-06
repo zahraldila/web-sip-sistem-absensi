@@ -14,8 +14,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:8'],
+            'email' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -27,11 +27,9 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
+            'email.required' => 'Username atau Email wajib diisi.',
+            'email.max' => 'Username atau Email tidak boleh lebih dari 255 karakter.',
             'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
         ];
     }
 }
