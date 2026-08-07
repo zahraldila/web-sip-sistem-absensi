@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="space-y-8">
+<div class="space-y-8" x-data="{ editJamOpen: false }">
 
     {{-- ===================================================== --}}
     {{-- HEADER --}}
@@ -24,6 +24,7 @@
         </div>
 
         <button
+            @click="editJamOpen = true"
             class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-[#0E337A]">
 
             <svg xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +36,7 @@
                 <path stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M11 5h2m-1-1v16m8-8H4"/>
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 
             </svg>
 
@@ -48,181 +49,126 @@
 
 
     {{-- ===================================================== --}}
+    {{-- FLASH NOTIFICATION --}}
+    {{-- ===================================================== --}}
+    @if(session('success'))
+    <div
+        x-data="{ show: true }"
+        x-show="show"
+        x-init="setTimeout(() => show = false, 4000)"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>{{ session('success') }}</span>
+    </div>
+    @endif
+
+    {{-- ===================================================== --}}
     {{-- SUMMARY CARD --}}
     {{-- ===================================================== --}}
 
     <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
         {{-- Total Pegawai --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-blue-50 p-6 shadow-sm border border-blue-100/50">
 
             <div class="flex items-start justify-between">
-
-                <div>
-
-                    <p class="text-sm text-slate-500">
-                        Total Pegawai
-                    </p>
-
-                    <h2 class="mt-3 text-4xl font-bold text-slate-900">
-                        {{ $totalPegawai }}
-                    </h2>
-
-                    <p class="mt-3 text-sm text-slate-400">
-                        Total karyawan aktif
-                    </p>
-
-                </div>
-
-                <div class="rounded-2xl bg-blue-50 p-3">
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-[#123D91]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M17 20h5V4H2v16h5"/>
-
+                <p class="text-sm font-medium text-blue-600">
+                    Total Pegawai
+                </p>
+                <div class="text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5"/>
                     </svg>
-
                 </div>
+            </div>
 
+            <div class="mt-4 text-center">
+                <h2 class="text-[40px] leading-none font-bold text-[#123D91]">
+                    {{ $totalPegawai }}
+                </h2>
+                <p class="mt-2 text-xs font-medium text-blue-400">
+                    Total karyawan aktif
+                </p>
             </div>
 
         </div>
-
-
 
         {{-- Hadir Hari Ini --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-green-50 p-6 shadow-sm border border-green-100/50">
 
             <div class="flex items-start justify-between">
-
-                <div>
-
-                    <p class="text-sm text-slate-500">
-                        Hadir Hari Ini
-                    </p>
-
-                    <h2 class="mt-3 text-4xl font-bold text-green-600">
-                        {{ $hadirHariIni }}
-                    </h2>
-
-                    <p class="mt-3 text-sm text-slate-400">
-                        Sudah melakukan check in
-                    </p>
-
-                </div>
-
-                <div class="rounded-2xl bg-green-100 p-3">
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-green-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 13l4 4L19 7"/>
-
+                <p class="text-sm font-medium text-green-700">
+                    Hadir Hari Ini
+                </p>
+                <div class="text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-
                 </div>
+            </div>
 
+            <div class="mt-4 text-center">
+                <h2 class="text-[40px] leading-none font-bold text-green-600">
+                    {{ $hadirHariIni }}
+                </h2>
+                <p class="mt-2 text-xs font-medium text-green-500">
+                    Pegawai sudah check in
+                </p>
             </div>
 
         </div>
-
-
 
         {{-- WFO --}}
         <div class="rounded-3xl bg-white p-6 shadow-card">
 
             <div class="flex items-start justify-between">
-
-                <div>
-
-                    <p class="text-sm text-slate-500">
-                        WFO
-                    </p>
-
-                    <h2 class="mt-3 text-4xl font-bold text-orange-500">
-                        {{ $wfoCount }}
-                    </h2>
-
-                    <p class="mt-3 text-sm text-slate-400">
-                        Work From Office
-                    </p>
-
-                </div>
-
-                <div class="rounded-2xl bg-orange-100 p-3">
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-orange-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M3 12h18"/>
-
+                <p class="text-sm font-medium text-slate-700">
+                    WFO
+                </p>
+                <div class="text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
-
                 </div>
+            </div>
 
+            <div class="mt-4 text-center">
+                <h2 class="text-[40px] leading-none font-bold text-slate-800">
+                    {{ $wfoCount }}
+                </h2>
+                <p class="mt-2 text-xs font-medium text-slate-400">
+                    Work From Office
+                </p>
             </div>
 
         </div>
 
-
-
         {{-- WFH/WFC --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-orange-50 p-6 shadow-sm border border-orange-100/50">
 
             <div class="flex items-start justify-between">
-
-                <div>
-
-                    <p class="text-sm text-slate-500">
-                        WFH / WFC
-                    </p>
-
-                    <h2 class="mt-3 text-4xl font-bold text-purple-600">
-                        {{ $wfhWfcCount }}
-                    </h2>
-
-                    <p class="mt-3 text-sm text-slate-400">
-                        Remote Working
-                    </p>
-
-                </div>
-
-                <div class="rounded-2xl bg-purple-100 p-3">
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-purple-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9.75 17L15 12l-5.25-5"/>
-
+                <p class="text-sm font-medium text-orange-600">
+                    WFH / WFC
+                </p>
+                <div class="text-orange-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 12l9-9 9 9M4 10v10a2 2 0 002 2h3a2 2 0 002-2v-4h2v4a2 2 0 002 2h3a2 2 0 002-2V10"/>
                     </svg>
-
                 </div>
+            </div>
 
+            <div class="mt-4 text-center">
+                <h2 class="text-[40px] leading-none font-bold text-orange-600">
+                    {{ $wfhWfcCount }}
+                </h2>
+                <p class="mt-2 text-xs font-medium text-orange-400">
+                    Remote Working
+                </p>
             </div>
 
         </div>
@@ -246,138 +192,124 @@
                         Statistik Kehadiran
                     </h2>
 
-                    <p class="mt-1 text-sm text-slate-500">
-                        Rekap kehadiran pegawai minggu ini
+                    <p id="chart-subtitle" class="mt-1 text-sm text-slate-500">
+                        7 hari terakhir
                     </p>
 
                 </div>
 
-                <select
-                    class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm outline-none">
+                {{-- Filter Dropdown --}}
+                <div class="relative" x-data="{ open: false }">
 
-                    <option>Minggu Ini</option>
-                    <option>Bulan Ini</option>
+                    <button
+                        @click="open = !open"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#123D91] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0E337A]">
+                        <span id="filter-label">Pilih Filter</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
 
-                </select>
+                    <div
+                        x-show="open"
+                        @click.outside="open = false"
+                        x-transition
+                        class="absolute right-0 mt-2 w-40 rounded-xl border border-slate-100 bg-white py-1 shadow-lg z-20">
 
-            </div>
-
-
-            {{-- Dummy Chart --}}
-            <div
-                class="flex h-[340px] items-end justify-between gap-3 rounded-2xl bg-slate-50 p-6">
-
-                @php
-                    $bars = [120,210,170,250,190,300,240];
-                    $days = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-                @endphp
-
-                @foreach($bars as $index=>$height)
-
-                    <div class="flex flex-1 flex-col items-center">
-
-                        <div
-                            class="w-full rounded-t-xl bg-[#123D91]"
-                            style="height: {{ $height }}px">
-                        </div>
-
-                        <span class="mt-3 text-xs text-slate-500">
-                            {{ $days[$index] }}
-                        </span>
+                        <button onclick="loadChart('minggu')" @click="open=false"
+                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            Per Minggu
+                        </button>
+                        <button onclick="loadChart('bulan')" @click="open=false"
+                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            Per Bulan
+                        </button>
+                        <button onclick="loadChart('tahun')" @click="open=false"
+                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            Per Tahun
+                        </button>
 
                     </div>
 
-                @endforeach
+                </div>
 
+            </div>
+
+            {{-- Chart Canvas --}}
+            <div class="relative h-[320px] w-full">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+            {{-- Legend --}}
+            <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center">
+                @foreach([
+                    ['WFO',      '#FB923C'],
+                    ['WFH/WFC',  '#A78BFA'],
+                    ['Izin',     '#34D399'],
+                    ['Alfa',     '#F87171'],
+                    ['Dinas',    '#60A5FA'],
+                ] as [$label, $color])
+                    <span class="flex items-center gap-1.5 text-xs text-slate-600">
+                        <span class="inline-block h-3 w-3 rounded-sm" style="background:{{ $color }}"></span>
+                        {{ $label }}
+                    </span>
+                @endforeach
             </div>
 
         </div>
 
 
 
+
         {{-- ============================= --}}
         {{-- LIVE CHECK IN --}}
         {{-- ============================= --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-white p-6 shadow-card flex flex-col h-[400px]">
 
-            <div class="mb-5">
-
-                <h2 class="text-xl font-semibold text-slate-900">
+            <div class="mb-5 text-center">
+                <h2 class="text-lg font-bold text-slate-900">
                     Live Check In
                 </h2>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Pegawai yang baru melakukan absensi
+                <p class="mt-1 text-[11px] text-slate-500">
+                    Aktivitas absensi hari ini
                 </p>
-
+                <hr class="mt-3 border-slate-200">
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
 
                 @foreach($liveCheckIns as $item)
 
-                    <div
-                        class="flex items-center justify-between rounded-2xl border border-slate-100 p-4 transition hover:bg-slate-50">
-
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
-
-                            <div
-                                class="flex h-12 w-12 items-center justify-center rounded-full bg-[#123D91] text-lg font-bold text-white">
-
-                                {{ strtoupper(substr($item['nama'],0,1)) }}
-
+                            <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-100 flex-shrink-0">
+                                {{-- Placeholder avatar --}}
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($item['nama']) }}&background=123D91&color=fff&bold=true" alt="{{ $item['nama'] }}" class="h-full w-full object-cover">
                             </div>
-
                             <div>
-
-                                <h3 class="font-semibold text-slate-900">
-
+                                <h3 class="text-sm font-semibold text-slate-900">
                                     {{ $item['nama'] }}
-
                                 </h3>
-
-                                <div class="mt-1 flex items-center gap-2">
-
-                                    <span
-                                        class="rounded-full bg-green-100 px-2 py-1 text-[11px] font-medium text-green-700">
-
-                                        Check In
-
-                                    </span>
-
-                                    <span
-                                        class="rounded-full bg-blue-100 px-2 py-1 text-[11px] font-medium text-blue-700">
-
-                                        {{ $item['status'] }}
-
-                                    </span>
-
-                                </div>
-
+                                <p class="text-[11px] font-medium text-slate-500">
+                                    Check in - <span class="text-green-500">{{ $item['status'] }}</span>
+                                </p>
                             </div>
-
                         </div>
-
                         <div class="text-right">
-
-                            <p class="text-xs text-slate-400">
-
-                                Waktu
-
+                            <p class="text-xs font-semibold text-slate-400">
+                                {{ $item['jam'] }} WIB
                             </p>
-
-                            <p class="mt-1 text-sm font-semibold text-slate-900">
-
-                                {{ $item['jam'] }}
-
-                            </p>
-
                         </div>
-
                     </div>
 
                 @endforeach
 
+            </div>
+
+            <div class="mt-5 pt-4">
+                <a href="{{ route('admin.log-aktivitas') }}" class="block w-full text-center rounded-full border border-slate-200 py-2 text-[13px] font-semibold text-slate-700 transition hover:bg-slate-50">
+                    Lihat Semua Aktivitas
+                </a>
             </div>
 
         </div>
@@ -394,145 +326,270 @@
         <div class="rounded-3xl bg-white p-6 shadow-card">
 
             <div class="mb-6 flex items-center justify-between">
-
-                <div>
-
-                    <h2 class="text-xl font-semibold text-slate-900">
-                        Menunggu Persetujuan
-                    </h2>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Pengajuan pegawai yang membutuhkan approval
-                    </p>
-
+                <h2 class="text-xl font-semibold text-slate-900">
+                    Menunggu Persetujuan
+                </h2>
+                <div class="flex items-center gap-2 rounded-full bg-[#123D91] px-3 py-1.5 text-xs font-semibold text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    12 Menunggu
                 </div>
-
-                <button
-                    class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
-
-                    Lihat Semua
-
-                </button>
-
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="space-y-0">
+                <div class="flex items-center justify-between border-b border-slate-100 py-3">
+                    <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Cuti
+                    </div>
+                    <span class="text-sm font-bold text-slate-900">0</span>
+                </div>
 
-                <table class="w-full">
+                <div class="flex items-center justify-between border-b border-slate-100 py-3">
+                    <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Izin
+                    </div>
+                    <span class="text-sm font-bold text-slate-900">2</span>
+                </div>
 
-                    <thead>
+                <div class="flex items-center justify-between border-b border-slate-100 py-3">
+                    <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Sakit
+                    </div>
+                    <span class="text-sm font-bold text-slate-900">3</span>
+                </div>
 
-                        <tr class="border-b border-slate-200">
+                <div class="flex items-center justify-between border-b border-slate-100 py-3">
+                    <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        WFH
+                    </div>
+                    <span class="text-sm font-bold text-slate-900">7</span>
+                </div>
+            </div>
 
-                            <th class="pb-4 text-left text-sm font-semibold text-slate-500">
-                                Nama
-                            </th>
-
-                            <th class="pb-4 text-left text-sm font-semibold text-slate-500">
-                                Pengajuan
-                            </th>
-
-                            <th class="pb-4 text-left text-sm font-semibold text-slate-500">
-                                Tanggal
-                            </th>
-
-                            <th class="pb-4 text-left text-sm font-semibold text-slate-500">
-                                Status
-                            </th>
-
-                            <th class="pb-4 text-right text-sm font-semibold text-slate-500">
-                                Aksi
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @foreach($pendingApprovals as $item)
-
-                        <tr class="border-b border-slate-100">
-
-                            <td class="py-5">
-
-                                <div class="flex items-center gap-3">
-
-                                    <div
-                                        class="flex h-10 w-10 items-center justify-center rounded-full bg-[#123D91] font-semibold text-white">
-
-                                        {{ strtoupper(substr($item['nama'],0,1)) }}
-
-                                    </div>
-
-                                    <span class="font-medium">
-
-                                        {{ $item['nama'] }}
-
-                                    </span>
-
-                                </div>
-
-                            </td>
-
-                            <td>
-
-                                {{ $item['jenis'] }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $item['tanggal'] }}
-
-                            </td>
-
-                            <td>
-
-                                <span
-                                    class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
-
-                                    {{ $item['status'] }}
-
-                                </span>
-
-                            </td>
-
-                            <td>
-
-                                <div class="flex justify-end gap-2">
-
-                                    <button
-                                        class="rounded-lg bg-green-500 px-4 py-2 text-xs font-semibold text-white hover:bg-green-600">
-
-                                        Setujui
-
-                                    </button>
-
-                                    <button
-                                        class="rounded-lg bg-red-500 px-4 py-2 text-xs font-semibold text-white hover:bg-red-600">
-
-                                        Tolak
-
-                                    </button>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
+            <div class="mt-6 flex justify-end">
+                <a href="{{ route('admin.persetujuan') }}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-[#123D91] transition">
+                    Lihat Semua
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </a>
             </div>
 
         </div>
     </section>
 
+
+    {{-- ===================================================== --}}
+    {{-- MODAL: EDIT JAM MASUK --}}
+    {{-- ===================================================== --}}
+    <div
+        x-show="editJamOpen"
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center"
+        aria-modal="true"
+        role="dialog">
+
+        {{-- Backdrop --}}
+        <div
+            class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            @click="editJamOpen = false">
+        </div>
+
+        {{-- Dialog --}}
+        <div
+            x-show="editJamOpen"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+
+            {{-- Label breadcrumb --}}
+            <p class="mb-6 text-xs text-slate-400">edit-jam-masuk</p>
+
+            {{-- Title --}}
+            <h2 class="text-2xl font-bold text-slate-900">
+                Edit Jam Masuk
+            </h2>
+
+            <p class="mt-2 text-sm text-slate-500">
+                Atur jam kerja standar untuk perhitungan keterlambatan.
+            </p>
+
+            {{-- Form --}}
+            <form method="POST" action="{{ route('admin.jam-kerja.simpan') }}" class="mt-6 space-y-4">
+                @csrf
+
+                {{-- Jam Masuk --}}
+                <div>
+                    <label class="mb-1 block text-sm text-slate-600" for="jam_masuk">
+                        Jam Masuk
+                    </label>
+                    <div class="relative">
+                        <input
+                            id="jam_masuk"
+                            name="jam_masuk"
+                            type="time"
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/20"
+                            placeholder="00:00">
+                        <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Jam Pulang --}}
+                <div>
+                    <label class="mb-1 block text-sm text-slate-600" for="jam_pulang">
+                        Jam Pulang
+                    </label>
+                    <div class="relative">
+                        <input
+                            id="jam_pulang"
+                            name="jam_pulang"
+                            type="time"
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/20"
+                            placeholder="00:00">
+                        <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="mt-6 flex items-center justify-end gap-3">
+
+                    <button
+                        type="button"
+                        @click="editJamOpen = false"
+                        class="rounded-2xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="rounded-2xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0E337A]">
+                        Simpan
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const COLORS = {
+        'WFO':     { bg: 'rgba(251,146, 60,0.85)', border: '#FB923C' },
+        'WFH/WFC': { bg: 'rgba(167,139,250,0.85)', border: '#A78BFA' },
+        'Izin':    { bg: 'rgba( 52,211,153,0.85)', border: '#34D399' },
+        'Alfa':    { bg: 'rgba(248,113,113,0.85)', border: '#F87171' },
+        'Dinas':   { bg: 'rgba( 96,165,250,0.85)', border: '#60A5FA' },
+    };
+
+    const FILTER_LABELS = {
+        minggu: 'Per Minggu',
+        bulan:  'Per Bulan',
+        tahun:  'Per Tahun',
+    };
+
+    let chart = null;
+
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+    window.loadChart = function (filter) {
+        document.getElementById('filter-label').textContent = FILTER_LABELS[filter] || 'Pilih Filter';
+
+        fetch(`{{ route('admin.chart-statistik') }}?filter=${filter}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(json => {
+            document.getElementById('chart-subtitle').textContent = json.subtitle ?? '';
+
+            const datasets = json.datasets.map(ds => ({
+                label:           ds.label,
+                data:            ds.data,
+                backgroundColor: COLORS[ds.label]?.bg     ?? 'rgba(100,116,139,0.7)',
+                borderColor:     COLORS[ds.label]?.border ?? '#64748b',
+                borderWidth:     1.5,
+                borderRadius:    4,
+            }));
+
+            if (chart) {
+                chart.data.labels   = json.labels;
+                chart.data.datasets = datasets;
+                chart.update('active');
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: json.labels, datasets },
+                    options: {
+                        responsive:          true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}`
+                                }
+                            },
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#64748b', font: { size: 12 } },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: { size: 11 },
+                                    stepSize: 1,
+                                    precision: 0,
+                                },
+                            },
+                        },
+                    },
+                });
+            }
+        })
+        .catch(err => console.error('Chart load error:', err));
+    };
+
+    // Load default on page ready
+    loadChart('minggu');
+})();
+</script>
+@endpush
