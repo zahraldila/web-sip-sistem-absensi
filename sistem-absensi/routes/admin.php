@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApprovalControllers;
 
 Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function () {
     Route::get('/', function () {
@@ -12,7 +13,11 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
 
     Route::get('/laporan-kehadiran', [App\Http\Controllers\AdminPlaceholderController::class, 'laporanKehadiran'])->name('admin.laporan-kehadiran');
     Route::get('/manajemen-akun', [App\Http\Controllers\AdminPlaceholderController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
-    Route::get('/persetujuan', [App\Http\Controllers\AdminPlaceholderController::class, 'persetujuan'])->name('admin.persetujuan');
+    // persetujuan pengajuan
+    Route::get('/persetujuan', [ApprovalControllers::class, 'index'])
+        ->name('admin.persetujuan');
+    Route::get('/persetujuan/{approval}', [ApprovalControllers::class, 'show'])
+        ->name('admin.persetujuan.detail');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');
