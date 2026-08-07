@@ -33,7 +33,25 @@ class AuthenticationControllers extends Controller
             })
             ->first();
 
-        if (! $akun || ! Hash::check($password, $akun->password)) {
+        $validPassword = false;
+        if ($akun) {
+            $storedPassword = $akun->password;
+
+            // Jika password sudah bcrypt, gunakan Hash::check.
+            // Jika password masih plain-text (legacy import), cocokkan langsung.
+            if (is_string($storedPassword) && preg_match('/^\$2[axyb]\$.{56}$/', $storedPassword)) {
+                $validPassword = Hash::check($password, $storedPassword);
+            } else {
+                $validPassword = hash_equals((string) $storedPassword, $password);
+
+                if ($validPassword) {
+                    $akun->password = Hash::make($password);
+                    $akun->save();
+                }
+            }
+        }
+
+        if (! $akun || ! $validPassword) {
             return back()
                 ->withErrors(['email' => 'Username/Email atau password yang Anda masukkan salah.'])
                 ->onlyInput('email');
@@ -49,10 +67,10 @@ class AuthenticationControllers extends Controller
         // Menyimpan informasi user/pegawai ke dalam session Laravel
         $pegawai = $akun->pegawai;
         session([
-            'akun_id' => $akun->id,
+            'akun_id' => $akun->akun_id,
             'pegawai_id' => $akun->pegawai_id,
             'role' => $akun->role,
-            'nama_pegawai' => $pegawai ? $pegawai->nama : null,
+            'nama_pegawai' => $pegawai ? $pegawai->nama_pegawai : null,
             'email_pegawai' => $pegawai ? $pegawai->email : null,
         ]);
 

@@ -11,6 +11,10 @@ class Akun extends Authenticatable
     use Notifiable;
 
     protected $table = 'akun';
+    protected $primaryKey = 'akun_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
         'username',
@@ -30,6 +34,6 @@ class Akun extends Authenticatable
 
     public function pegawai(): BelongsTo
     {
-        return $this->belongsTo(Pegawai::class, 'pegawai_id');
+        return $this->belongsTo(Pegawai::class, 'pegawai_id', 'pegawai_id');
     }
 }
