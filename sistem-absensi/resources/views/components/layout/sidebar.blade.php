@@ -52,8 +52,8 @@
         <div class="space-y-2">
 
             {{-- Dashboard --}}
-            <a href="#"
-                class="relative flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-slate-900 shadow-sm transition hover:bg-slate-100">
+            <a href="{{ route('admin.dashboard') }}"
+                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} px-4 py-3 transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -72,15 +72,17 @@
                     Dashboard
                 </span>
 
+                @if(request()->routeIs('admin.dashboard', 'admin.dashboard.index'))
                 <span
                     class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]">
                 </span>
+                @endif
 
             </a>
 
             {{-- Laporan Kehadiran --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.laporan-kehadiran') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -102,8 +104,8 @@
             </a>
 
             {{-- Manajemen Akun --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.manajemen-akun') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -134,8 +136,8 @@
             </a>
 
             {{-- Persetujuan --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.persetujuan') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -161,8 +163,8 @@
             </a>
 
             {{-- Log Aktivitas --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.log-aktivitas') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -188,8 +190,8 @@
             </a>
 
             {{-- Tampilan & Branding --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.tampilan-branding') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -215,8 +217,8 @@
             </a>
 
             {{-- Pengaturan --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.pengaturan') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.pengaturan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -242,8 +244,8 @@
             </a>
 
             {{-- Bantuan --}}
-            <a href="#"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 transition hover:bg-slate-100 hover:text-[#123D91]">
+            <a href="{{ route('admin.bantuan') }}"
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
