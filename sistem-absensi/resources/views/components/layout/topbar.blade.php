@@ -1,3 +1,10 @@
+@php
+    $topbarUser = Auth::user();
+    $topbarRole = $topbarUser?->role ?? 'Admin';
+    $topbarRoleLabel = strtolower($topbarRole) === 'admin' ? 'Admin' : ucfirst($topbarRole);
+    $topbarName = $topbarUser?->pegawai?->nama_pegawai ?? $topbarUser?->username ?? 'User';
+@endphp
+
 <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-5 lg:px-6">
         <div class="flex items-center gap-4">
@@ -20,7 +27,7 @@
             </button>
 
             <div>
-                <p class="text-sm font-semibold text-slate-700">Hai, Admin</p>
+                <p class="text-sm font-semibold text-slate-700">Hai, {{ $topbarRoleLabel }}</p>
                 <p class="text-xs text-slate-500">Selamat datang kembali</p>
             </div>
         </div>
@@ -61,8 +68,8 @@
                     </svg>
                 </span>
                 <div>
-                    <p class="text-sm font-semibold text-slate-900">Farida Aryani</p>
-                    <p class="text-xs text-slate-500">Admin</p>
+                    <p class="text-sm font-semibold text-slate-900">{{ $topbarName }}</p>
+                    <p class="text-xs text-slate-500">{{ $topbarRoleLabel }}</p>
                 </div>
             </div>
         </div>

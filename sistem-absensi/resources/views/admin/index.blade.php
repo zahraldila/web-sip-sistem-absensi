@@ -65,7 +65,7 @@
                     </p>
 
                     <h2 class="mt-3 text-4xl font-bold text-slate-900">
-                        10
+                        {{ $totalPegawai }}
                     </h2>
 
                     <p class="mt-3 text-sm text-slate-400">
@@ -109,7 +109,7 @@
                     </p>
 
                     <h2 class="mt-3 text-4xl font-bold text-green-600">
-                        8
+                        {{ $hadirHariIni }}
                     </h2>
 
                     <p class="mt-3 text-sm text-slate-400">
@@ -153,7 +153,7 @@
                     </p>
 
                     <h2 class="mt-3 text-4xl font-bold text-orange-500">
-                        6
+                        {{ $wfoCount }}
                     </h2>
 
                     <p class="mt-3 text-sm text-slate-400">
@@ -197,7 +197,7 @@
                     </p>
 
                     <h2 class="mt-3 text-4xl font-bold text-purple-600">
-                        2
+                        {{ $wfhWfcCount }}
                     </h2>
 
                     <p class="mt-3 text-sm text-slate-400">
@@ -314,46 +314,7 @@
 
             <div class="space-y-4">
 
-                @php
-
-                $pegawai = [
-
-                    [
-                        'nama'=>'Devina',
-                        'status'=>'WFO',
-                        'jam'=>'08:05 WIB'
-                    ],
-
-                    [
-                        'nama'=>'Anun',
-                        'status'=>'WFH',
-                        'jam'=>'08:10 WIB'
-                    ],
-
-                    [
-                        'nama'=>'Gisel',
-                        'status'=>'WFO',
-                        'jam'=>'08:18 WIB'
-                    ],
-
-                    [
-                        'nama'=>'Ama',
-                        'status'=>'WFC',
-                        'jam'=>'08:23 WIB'
-                    ],
-
-                    [
-                        'nama'=>'Farida',
-                        'status'=>'WFO',
-                        'jam'=>'08:31 WIB'
-                    ],
-
-                ];
-
-                @endphp
-
-
-                @foreach($pegawai as $item)
+                @foreach($liveCheckIns as $item)
 
                     <div
                         class="flex items-center justify-between rounded-2xl border border-slate-100 p-4 transition hover:bg-slate-50">
@@ -423,14 +384,14 @@
 
     </section>
         {{-- ===================================================== --}}
-    {{-- APPROVAL & AKTIVITAS --}}
+    {{-- APPROVAL --}}
     {{-- ===================================================== --}}
-    <section class="grid gap-6 xl:grid-cols-3">
+    <section class="grid gap-6">
 
         {{-- ======================================== --}}
         {{-- MENUNGGU PERSETUJUAN --}}
         {{-- ======================================== --}}
-        <div class="xl:col-span-2 rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-white p-6 shadow-card">
 
             <div class="mb-6 flex items-center justify-between">
 
@@ -489,43 +450,7 @@
 
                     <tbody>
 
-                        @php
-
-                        $approval = [
-
-                            [
-                                'nama'=>'Anun',
-                                'jenis'=>'WFH',
-                                'tanggal'=>'10 Juli 2026',
-                                'status'=>'Pending'
-                            ],
-
-                            [
-                                'nama'=>'Gisel',
-                                'jenis'=>'Izin',
-                                'tanggal'=>'10 Juli 2026',
-                                'status'=>'Pending'
-                            ],
-
-                            [
-                                'nama'=>'Ama',
-                                'jenis'=>'Cuti',
-                                'tanggal'=>'11 Juli 2026',
-                                'status'=>'Pending'
-                            ],
-
-                            [
-                                'nama'=>'Farida',
-                                'jenis'=>'Dinas',
-                                'tanggal'=>'11 Juli 2026',
-                                'status'=>'Pending'
-                            ],
-
-                        ];
-
-                        @endphp
-
-                        @foreach($approval as $item)
+                        @foreach($pendingApprovals as $item)
 
                         <tr class="border-b border-slate-100">
 
@@ -606,96 +531,6 @@
             </div>
 
         </div>
-
-
-
-        {{-- ======================================== --}}
-        {{-- AKTIVITAS TERBARU --}}
-        {{-- ======================================== --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
-
-            <div class="mb-6">
-
-                <h2 class="text-xl font-semibold text-slate-900">
-
-                    Aktivitas Terbaru
-
-                </h2>
-
-                <p class="mt-1 text-sm text-slate-500">
-
-                    Update aktivitas sistem
-
-                </p>
-
-            </div>
-
-            <div class="space-y-5">
-
-                @php
-
-                $activities = [
-
-                    [
-                        'title'=>'Devina berhasil Check In',
-                        'time'=>'2 menit lalu',
-                        'color'=>'green'
-                    ],
-
-                    [
-                        'title'=>'Anun mengajukan WFH',
-                        'time'=>'10 menit lalu',
-                        'color'=>'blue'
-                    ],
-
-                    [
-                        'title'=>'Gisel mengajukan Izin',
-                        'time'=>'20 menit lalu',
-                        'color'=>'yellow'
-                    ],
-
-                    [
-                        'title'=>'Ama berhasil Check Out',
-                        'time'=>'35 menit lalu',
-                        'color'=>'purple'
-                    ],
-
-                ];
-
-                @endphp
-
-                @foreach($activities as $activity)
-
-                <div class="flex gap-4">
-
-                    <div
-                        class="mt-2 h-3 w-3 rounded-full bg-{{ $activity['color'] }}-500">
-                    </div>
-
-                    <div>
-
-                        <h4 class="font-medium text-slate-900">
-
-                            {{ $activity['title'] }}
-
-                        </h4>
-
-                        <p class="mt-1 text-sm text-slate-500">
-
-                            {{ $activity['time'] }}
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-                @endforeach
-
-            </div>
-
-        </div>
-
     </section>
 
 </div>

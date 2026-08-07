@@ -17,6 +17,7 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');
     Route::get('/bantuan', [App\Http\Controllers\AdminPlaceholderController::class, 'bantuan'])->name('admin.bantuan');
+    Route::get('/', [App\Http\Controllers\DashboardControllers::class, 'admin'])->name('admin.dashboard');
 
     // Admin resource routes (placeholders)
     Route::apiResource('employees', App\Http\Controllers\EmployeeControllers::class);
