@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Akun;
+use App\Models\Nfc;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +14,7 @@ class Pegawai extends Model
     protected $primaryKey = 'pegawai_id';
     public $incrementing = true;
     protected $keyType = 'int';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'pegawai_id',
@@ -39,5 +41,10 @@ class Pegawai extends Model
     public function masterJabatan(): BelongsTo
     {
         return $this->belongsTo(MasterJabatan::class, 'jabatan_id', 'jabatan_id');
+    }
+
+    public function nfc(): HasOne
+    {
+        return $this->hasOne(Nfc::class, 'pegawai_id', 'pegawai_id');
     }
 }

@@ -20,8 +20,23 @@
                 @error('nip')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">NFC ID</label>
+                <input type="text" name="nfc_id" value="{{ old('nfc_id') }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                @error('nfc_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                <input type="email" name="email" value="{{ old('email') }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Username (opsional)</label>
+                <input type="text" name="username" value="{{ old('username') }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                @error('username')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">No. Telepon</label>
+                <input type="text" name="no_handphone" value="{{ old('no_handphone') }}" placeholder="Contoh : 081234567890" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                @error('no_handphone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Divisi</label>
@@ -48,11 +63,16 @@
                 <input type="password" name="password" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
             </div>
             <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Status</label>
                 <select name="status" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
-                    <option value="Aktif">Aktif</option>
-                    <option value="Tidak Aktif">Tidak Aktif</option>
+                    <option value="Aktif" {{ old('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="Tidak Aktif" {{ old('status') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
                 </select>
+                @error('status')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Foto Profil (opsional)</label>

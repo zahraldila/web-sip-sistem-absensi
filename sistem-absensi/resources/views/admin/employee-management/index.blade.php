@@ -19,6 +19,18 @@
         <div x-data="{ show: true }" x-cloak x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="mb-4 relative rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             <div class="pr-6">{{ session('success') }}</div>
             <button type="button" @click="show = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-green-700 hover:text-green-900">
+    @endif
+
+    @if (session('error'))
+        <div x-data="{ show: true }" x-cloak x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="mb-4 relative rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="pr-6">{{ session('error') }}</div>
+            <button type="button" @click="show = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-red-700 hover:text-red-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    @endif
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -45,7 +57,7 @@
                     <button type="button" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
                         Filter
                     </button>
-                    <button type="button" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
+                    <button type="button" @click.prevent="openExport()" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
                         Export
                     </button>
                 </div>
@@ -102,6 +114,9 @@
                                             'jabatan_id' => $employee->jabatan_id,
                                             'status' => $employee->status ?? 'Aktif',
                                             'no_handphone' => $employee->no_handphone,
+                                            'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
+                                            'foto_profile_path' => $employee->foto_profile ?? '',
+                                            'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
                                             'username' => $employee->akun->username ?? ''
                                         ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
                                         class="text-indigo-600 hover:text-indigo-900">Edit</button>
@@ -159,6 +174,7 @@
     </div>
 
     @include('admin.employee-management._employee-form-modal')
+    @include('admin.employee-management._export-modal')
 
     <div x-show="divisionModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="closeDivisionModal()"></div>
@@ -257,8 +273,10 @@
                 'no_handphone' => old('no_handphone', ''),
                 'status' => old('status', 'Aktif'),
                 'password' => '',
+                'password_confirmation' => '',
                 'username' => old('username', ''),
-                'photoPreview' => ''
+                'photoPreview' => '',
+                'foto_profile_existing' => old('foto_profile_existing', ''),
             ], JSON_HEX_APOS | JSON_HEX_QUOT) !!};
 
             return {
@@ -283,11 +301,14 @@
                 roleSuccess: '',
                 isSavingDivision: false,
                 isSavingRole: false,
+                previewObjectUrl: null,
                 form: {
                     pegawai_id: '',
                     nama_pegawai: '',
                     nip: '',
                     nfc_id: '',
+                    foto_profile: '',
+                    foto_profile_existing: '',
                     divisi_id: '',
                     jabatan_id: '',
                     email: '',
@@ -330,17 +351,28 @@
                     this.isSavingDivision = false;
                     this.isSavingRole = false;
                     this.showPassword = false;
+                    if (this.previewObjectUrl) {
+                        URL.revokeObjectURL(this.previewObjectUrl);
+                        this.previewObjectUrl = null;
+                    }
+                    const fileInput = document.getElementById('photoInput');
+                    if (fileInput) {
+                        fileInput.value = null;
+                    }
                     this.form = {
                         pegawai_id: '',
                         nama_pegawai: '',
                         nip: '',
                         nfc_id: '',
+                        foto_profile: '',
+                        foto_profile_existing: '',
                         divisi_id: '',
                         jabatan_id: '',
                         email: '',
                         no_handphone: '',
                         status: 'Aktif',
                         password: '',
+                        password_confirmation: '',
                         username: '',
                         photoPreview: ''
                     };
@@ -366,6 +398,8 @@
                         nama_pegawai: employee.nama_pegawai || '',
                         nip: employee.nip || '',
                         nfc_id: employee.nfc_id || '',
+                        foto_profile: '',
+                        foto_profile_existing: employee.foto_profile_path || '',
                         divisi_id: employee.divisi_id || '',
                         jabatan_id: employee.jabatan_id || '',
                         email: employee.email || '',
@@ -383,14 +417,20 @@
                 previewPhoto(event) {
                     const file = event.target.files[0];
                     if (!file) {
+                        if (this.previewObjectUrl) {
+                            URL.revokeObjectURL(this.previewObjectUrl);
+                            this.previewObjectUrl = null;
+                        }
                         this.form.photoPreview = '';
                         return;
                     }
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.form.photoPreview = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
+
+                    if (this.previewObjectUrl) {
+                        URL.revokeObjectURL(this.previewObjectUrl);
+                    }
+
+                    this.previewObjectUrl = URL.createObjectURL(file);
+                    this.form.photoPreview = this.previewObjectUrl;
                 },
                 openDivisionModal() {
                     this.divisionModalOpen = true;
@@ -413,6 +453,22 @@
                     this.roleModalOpen = false;
                     this.newJabatanName = '';
                     this.roleError = '';
+                },
+                exportModalOpen: false,
+                exportIsLoading: false,
+                openExport() {
+                    this.exportModalOpen = true;
+                },
+                closeExport() {
+                    this.exportModalOpen = false;
+                },
+                submitExport(event) {
+                    if (this.exportIsLoading) {
+                        return;
+                    }
+
+                    this.exportIsLoading = true;
+                    event.target.submit();
                 },
                 async saveDivision() {
                     this.divisionError = '';

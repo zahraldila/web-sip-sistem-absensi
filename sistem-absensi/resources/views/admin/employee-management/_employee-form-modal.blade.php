@@ -30,13 +30,14 @@
                     @csrf
                     <input type="hidden" name="form_mode" :value="mode">
                     <input type="hidden" name="pegawai_id" x-model="form.pegawai_id">
+                    <input type="hidden" name="foto_profile_existing" x-model="form.foto_profile_existing">
                     <template x-if="mode === 'edit'">
                         <input type="hidden" name="_method" value="PUT">
                     </template>
 
                     <div class="rounded-[20px] border border-slate-200 bg-slate-50 p-4">
                         <label for="photoInput" class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[20px] bg-white p-3 text-center">
-                            <div class="flex h-[90px] w-full max-w-[140px] items-center justify-center rounded-[20px] bg-slate-100 text-slate-500 shadow-sm">
+                            <div class="flex h-[90px] w-full max-w-[140px] items-center justify-center rounded-[20px] bg-slate-100 text-slate-500 shadow-sm overflow-hidden">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M8 12a4 4 0 118 0M12 8v8" />
                                 </svg>
@@ -49,8 +50,9 @@
                         <input id="photoInput" type="file" name="foto_profile" accept="image/png,image/jpeg" @change="previewPhoto($event)" class="hidden">
 
                         <template x-if="form.photoPreview">
-                            <img :src="form.photoPreview" alt="Preview foto" class="mx-auto mt-3 h-24 w-24 rounded-full object-cover" />
+                            <img :src="form.photoPreview" alt="Preview foto baru" class="mx-auto mt-3 h-24 w-24 rounded-full object-cover" />
                         </template>
+                        @error('foto_profile')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="grid gap-3">
@@ -121,6 +123,13 @@
                         </div>
 
                         <div>
+                            <label class="mb-1 block text-sm font-medium text-slate-700">Username (opsional)</label>
+                            <input type="text" name="username" x-model="form.username" placeholder="Contoh : jdoe"
+                                class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                            @error('username')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
                             <label class="mb-1 block text-sm font-medium text-slate-700">No. Telepon</label>
                             <input type="text" name="no_handphone" x-model="form.no_handphone" placeholder="Contoh : 010101010"
                                 class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
@@ -132,7 +141,7 @@
                             <select name="status" x-model="form.status"
                                 class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                                 <option value="Aktif">Aktif</option>
-                                <option value="Nonaktif">Nonaktif</option>
+                                <option value="Tidak Aktif">Tidak Aktif</option>
                             </select>
                             @error('status')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
@@ -159,6 +168,12 @@
                                 </button>
                             </div>
                             @error('password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-slate-700">Konfirmasi Password</label>
+                            <input :type="showPassword ? 'text' : 'password'" name="password_confirmation" x-model="form.password_confirmation"
+                                placeholder="Ketik ulang password"
+                                class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                         </div>
                     </div>
                 </form>

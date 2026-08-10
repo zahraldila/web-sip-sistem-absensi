@@ -20,8 +20,18 @@
                 <input type="text" name="nip" value="{{ old('nip', $employee->nip) }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
             </div>
             <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">NFC ID</label>
+                <input type="text" name="nfc_id" value="{{ old('nfc_id', $employee->nfc->nfc_serial_number ?? '') }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                @error('nfc_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Email</label>
                 <input type="email" name="email" value="{{ old('email', $employee->email) }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">No. Telepon</label>
+                <input type="text" name="no_handphone" value="{{ old('no_handphone', $employee->no_handphone) }}" placeholder="Contoh : 081234567890" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                @error('no_handphone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Username</label>
@@ -52,11 +62,16 @@
                 <input type="password" name="password" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
             </div>
             <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Status</label>
                 <select name="status" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
                     <option value="Aktif" {{ old('status', $employee->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
                     <option value="Tidak Aktif" {{ old('status', $employee->status) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
                 </select>
+                @error('status')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div class="md:col-span-2 flex gap-3">
                 <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Perbarui</button>

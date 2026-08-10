@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Akun;
 use App\Models\MasterDivisi;
 use App\Models\MasterJabatan;
+use App\Models\Nfc;
 use App\Models\Pegawai;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -13,12 +14,12 @@ class EmployeeManagementRepository
 {
     public function query(): Builder
     {
-        return Pegawai::query()->with(['akun', 'masterDivisi', 'masterJabatan']);
+        return Pegawai::query()->with(['akun', 'masterDivisi', 'masterJabatan', 'nfc']);
     }
 
     public function findByPegawaiId(int $pegawaiId): ?Pegawai
     {
-        return Pegawai::with(['akun', 'masterDivisi', 'masterJabatan'])
+        return Pegawai::with(['akun', 'masterDivisi', 'masterJabatan', 'nfc'])
             ->where('pegawai_id', $pegawaiId)
             ->first();
     }
@@ -33,6 +34,28 @@ class EmployeeManagementRepository
         $pegawai->update($data);
 
         return $pegawai;
+    }
+
+    public function findNfcByPegawaiId(int $pegawaiId): ?Nfc
+    {
+        return Nfc::where('pegawai_id', $pegawaiId)->first();
+    }
+
+    public function createNfc(array $data): Nfc
+    {
+        return Nfc::create($data);
+    }
+
+    public function updateNfc(Nfc $nfc, array $data): Nfc
+    {
+        $nfc->update($data);
+
+        return $nfc;
+    }
+
+    public function deleteNfcByPegawaiId(int $pegawaiId): void
+    {
+        Nfc::where('pegawai_id', $pegawaiId)->delete();
     }
 
     public function createAccount(array $data): Akun
@@ -71,6 +94,26 @@ class EmployeeManagementRepository
         return MasterJabatan::query()
             ->orderBy('nama_jabatan')
             ->get();
+    }
+
+    public function getAccountsForExport(array $filters = []): Collection
+    {
+        $query = Pegawai::with(['akun', 'masterDivisi', 'masterJabatan'])
+            ->when(!empty($filters['status']), function ($q) use ($filters) {
+                $q->where('status', $filters['status']);
+            })
+            ->when(!empty($filters['divisi_id']), function ($q) use ($filters) {
+                $q->where('divisi_id', $filters['divisi_id']);
+            })
+            ->when(!empty($filters['pegawai_id']), function ($q) use ($filters) {
+                $q->where('pegawai_id', $filters['pegawai_id']);
+            })
+            ->when(!empty($filters['jabatan_id']), function ($q) use ($filters) {
+                $q->where('jabatan_id', $filters['jabatan_id']);
+            })
+            ->orderBy('nama_pegawai');
+
+        return $query->get();
     }
 
     public function createDivision(array $data): MasterDivisi

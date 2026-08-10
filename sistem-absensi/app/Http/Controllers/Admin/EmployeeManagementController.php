@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pegawai;
 use App\Services\EmployeeManagementService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EmployeeManagementController extends Controller
 {
@@ -34,12 +35,14 @@ class EmployeeManagementController extends Controller
         $data = $request->validate([
             'nip' => 'required|string|max:50|unique:pegawai,nip',
             'nama_pegawai' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'no_handphone' => 'nullable|string|max:20',
-            'foto_profile' => 'nullable|image|max:2048',
+            'nfc_id' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255|unique:pegawai,email',
+            'no_handphone' => 'nullable|string|regex:/^[0-9]+$/|max:20',
+            'foto_profile' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
-            'password' => 'required|string|min:6',
+            'username' => ['nullable','string','max:100','unique:akun,username'],
+            'password' => 'required|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
         ]);
 
@@ -62,15 +65,23 @@ class EmployeeManagementController extends Controller
     public function update(Request $request, Pegawai $pegawai)
     {
         $data = $request->validate([
-            'nip' => 'nullable|string|max:50',
+            'nip' => 'nullable|string|max:50|unique:pegawai,nip,' . $pegawai->pegawai_id . ',pegawai_id',
             'nama_pegawai' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
+            'nfc_id' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255|unique:pegawai,email,' . $pegawai->pegawai_id . ',pegawai_id',
+            'no_handphone' => 'nullable|string|regex:/^[0-9]+$/|max:20',
+            'foto_profile' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
-            'username' => 'nullable|string|max:100',
-            'password' => 'nullable|string|min:6',
+            'username' => [
+                'nullable','string','max:100',
+                Rule::unique('akun','username')->ignore($pegawai->akun->akun_id ?? null, 'akun_id')
+            ],
+            'password' => 'nullable|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
         ]);
+
+        $data['foto_profile_file'] = $request->file('foto_profile');
 
         $this->service->updateEmployee($pegawai, $data);
 
