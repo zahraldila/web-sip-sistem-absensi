@@ -37,7 +37,7 @@
 
         {{-- Email --}}
         <div>
-            <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">email:</label>
+            <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">Email</label>
             <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
@@ -49,14 +49,13 @@
                     value="{{ old('email') }}"
                     required
                     autofocus
-                    placeholder="admin@spi.co.id"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
+                    class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
             </div>
         </div>
 
         {{-- Password --}}
         <div>
-            <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password:</label>
+            <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password</label>
             <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2" />
@@ -67,8 +66,7 @@
                     name="password"
                     id="password"
                     required
-                    placeholder="............"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
+                    class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
                 <button type="button" @click="showPassword = !showPassword" class="shrink-0 text-slate-400 hover:text-slate-600">
                     <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
