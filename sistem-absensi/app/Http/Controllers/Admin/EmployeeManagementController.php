@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Pegawai;
+use App\Services\EmployeeManagementService;
+use Illuminate\Http\Request;
+
+class EmployeeManagementController extends Controller
+{
+    public function __construct(protected EmployeeManagementService $service)
+    {
+    }
+
+    public function index(Request $request)
+    {
+        $search = $request->get('search');
+        $employees = $this->service->listEmployees($search);
+        $filters = $this->service->getFilterOptions();
+
+        return view('admin.employee-management.index', compact('employees', 'filters', 'search'));
+    }
+
+    public function create()
+    {
+        $filters = $this->service->getFilterOptions();
+
+        return view('admin.employee-management.create', compact('filters'));
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'nip' => 'required|string|max:50|unique:pegawai,nip',
+            'nama_pegawai' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'no_handphone' => 'nullable|string|max:20',
+            'foto_profile' => 'nullable|image|max:2048',
+            'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
+            'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
+            'password' => 'required|string|min:6',
+            'status' => 'nullable|string|max:50',
+        ]);
+
+        // include uploaded file instance for the service
+        $data['foto_profile_file'] = $request->file('foto_profile');
+
+        $this->service->saveEmployee($data);
+
+        return redirect()->route('admin.employee-management.index')->with('success', 'Akun karyawan berhasil ditambahkan.');
+    }
+
+    public function edit(Pegawai $pegawai)
+    {
+        $employee = $this->service->getEmployee($pegawai->pegawai_id);
+        $filters = $this->service->getFilterOptions();
+
+        return view('admin.employee-management.edit', compact('employee', 'filters'));
+    }
+
+    public function update(Request $request, Pegawai $pegawai)
+    {
+        $data = $request->validate([
+            'nip' => 'nullable|string|max:50',
+            'nama_pegawai' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
+            'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
+            'username' => 'nullable|string|max:100',
+            'password' => 'nullable|string|min:6',
+            'status' => 'nullable|string|max:50',
+        ]);
+
+        $this->service->updateEmployee($pegawai, $data);
+
+        return redirect()->route('admin.employee-management.index')->with('success', 'Akun karyawan berhasil diperbarui.');
+    }
+
+    public function storeDivision(Request $request)
+    {
+        $data = $request->validate([
+            'nama_divisi' => 'required|string|max:255|unique:master_divisi,nama_divisi',
+        ]);
+
+        $division = $this->service->createDivision($data['nama_divisi']);
+
+        return response()->json([
+            'message' => 'Divisi berhasil ditambahkan.',
+            'division' => $division,
+        ], 201);
+    }
+
+    public function storeRole(Request $request)
+    {
+        $data = $request->validate([
+            'nama_jabatan' => 'required|string|max:255|unique:master_jabatan,nama_jabatan',
+        ]);
+
+        $role = $this->service->createRole($data['nama_jabatan']);
+
+        return response()->json([
+            'message' => 'Jabatan berhasil ditambahkan.',
+            'role' => $role,
+        ], 201);
+    }
+}

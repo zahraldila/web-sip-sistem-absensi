@@ -11,7 +11,14 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     })->name('admin.dashboard.index');
 
     Route::get('/laporan-kehadiran', [App\Http\Controllers\AdminPlaceholderController::class, 'laporanKehadiran'])->name('admin.laporan-kehadiran');
-    Route::get('/manajemen-akun', [App\Http\Controllers\AdminPlaceholderController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
+    Route::get('/manajemen-akun', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.manajemen-akun');
+    Route::get('/employee-management', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.employee-management.index');
+    Route::get('/employee-management/create', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'create'])->name('admin.employee-management.create');
+    Route::post('/employee-management', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'store'])->name('admin.employee-management.store');
+    Route::post('/employee-management/divisions', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'storeDivision'])->name('admin.employee-management.storeDivision');
+    Route::post('/employee-management/roles', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'storeRole'])->name('admin.employee-management.storeRole');
+    Route::get('/employee-management/{pegawai}/edit', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'edit'])->name('admin.employee-management.edit');
+    Route::put('/employee-management/{pegawai}', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'update'])->name('admin.employee-management.update');
     Route::get('/persetujuan', [App\Http\Controllers\AdminPlaceholderController::class, 'persetujuan'])->name('admin.persetujuan');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');

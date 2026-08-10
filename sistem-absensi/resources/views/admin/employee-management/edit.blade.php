@@ -1,0 +1,68 @@
+@extends('layouts.admin.app')
+
+@section('content')
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Edit Akun Karyawan</h1>
+        <p class="text-sm text-gray-600">Perbarui detail akun dan data pegawai.</p>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <form method="POST" action="{{ route('admin.employee-management.update', $employee->pegawai_id) }}" class="grid gap-4 md:grid-cols-2">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Nama Pegawai</label>
+                <input type="text" name="nama_pegawai" value="{{ old('nama_pegawai', $employee->nama_pegawai) }}" required class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">NIP</label>
+                <input type="text" name="nip" value="{{ old('nip', $employee->nip) }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" name="email" value="{{ old('email', $employee->email) }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Username</label>
+                <input type="text" name="username" value="{{ old('username', $employee->akun->username ?? '') }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Divisi</label>
+                <select name="divisi_id" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                    <option value="">Pilih Divisi</option>
+                    @foreach ($filters['divisions'] ?? [] as $division)
+                        <option value="{{ $division->divisi_id }}" {{ old('divisi_id', $employee->divisi_id) == $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
+                    @endforeach
+                </select>
+                @error('divisi_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Jabatan</label>
+                <select name="jabatan_id" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                    <option value="">Pilih Jabatan</option>
+                    @foreach ($filters['roles'] ?? [] as $role)
+                        <option value="{{ $role->jabatan_id }}" {{ old('jabatan_id', $employee->jabatan_id) == $role->jabatan_id ? 'selected' : '' }}>{{ $role->nama_jabatan }}</option>
+                    @endforeach
+                </select>
+                @error('jabatan_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Status</label>
+                <select name="status" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+                    <option value="Aktif" {{ old('status', $employee->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="Tidak Aktif" {{ old('status', $employee->status) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                </select>
+            </div>
+            <div class="md:col-span-2 flex gap-3">
+                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Perbarui</button>
+                <a href="{{ route('admin.employee-management.index') }}" class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
