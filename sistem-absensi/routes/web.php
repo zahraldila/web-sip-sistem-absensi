@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
+Route::get('/', [App\Http\Controllers\DashboardTv\TvDashboardController::class, 'index'])->name('tv.dashboard');
+Route::get('/api/tv-dashboard/stats', [App\Http\Controllers\DashboardTv\TvDashboardController::class, 'getStats'])->name('tv.dashboard.stats');
 
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
