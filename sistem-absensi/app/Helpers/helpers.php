@@ -72,6 +72,21 @@ if (! function_exists('supabase_public_url')) {
         $bucket = trim($bucket ?: 'profile-images');
         $path = ltrim($path, '/');
 
-        return rtrim($baseUrl, '/') . '/storage/v1/object/public/' . rawurlencode($bucket) . '/' . implode('/', array_map('rawurlencode', explode('/', $path)));
+        if (str_starts_with($path, 'public/' . $bucket . '/')) {
+            $path = substr($path, strlen('public/' . $bucket . '/'));
+        }
+
+        if (str_starts_with($path, $bucket . '/')) {
+            $path = substr($path, strlen($bucket . '/'));
+        }
+
+        $path = ltrim($path, '/');
+        if ($path === '') {
+            return null;
+        }
+
+        $segments = array_map('rawurlencode', explode('/', $path));
+
+        return rtrim($baseUrl, '/') . '/storage/v1/object/public/' . rawurlencode($bucket) . '/' . implode('/', $segments);
     }
 }
