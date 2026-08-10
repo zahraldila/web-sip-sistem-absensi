@@ -10,7 +10,9 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
         return view('admin.index');
     })->name('admin.dashboard.index');
 
-    Route::get('/laporan-kehadiran', [App\Http\Controllers\AdminPlaceholderController::class, 'laporanKehadiran'])->name('admin.laporan-kehadiran');
+    Route::get('/laporan-kehadiran', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('admin.laporan-kehadiran');
+    Route::get('/laporan-kehadiran/export/excel', [App\Http\Controllers\AttendanceReportController::class, 'exportExcel'])->name('admin.laporan-kehadiran.export.excel');
+    Route::get('/laporan-kehadiran/export/pdf', [App\Http\Controllers\AttendanceReportController::class, 'exportPdf'])->name('admin.laporan-kehadiran.export.pdf');
     Route::get('/manajemen-akun', [App\Http\Controllers\AdminPlaceholderController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
     Route::get('/persetujuan', [App\Http\Controllers\AdminPlaceholderController::class, 'persetujuan'])->name('admin.persetujuan');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
