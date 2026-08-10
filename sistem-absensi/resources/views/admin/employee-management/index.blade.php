@@ -115,6 +115,47 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-4 flex flex-col gap-4 border-t border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+            @php
+                $from = $employees->firstItem() ?: 0;
+                $to = $employees->lastItem() ?: 0;
+                $total = $employees->total();
+                $currentPage = $employees->currentPage();
+                $lastPage = $employees->lastPage();
+            @endphp
+
+            <p class="text-sm text-slate-500">
+                Menampilkan {{ $from }} - {{ $to }} dari {{ $total }} data
+            </p>
+
+            <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm" aria-label="Pagination">
+                <a
+                    class="inline-flex h-[46px] w-[46px] items-center justify-center border-r border-slate-200 text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $employees->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                    href="{{ $employees->onFirstPage() ? '#' : $employees->previousPageUrl() }}"
+                    aria-disabled="{{ $employees->onFirstPage() ? 'true' : 'false' }}"
+                >
+                    ‹
+                </a>
+
+                @for ($page = 1; $page <= $lastPage; $page++)
+                    <a
+                        class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $page === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
+                        href="{{ $employees->url($page) }}"
+                    >
+                        {{ $page }}
+                    </a>
+                @endfor
+
+                <a
+                    class="inline-flex h-[46px] w-[46px] items-center justify-center text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $employees->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                    href="{{ $employees->hasMorePages() ? $employees->nextPageUrl() : '#' }}"
+                    aria-disabled="{{ ! $employees->hasMorePages() ? 'true' : 'false' }}"
+                >
+                    ›
+                </a>
+            </nav>
+        </div>
     </div>
 
     @include('admin.employee-management._employee-form-modal')

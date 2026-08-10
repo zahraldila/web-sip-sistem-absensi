@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Akun;
 use App\Models\Pegawai;
 use App\Repositories\EmployeeManagementRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +19,7 @@ class EmployeeManagementService
     {
     }
 
-    public function listEmployees(?string $search = null): EloquentCollection
+    public function listEmployees(?string $search = null): LengthAwarePaginator
     {
         $query = $this->repository->query();
 
@@ -30,7 +31,7 @@ class EmployeeManagementService
             });
         }
 
-        return $query->orderBy('nama_pegawai')->get();
+        return $query->orderBy('nama_pegawai')->paginate(5)->withQueryString();
     }
 
     public function getEmployee(int $pegawaiId): ?Pegawai
