@@ -98,16 +98,24 @@ class TvDashboardController extends Controller
 
         $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
 
-        // 7. Live Check In List (joining absensi and pegawai)
+        // 7. Live Check In List (joining absensi, pegawai, master_divisi, master_jabatan, and jadwal_kerja)
         $liveCheckIns = DB::table('absensi')
             ->join('pegawai', 'absensi.pegawai_id', '=', 'pegawai.pegawai_id')
+            ->leftJoin('master_divisi', 'pegawai.divisi_id', '=', 'master_divisi.divisi_id')
+            ->leftJoin('master_jabatan', 'pegawai.jabatan_id', '=', 'master_jabatan.jabatan_id')
+            ->leftJoin('jadwal_kerja', 'absensi.jadwal_id', '=', 'jadwal_kerja.jadwal_id')
             ->whereDate('absensi.tanggal_absensi', $date)
             ->select(
                 'absensi.absensi_id',
                 'absensi.jam_checkin',
                 'absensi.skema_kerja',
+                'absensi.status_kehadiran',
                 'pegawai.nama_pegawai',
-                'pegawai.foto_profile'
+                'pegawai.foto_profile',
+                'master_divisi.nama_divisi',
+                'master_jabatan.nama_jabatan',
+                'jadwal_kerja.jam_masuk',
+                'jadwal_kerja.jam_pulang'
             )
             ->orderBy('absensi.jam_checkin', 'desc')
             ->get()
@@ -122,12 +130,24 @@ class TvDashboardController extends Controller
                 $skema = strtoupper($item->skema_kerja);
                 if ($skema === 'WFO') {
                     $skemaLabel = 'Work From Office';
+                    $lokasi = 'Kantor';
                 } elseif ($skema === 'WFH') {
                     $skemaLabel = 'Work From Home';
+                    $lokasi = 'Rumah';
                 } elseif ($skema === 'WFC') {
                     $skemaLabel = 'Work From Cafe';
+                    $lokasi = 'Cafe';
                 } else {
                     $skemaLabel = $item->skema_kerja;
+                    $lokasi = 'Remote';
+                }
+
+                // Format work hours "HH:MM - HH:MM"
+                $jamKerja = '08:30 - 17:30'; // default fallback
+                if ($item->jam_masuk && $item->jam_pulang) {
+                    $masuk = Carbon::parse($item->jam_masuk)->format('H:i');
+                    $pulang = Carbon::parse($item->jam_pulang)->format('H:i');
+                    $jamKerja = "{$masuk} - {$pulang}";
                 }
 
                 return [
@@ -136,6 +156,11 @@ class TvDashboardController extends Controller
                     'waktu' => $time,
                     'skema' => $skema,
                     'skema_label' => $skemaLabel,
+                    'lokasi' => $lokasi,
+                    'status_kehadiran' => $item->status_kehadiran ?? 'Hadir',
+                    'divisi' => $item->nama_divisi ?? 'IT',
+                    'jabatan' => $item->nama_jabatan ?? 'Staff',
+                    'jam_kerja' => $jamKerja,
                     'foto_profile' => $item->foto_profile ? asset('storage/' . $item->foto_profile) : null,
                 ];
             });
