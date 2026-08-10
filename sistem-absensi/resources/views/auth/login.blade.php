@@ -3,6 +3,17 @@
 @section('title', 'Login | Sistem Absensi')
 
 @section('content')
+<style>
+    /* Override browser autofill background & text colors */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+        -webkit-text-fill-color: #1e293b !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+</style>
 <div class="rounded-[40px] border border-slate-100 bg-white px-8 py-10 shadow-2xl sm:px-10">
 
     {{-- Logo --}}
