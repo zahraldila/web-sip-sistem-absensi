@@ -169,7 +169,16 @@ class EmployeeManagementService
             $query->where(function ($q) use ($search) {
                 $q->where('nama_pegawai', 'ilike', '%' . $search . '%')
                     ->orWhere('nip', 'ilike', '%' . $search . '%')
-                    ->orWhere('email', 'ilike', '%' . $search . '%');
+                    ->orWhere('email', 'ilike', '%' . $search . '%')
+                    ->orWhereHas('masterDivisi', function ($q2) use ($search) {
+                        $q2->where('nama_divisi', 'ilike', '%' . $search . '%');
+                    })
+                    ->orWhereHas('masterJabatan', function ($q2) use ($search) {
+                        $q2->where('nama_jabatan', 'ilike', '%' . $search . '%');
+                    })
+                    ->orWhereHas('akun', function ($q2) use ($search) {
+                        $q2->where('role', 'ilike', '%' . $search . '%');
+                    });
             });
         }
 
