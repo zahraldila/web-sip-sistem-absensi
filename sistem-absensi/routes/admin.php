@@ -16,6 +16,10 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     // persetujuan pengajuan
     Route::get('/persetujuan', [ApprovalControllers::class, 'index'])
         ->name('admin.persetujuan');
+    Route::get(
+        '/persetujuan/export/excel',
+        [App\Http\Controllers\ApprovalControllers::class, 'exportExcel']
+    )->name('admin.persetujuan.export.excel');
     Route::get('/persetujuan/{approval}', [ApprovalControllers::class, 'show'])
         ->name('admin.persetujuan.detail');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
