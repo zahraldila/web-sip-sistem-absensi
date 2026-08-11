@@ -108,8 +108,8 @@ class EmployeeManagementService
         $exportRows = $this->buildCsvRows($rows);
 
         $callback = function () use ($exportRows) {
-            $spreadsheet = new \PHPExcel();
-            $sheet = $spreadsheet->setActiveSheetIndex(0);
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
             $sheet->fromArray(array_keys($exportRows->first()), null, 'A1');
 
             $rowIndex = 2;
@@ -117,7 +117,7 @@ class EmployeeManagementService
                 $sheet->fromArray(array_values($row), null, 'A' . $rowIndex++);
             }
 
-            $writer = \PHPExcel_IOFactory::createWriter($spreadsheet, 'Excel2007');
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $writer->save('php://output');
         };
 
