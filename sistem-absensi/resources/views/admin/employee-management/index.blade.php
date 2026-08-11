@@ -72,7 +72,11 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Department</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Action</th>
+                        <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-600">
+                            <div class="relative w-full">
+                                <span class="absolute left-[42px] top-1/2 -translate-y-1/2 -translate-x-1/2">AKSI</span>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -95,8 +99,9 @@
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $employee->masterDivisi->nama_divisi ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $employee->masterJabatan->nama_jabatan ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm">
-                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                                    {{ $employee->status ?? 'Aktif' }}
+                                @php $status = $employee->status ?? 'Aktif'; @endphp
+                                <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ strtolower($status) === 'tidak aktif' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                                    {{ $status }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm">
@@ -390,6 +395,7 @@
                 isSavingDivision: false,
                 isSavingRole: false,
                 previewObjectUrl: null,
+                photoUploadError: '',
                 detailModalOpen: false,
                 detailData: {
                     pegawai_id: '',
@@ -459,6 +465,7 @@
                     this.isSavingDivision = false;
                     this.isSavingRole = false;
                     this.showPassword = false;
+                    this.photoUploadError = '';
                     if (this.previewObjectUrl) {
                         URL.revokeObjectURL(this.previewObjectUrl);
                         this.previewObjectUrl = null;
@@ -557,23 +564,109 @@
                 closeDetail() {
                     this.detailModalOpen = false;
                 },
-                previewPhoto(event) {
-                    const file = event.target.files[0];
+                async previewPhoto(event) {
+                    this.photoUploadError = '';
+                    const input = event.target;
+                    const file = input.files?.[0];
+
                     if (!file) {
-                        if (this.previewObjectUrl) {
-                            URL.revokeObjectURL(this.previewObjectUrl);
-                            this.previewObjectUrl = null;
-                        }
-                        this.form.photoPreview = '';
+                        this.clearPhotoPreview();
                         return;
                     }
 
+                    let previewFile = file;
+                    if (this.isHeicOrHeif(file)) {
+                        try {
+                            previewFile = await this.convertFileToJpeg(file);
+                            this.setFileInput(input, previewFile);
+                        } catch (error) {
+                            this.clearPhotoPreview();
+                            this.photoUploadError = 'Gagal memproses file HEIC/HEIF. Silakan gunakan file JPG/PNG/WEBP atau coba ulang.';
+                            return;
+                        }
+                    }
+
+                    this.updatePreviewFromFile(previewFile);
+                },
+                clearPhotoPreview() {
+                    if (this.previewObjectUrl) {
+                        URL.revokeObjectURL(this.previewObjectUrl);
+                        this.previewObjectUrl = null;
+                    }
+                    this.form.photoPreview = '';
+                },
+                isHeicOrHeif(file) {
+                    const type = (file.type || '').toLowerCase();
+                    const name = (file.name || '').toLowerCase();
+                    return type === 'image/heic' || type === 'image/heif' || name.endsWith('.heic') || name.endsWith('.heif');
+                },
+                normalizeFileName(name, ext) {
+                    const baseName = name.replace(/\.[^/.]+$/, '');
+                    return `${baseName}.${ext}`;
+                },
+                setFileInput(input, file) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                },
+                updatePreviewFromFile(file) {
                     if (this.previewObjectUrl) {
                         URL.revokeObjectURL(this.previewObjectUrl);
                     }
-
                     this.previewObjectUrl = URL.createObjectURL(file);
                     this.form.photoPreview = this.previewObjectUrl;
+                },
+                async convertFileToJpeg(file) {
+                    const blob = await new Promise((resolve, reject) => {
+                        const cleanupUrl = (url) => { if (url) URL.revokeObjectURL(url); };
+
+                        const drawToCanvas = async (source) => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = source.width || source.naturalWidth;
+                            canvas.height = source.height || source.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(source, 0, 0);
+                            canvas.toBlob((result) => {
+                                if (!result) {
+                                    reject(new Error('Canvas conversion failed'));
+                                    return;
+                                }
+                                resolve(result);
+                            }, 'image/jpeg', 0.92);
+                        };
+
+                        if (window.createImageBitmap) {
+                            createImageBitmap(file).then((bitmap) => {
+                                drawToCanvas(bitmap);
+                            }).catch(() => {
+                                const url = URL.createObjectURL(file);
+                                const img = new Image();
+                                img.onload = () => {
+                                    drawToCanvas(img);
+                                    cleanupUrl(url);
+                                };
+                                img.onerror = (event) => {
+                                    cleanupUrl(url);
+                                    reject(new Error('Unable to load HEIC/HEIF image'));
+                                };
+                                img.src = url;
+                            });
+                        } else {
+                            const url = URL.createObjectURL(file);
+                            const img = new Image();
+                            img.onload = () => {
+                                drawToCanvas(img);
+                                cleanupUrl(url);
+                            };
+                            img.onerror = (event) => {
+                                cleanupUrl(url);
+                                reject(new Error('Unable to load HEIC/HEIF image'));
+                            };
+                            img.src = url;
+                        }
+                    });
+
+                    return new File([blob], this.normalizeFileName(file.name, 'jpg'), { type: 'image/jpeg' });
                 },
                 openDivisionModal() {
                     this.divisionModalOpen = true;

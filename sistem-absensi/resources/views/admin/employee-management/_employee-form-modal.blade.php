@@ -44,13 +44,16 @@
                             </div>
                             <div class="space-y-1">
                                 <p class="text-sm font-semibold text-slate-900">Klik untuk Upload Foto</p>
-                                <p class="text-xs text-slate-500">PNG, JPG maksimal 2MB</p>
+                                <p class="text-xs text-slate-500">PNG, JPG, HEIC, HEIF, WEBP maksimal 2MB</p>
                             </div>
                         </label>
-                        <input id="photoInput" type="file" name="foto_profile" accept="image/png,image/jpeg" @change="previewPhoto($event)" class="hidden">
+                        <input id="photoInput" type="file" name="foto_profile" accept="image/png,image/jpeg,image/heic,image/heif,image/webp" @change="previewPhoto($event)" class="hidden">
 
                         <template x-if="form.photoPreview">
                             <img :src="form.photoPreview" alt="Preview foto baru" class="mx-auto mt-3 h-24 w-24 rounded-full object-cover" />
+                        </template>
+                        <template x-if="photoUploadError">
+                            <p class="mt-1 text-xs text-red-600" x-text="photoUploadError"></p>
                         </template>
                         @error('foto_profile')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
