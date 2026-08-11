@@ -28,9 +28,9 @@ class Akun extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-    ];
+    // Note: password hashing is handled in service/controller using Hash::make().
+    // Keep casts empty to avoid automatic double-hashing.
+    protected $casts = [];
 
     public function pegawai(): BelongsTo
     {

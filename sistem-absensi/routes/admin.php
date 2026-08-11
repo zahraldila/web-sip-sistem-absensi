@@ -13,7 +13,15 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     Route::get('/laporan-kehadiran', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('admin.laporan-kehadiran');
     Route::get('/laporan-kehadiran/export/excel', [App\Http\Controllers\AttendanceReportController::class, 'exportExcel'])->name('admin.laporan-kehadiran.export.excel');
     Route::get('/laporan-kehadiran/export/pdf', [App\Http\Controllers\AttendanceReportController::class, 'exportPdf'])->name('admin.laporan-kehadiran.export.pdf');
-    Route::get('/manajemen-akun', [App\Http\Controllers\AdminPlaceholderController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
+    Route::get('/manajemen-akun', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.manajemen-akun');
+    Route::get('/employee-management', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.employee-management.index');
+    Route::get('/employee-management/create', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'create'])->name('admin.employee-management.create');
+    Route::post('/employee-management', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'store'])->name('admin.employee-management.store');
+    Route::post('/employee-management/divisions', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'storeDivision'])->name('admin.employee-management.storeDivision');
+    Route::post('/employee-management/roles', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'storeRole'])->name('admin.employee-management.storeRole');
+    Route::post('/employee-management/export', [App\Http\Controllers\Admin\EmployeeExportController::class, 'export'])->name('admin.employee-management.export');
+    Route::get('/employee-management/{pegawai}/edit', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'edit'])->name('admin.employee-management.edit');
+    Route::put('/employee-management/{pegawai}', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'update'])->name('admin.employee-management.update');
     Route::get('/persetujuan', [App\Http\Controllers\AdminPlaceholderController::class, 'persetujuan'])->name('admin.persetujuan');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');

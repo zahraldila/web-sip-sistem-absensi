@@ -105,7 +105,7 @@
 
             {{-- Manajemen Akun --}}
             <a href="{{ route('admin.manajemen-akun') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"

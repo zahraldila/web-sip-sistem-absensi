@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class MasterJabatan extends Model
+{
+    protected $table = 'master_jabatan';
+    protected $primaryKey = 'jabatan_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    protected $fillable = [
+        'nama_jabatan',
+    ];
+
+    public function pegawais(): HasMany
+    {
+        return $this->hasMany(Pegawai::class, 'jabatan_id', 'jabatan_id');
+    }
+}

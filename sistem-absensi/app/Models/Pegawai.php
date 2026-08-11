@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Akun;
+use App\Models\Nfc;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pegawai extends Model
 {
@@ -19,12 +22,29 @@ class Pegawai extends Model
         'nama_pegawai',
         'email',
         'no_handphone',
-        'jabatan',
-        'divisi',
+        'divisi_id',
+        'jabatan_id',
+        'status',
+        'foto_profile',
     ];
 
     public function akun(): HasOne
     {
         return $this->hasOne(Akun::class, 'pegawai_id', 'pegawai_id');
+    }
+
+    public function masterDivisi(): BelongsTo
+    {
+        return $this->belongsTo(MasterDivisi::class, 'divisi_id', 'divisi_id');
+    }
+
+    public function masterJabatan(): BelongsTo
+    {
+        return $this->belongsTo(MasterJabatan::class, 'jabatan_id', 'jabatan_id');
+    }
+
+    public function nfc(): HasOne
+    {
+        return $this->hasOne(Nfc::class, 'pegawai_id', 'pegawai_id');
     }
 }
