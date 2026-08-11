@@ -18,8 +18,40 @@ class AttendanceReportController extends Controller
         $query = Attendance::with('pegawai');
 
         if ($search = trim((string) $request->query('search', ''))) {
-            $query->whereHas('pegawai', function ($query) use ($search) {
-                $query->where('nama_pegawai', 'ilike', "%{$search}%");
+            $searchTerm = "%{$search}%";
+
+            $query->where(function ($query) use ($search, $searchTerm) {
+                $query->whereHas('pegawai', function ($query) use ($searchTerm) {
+                    $query->where('nama_pegawai', 'ilike', $searchTerm);
+                })
+                ->orWhere('skema_kerja', 'ilike', $searchTerm)
+                ->orWhere('status_kehadiran', 'ilike', $searchTerm)
+                ->orWhereRaw("to_char(tanggal_absensi, 'FMDD TMMonth YYYY') ILIKE ?", [$searchTerm])
+                ->orWhereRaw("CAST(tanggal_absensi AS TEXT) ILIKE ?", [$searchTerm])
+                ->orWhereRaw("COALESCE(to_char(jam_checkin, 'HH24:MI'), '') ILIKE ?", [$searchTerm])
+                ->orWhereRaw("COALESCE(to_char(jam_checkout, 'HH24:MI'), '') ILIKE ?", [$searchTerm])
+                ->orWhereRaw("(
+                    CASE
+                        WHEN jam_checkin IS NULL OR jam_checkout IS NULL OR jam_checkout < jam_checkin THEN ''
+                        ELSE (
+                            CASE WHEN FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 3600) > 0
+                                THEN FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 3600)::TEXT || ' Jam'
+                                ELSE ''
+                            END
+                            || CASE WHEN MOD(FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 60), 60) > 0
+                                THEN CASE WHEN FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 3600) > 0 THEN ' ' ELSE '' END
+                                     || MOD(FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 60), 60)::TEXT || ' Menit'
+                                ELSE ''
+                            END
+                            || CASE WHEN FLOOR(EXTRACT(EPOCH FROM (jam_checkout - jam_checkin)) / 60) = 0 THEN '0 Menit' ELSE '' END
+                        )
+                    END
+                ) ILIKE ?", [$searchTerm])
+                ->orWhereRaw("CAST(latitude AS TEXT) ILIKE ? OR CAST(longitude AS TEXT) ILIKE ? OR (CAST(latitude AS TEXT) || ', ' || CAST(longitude AS TEXT)) ILIKE ?", [$searchTerm, $searchTerm, $searchTerm]);
+
+                if ($date = $this->parseSearchDate($search)) {
+                    $query->orWhereDate('tanggal_absensi', '=', $date);
+                }
             });
         }
 
@@ -101,6 +133,49 @@ class AttendanceReportController extends Controller
         }
 
         return '-';
+    }
+
+    private function parseSearchDate(string $search): ?string
+    {
+        $search = trim(strtolower($search));
+
+        if ($search === '') {
+            return null;
+        }
+
+        $months = [
+            'januari' => 'January',
+            'februari' => 'February',
+            'maret' => 'March',
+            'april' => 'April',
+            'mei' => 'May',
+            'juni' => 'June',
+            'juli' => 'July',
+            'agustus' => 'August',
+            'september' => 'September',
+            'oktober' => 'October',
+            'november' => 'November',
+            'desember' => 'December',
+        ];
+
+        $normalized = preg_replace_callback('/\b(' . implode('|', array_keys($months)) . ')\b/i', function ($matches) use ($months) {
+            return $months[strtolower($matches[1])];
+        }, $search);
+
+        $formats = ['d F Y', 'd M Y', 'Y-m-d', 'd-m-Y', 'd/m/Y'];
+
+        foreach ($formats as $format) {
+            try {
+                $date = Carbon::createFromFormat($format, $normalized);
+                if ($date !== false) {
+                    return $date->toDateString();
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return null;
     }
 
     public function index(Request $request)
