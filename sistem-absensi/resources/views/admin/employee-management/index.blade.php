@@ -100,6 +100,30 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm">
+                                <button type="button" @click.prevent="openDetail($event)"
+                                        data-employee="{{ json_encode([
+                                            'pegawai_id' => $employee->pegawai_id,
+                                            'nama_pegawai' => $employee->nama_pegawai,
+                                            'nip' => $employee->nip,
+                                            'email' => $employee->email,
+                                            'divisi_id' => $employee->divisi_id,
+                                            'divisi_name' => $employee->masterDivisi->nama_divisi ?? '-',
+                                            'jabatan_id' => $employee->jabatan_id,
+                                            'jabatan_name' => $employee->masterJabatan->nama_jabatan ?? '-',
+                                            'status' => $employee->status ?? 'Aktif',
+                                            'no_handphone' => $employee->no_handphone,
+                                            'nfc_id' => $employee->nfc->nfc_serial_number ?? '-',
+                                            'foto_profile_path' => $employee->foto_profile ?? '',
+                                            'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
+                                            'username' => $employee->akun->username ?? '-',
+                                        ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
+                                        class="mr-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                                        aria-label="Lihat detail pegawai">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </button>
                                 <button type="button" @click.prevent="openEdit($event)"
                                         data-employee="{{ json_encode([
                                             'pegawai_id' => $employee->pegawai_id,
@@ -115,7 +139,13 @@
                                             'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
                                             'username' => $employee->akun->username ?? ''
                                         ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
-                                        class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-indigo-600 transition hover:bg-slate-50 hover:text-indigo-900"
+                                        aria-label="Edit pegawai">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                    </svg>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -256,6 +286,68 @@
         </div>
     </div>
 
+    <div x-show="detailModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="closeDetail()"></div>
+        <div class="relative w-full max-w-2xl overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-6 py-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900">Detail Pegawai</h2>
+                        <p class="mt-1 text-sm text-slate-500">Informasi lengkap pegawai yang dipilih.</p>
+                    </div>
+                    <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                        @click="closeDetail()" aria-label="Tutup modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <div class="grid gap-6 lg:grid-cols-[220px_1fr]">
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center">
+                        <template x-if="detailData.foto_profile">
+                            <img :src="detailData.foto_profile" alt="Foto Pegawai" class="mx-auto h-28 w-28 rounded-full object-cover" />
+                        </template>
+                        <template x-if="!detailData.foto_profile">
+                            <div class="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-slate-200 text-3xl font-semibold text-slate-700" x-text="detailInitials"></div>
+                        </template>
+                        <div class="mt-4 text-lg font-semibold text-slate-900" x-text="detailData.nama_pegawai"></div>
+                        <div class="mt-1 text-sm text-slate-500" x-text="detailData.status"></div>
+                    </div>
+                    <div class="grid gap-4">
+                        <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                            <div class="text-sm text-slate-500">Employee ID</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.pegawai_id"></div>
+                            <div class="text-sm text-slate-500">NIP</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.nip || '-' "></div>
+                            <div class="text-sm text-slate-500">Email</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.email || '-' "></div>
+                            <div class="text-sm text-slate-500">Nomor HP</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.no_handphone || '-' "></div>
+                            <div class="text-sm text-slate-500">Department</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.divisi_name || '-' "></div>
+                            <div class="text-sm text-slate-500">Jabatan</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.jabatan_name || '-' "></div>
+                            <div class="text-sm text-slate-500">Role</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.username ? 'pegawai' : '-' "></div>
+                            <div class="text-sm text-slate-500">Username</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.username || '-' "></div>
+                            <div class="text-sm text-slate-500">NFC ID</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.nfc_id || '-' "></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 bg-white px-6 py-4 text-right">
+                <button type="button" @click="closeDetail()"
+                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function employeeModal() {
             const oldForm = {!! json_encode([
@@ -298,6 +390,26 @@
                 isSavingDivision: false,
                 isSavingRole: false,
                 previewObjectUrl: null,
+                detailModalOpen: false,
+                detailData: {
+                    pegawai_id: '',
+                    nama_pegawai: '',
+                    nip: '',
+                    email: '',
+                    no_handphone: '',
+                    divisi_name: '',
+                    jabatan_name: '',
+                    status: '',
+                    username: '',
+                    nfc_id: '',
+                    foto_profile: ''
+                },
+                detailInitials() {
+                    if (!this.detailData.nama_pegawai) {
+                        return '-';
+                    }
+                    return this.detailData.nama_pegawai.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
+                },
                 form: {
                     pegawai_id: '',
                     nama_pegawai: '',
@@ -372,6 +484,20 @@
                         username: '',
                         photoPreview: ''
                     };
+                    this.detailModalOpen = false;
+                    this.detailData = {
+                        pegawai_id: '',
+                        nama_pegawai: '',
+                        nip: '',
+                        email: '',
+                        no_handphone: '',
+                        divisi_name: '',
+                        jabatan_name: '',
+                        status: '',
+                        username: '',
+                        nfc_id: '',
+                        foto_profile: ''
+                    };
                 },
                 openCreate() {
                     this.resetModalState();
@@ -409,6 +535,27 @@
                 },
                 closeModal() {
                     this.resetModalState();
+                },
+                openDetail(event) {
+                    this.resetModalState();
+                    const employee = JSON.parse(event.currentTarget.dataset.employee || '{}');
+                    this.detailData = {
+                        pegawai_id: employee.pegawai_id || '',
+                        nama_pegawai: employee.nama_pegawai || '',
+                        nip: employee.nip || '',
+                        email: employee.email || '',
+                        no_handphone: employee.no_handphone || '',
+                        divisi_name: employee.divisi_name || employee.divisi_id || '-',
+                        jabatan_name: employee.jabatan_name || employee.jabatan_id || '-',
+                        status: employee.status || 'Aktif',
+                        username: employee.username || '-',
+                        nfc_id: employee.nfc_id || '-',
+                        foto_profile: employee.foto_profile || '',
+                    };
+                    this.detailModalOpen = true;
+                },
+                closeDetail() {
+                    this.detailModalOpen = false;
                 },
                 previewPhoto(event) {
                     const file = event.target.files[0];
