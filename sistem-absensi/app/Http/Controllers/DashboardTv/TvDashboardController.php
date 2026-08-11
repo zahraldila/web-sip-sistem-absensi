@@ -157,7 +157,16 @@ class TvDashboardController extends Controller
                     'skema' => $skema,
                     'skema_label' => $skemaLabel,
                     'lokasi' => $lokasi,
-                    'status_kehadiran' => $item->status_kehadiran ?? 'Hadir',
+                    'status_kehadiran' => (function() use ($item) {
+                        if ($item->jam_checkin && $item->jam_masuk) {
+                            $checkInTime = Carbon::parse($item->jam_checkin)->format('H:i:s');
+                            $jamMasukTime = Carbon::parse($item->jam_masuk)->format('H:i:s');
+                            if ($checkInTime > $jamMasukTime) {
+                                return 'Terlambat';
+                            }
+                        }
+                        return $item->status_kehadiran ?? 'Tepat Waktu';
+                    })(),
                     'divisi' => $item->nama_divisi ?? 'IT',
                     'jabatan' => $item->nama_jabatan ?? 'Staff',
                     'jam_kerja' => $jamKerja,
