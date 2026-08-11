@@ -185,7 +185,7 @@ class AttendanceReportController extends Controller
         $attendances = $this->attendanceQuery($request)
             ->orderByDesc('tanggal_absensi')
             ->orderBy('jam_checkin')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get(['pegawai_id', 'nama_pegawai']);
