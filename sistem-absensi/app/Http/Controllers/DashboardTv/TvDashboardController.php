@@ -170,7 +170,22 @@ class TvDashboardController extends Controller
                     'divisi' => $item->nama_divisi ?? 'IT',
                     'jabatan' => $item->nama_jabatan ?? 'Staff',
                     'jam_kerja' => $jamKerja,
-                    'foto_profile' => $item->foto_profile ? asset('storage/' . $item->foto_profile) : null,
+                    'foto_profile' => (function() use ($item) {
+                        if (!$item->foto_profile) {
+                            return null;
+                        }
+                        if (str_starts_with($item->foto_profile, 'http://') || str_starts_with($item->foto_profile, 'https://')) {
+                            return $item->foto_profile;
+                        }
+                        // Dynamic Supabase project reference extraction from DB_USERNAME
+                        $projectRef = 'fxovkmcrdeezrotwqjhb'; // default fallback
+                        $dbUser = env('DB_USERNAME', '');
+                        if (str_contains($dbUser, '.')) {
+                            $parts = explode('.', $dbUser);
+                            $projectRef = end($parts);
+                        }
+                        return "https://{$projectRef}.supabase.co/storage/v1/object/public/" . ltrim($item->foto_profile, '/');
+                    })(),
                 ];
             });
 
