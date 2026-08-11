@@ -19,18 +19,17 @@
         <div x-data="{ show: true }" x-cloak x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="mb-4 relative rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             <div class="pr-6">{{ session('success') }}</div>
             <button type="button" @click="show = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-green-700 hover:text-green-900">
-    @endif
-
-    @if (session('error'))
-        <div x-data="{ show: true }" x-cloak x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="mb-4 relative rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <div class="pr-6">{{ session('error') }}</div>
-            <button type="button" @click="show = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-red-700 hover:text-red-900">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
     @endif
+
+    @if (session('error'))
+        <div x-data="{ show: true }" x-cloak x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="mb-4 relative rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="pr-6">{{ session('error') }}</div>
+            <button type="button" @click="show = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-red-700 hover:text-red-900">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -457,9 +456,11 @@
                 exportModalOpen: false,
                 exportIsLoading: false,
                 openExport() {
+                    this.exportIsLoading = false;
                     this.exportModalOpen = true;
                 },
                 closeExport() {
+                    this.exportIsLoading = false;
                     this.exportModalOpen = false;
                 },
                 submitExport(event) {
@@ -469,6 +470,9 @@
 
                     this.exportIsLoading = true;
                     event.target.submit();
+                    setTimeout(() => {
+                        this.exportIsLoading = false;
+                    }, 1500);
                 },
                 async saveDivision() {
                     this.divisionError = '';

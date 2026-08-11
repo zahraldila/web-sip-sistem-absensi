@@ -7,14 +7,12 @@ use App\Models\Pegawai;
 use App\Repositories\EmployeeManagementRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EmployeeManagementService
@@ -49,13 +47,31 @@ class EmployeeManagementService
             return [
                 'No' => $index + 1,
                 'Nama Pegawai' => $pegawai->nama_pegawai,
-                'Employee ID' => $pegawai->nip ?? '',
-                'Department' => $pegawai->masterDivisi->nama_divisi ?? '',
+                'NIP' => $pegawai->nip ?? '',
+                'Employee ID' => $pegawai->pegawai_id ?? '',
+                'Department/Divisi' => $pegawai->masterDivisi->nama_divisi ?? '',
                 'Role' => $pegawai->akun->role ?? '',
                 'Status' => $pegawai->status ?? '',
                 'Email' => $pegawai->email ?? '',
-                'No. Handphone' => $pegawai->no_handphone ?? '',
+                'No Handphone' => $pegawai->no_handphone ?? '',
                 'Username' => $pegawai->akun->username ?? '',
+            ];
+        });
+    }
+
+    protected function buildCsvRows(Collection $rows): Collection
+    {
+        return $rows->values()->map(function ($pegawai, $index) {
+            return [
+                'No' => $index + 1,
+                'Nama Pegawai' => $pegawai->nama_pegawai,
+                'NIP' => $pegawai->nip ?? '',
+                'Employee ID' => $pegawai->pegawai_id ?? '',
+                'Email' => $pegawai->email ?? '',
+                'No Handphone' => $pegawai->no_handphone ?? '',
+                'Department/Divisi' => $pegawai->masterDivisi->nama_divisi ?? '',
+                'Role' => $pegawai->akun->role ?? '',
+                'Status' => $pegawai->status ?? '',
             ];
         });
     }
@@ -63,13 +79,13 @@ class EmployeeManagementService
     protected function exportCsv(Collection $rows)
     {
         $filename = 'manajemen-akun-' . date('Ymd_His') . '.csv';
-        $exportRows = $this->buildExportRows($rows);
+        $exportRows = $this->buildCsvRows($rows);
 
         $callback = function () use ($exportRows) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
             fwrite($out, "sep=;\r\n");
-            fputcsv($out, array_keys($exportRows->first()->toArray()), ';');
+            fputcsv($out, array_keys($exportRows->first()), ';');
 
             foreach ($exportRows as $row) {
                 fputcsv($out, array_values($row), ';');
@@ -88,18 +104,29 @@ class EmployeeManagementService
 
     protected function exportXlsx(Collection $rows)
     {
-        $filename = 'manajemen-akun-' . date('Ymd_His');
-        $exportRows = $this->buildExportRows($rows);
+        $filename = 'manajemen-akun-' . date('Ymd_His') . '.xlsx';
+        $exportRows = $this->buildCsvRows($rows);
 
-        return Excel::create($filename, function ($excel) use ($exportRows) {
-            $excel->sheet('Manajemen Akun', function ($sheet) use ($exportRows) {
-                $sheet->row(1, array_keys($exportRows->first()->toArray()));
-                $rowIndex = 2;
-                foreach ($exportRows as $row) {
-                    $sheet->row($rowIndex++, array_values($row));
-                }
-            });
-        })->download('xlsx');
+        $callback = function () use ($exportRows) {
+            $spreadsheet = new \PHPExcel();
+            $sheet = $spreadsheet->setActiveSheetIndex(0);
+            $sheet->fromArray(array_keys($exportRows->first()), null, 'A1');
+
+            $rowIndex = 2;
+            foreach ($exportRows as $row) {
+                $sheet->fromArray(array_values($row), null, 'A' . $rowIndex++);
+            }
+
+            $writer = \PHPExcel_IOFactory::createWriter($spreadsheet, 'Excel2007');
+            $writer->save('php://output');
+        };
+
+        return new StreamedResponse($callback, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'public',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        ]);
     }
 
     protected function exportPdf(Collection $rows, array $filters)
@@ -109,10 +136,13 @@ class EmployeeManagementService
             return [
                 'No' => $row['No'],
                 'Nama Pegawai' => $row['Nama Pegawai'],
+                'NIP' => $row['NIP'],
                 'Employee ID' => $row['Employee ID'],
-                'Department' => $row['Department'],
+                'Department' => $row['Department/Divisi'],
                 'Role' => $row['Role'],
                 'Status' => $row['Status'],
+                'Email' => $row['Email'],
+                'No Handphone' => $row['No Handphone'],
             ];
         });
 
