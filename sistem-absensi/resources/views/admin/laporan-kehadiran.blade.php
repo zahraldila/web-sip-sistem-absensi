@@ -114,9 +114,14 @@
                         <tr class="transition hover:bg-gray-50">
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-gradient-to-br from-slate-300 to-slate-400 text-sm font-semibold text-white">
-                                        {{ substr($attendance->pegawai?->nama_pegawai ?? '?', 0, 1) }}
-                                    </div>
+                                    @php $photoUrl = supabase_public_url($attendance->pegawai?->foto_profile); @endphp
+                                    @if ($photoUrl)
+                                        <img src="{{ $photoUrl }}" alt="{{ $attendance->pegawai?->nama_pegawai ?? '-' }}" class="h-10 w-10 rounded-full object-cover" />
+                                    @else
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700">
+                                            {{ getInitials($attendance->pegawai?->nama_pegawai) }}
+                                        </div>
+                                    @endif
                                     <div class="min-w-0">
                                         <p class="truncate text-sm font-medium text-gray-900">{{ $attendance->pegawai?->nama_pegawai ?? '-' }}</p>
                                     </div>
