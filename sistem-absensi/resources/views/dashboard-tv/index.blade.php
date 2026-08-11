@@ -236,6 +236,7 @@
                                 <img 
                                     :src="checkIn.foto_profile" 
                                     :alt="checkIn.nama" 
+                                    @@error="checkIn.foto_profile = null"
                                     class="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm"
                                 >
                             </template>
@@ -350,6 +351,7 @@
                         <img 
                             :src="modalData.foto_profile" 
                             :alt="modalData.nama" 
+                            @@error="modalData.foto_profile = null"
                             class="w-20 h-20 rounded-full object-cover border-2 border-[#E6F4EA] shadow-md"
                         >
                     </template>

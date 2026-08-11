@@ -157,11 +157,35 @@ class TvDashboardController extends Controller
                     'skema' => $skema,
                     'skema_label' => $skemaLabel,
                     'lokasi' => $lokasi,
-                    'status_kehadiran' => $item->status_kehadiran ?? 'Hadir',
+                    'status_kehadiran' => (function() use ($item) {
+                        if ($item->jam_checkin && $item->jam_masuk) {
+                            $checkInTime = Carbon::parse($item->jam_checkin)->format('H:i:s');
+                            $jamMasukTime = Carbon::parse($item->jam_masuk)->format('H:i:s');
+                            if ($checkInTime > $jamMasukTime) {
+                                return 'Terlambat';
+                            }
+                        }
+                        return $item->status_kehadiran ?? 'Tepat Waktu';
+                    })(),
                     'divisi' => $item->nama_divisi ?? 'IT',
                     'jabatan' => $item->nama_jabatan ?? 'Staff',
                     'jam_kerja' => $jamKerja,
-                    'foto_profile' => $item->foto_profile ? asset('storage/' . $item->foto_profile) : null,
+                    'foto_profile' => (function() use ($item) {
+                        if (!$item->foto_profile) {
+                            return null;
+                        }
+                        if (str_starts_with($item->foto_profile, 'http://') || str_starts_with($item->foto_profile, 'https://')) {
+                            return $item->foto_profile;
+                        }
+                        // Dynamic Supabase project reference extraction from DB_USERNAME
+                        $projectRef = 'fxovkmcrdeezrotwqjhb'; // default fallback
+                        $dbUser = env('DB_USERNAME', '');
+                        if (str_contains($dbUser, '.')) {
+                            $parts = explode('.', $dbUser);
+                            $projectRef = end($parts);
+                        }
+                        return "https://{$projectRef}.supabase.co/storage/v1/object/public/" . ltrim($item->foto_profile, '/');
+                    })(),
                 ];
             });
 
