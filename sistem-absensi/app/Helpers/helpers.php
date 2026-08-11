@@ -65,7 +65,13 @@ if (! function_exists('supabase_public_url')) {
 
         $baseUrl = config('supabase.url') ?: env('SUPABASE_URL');
         if (empty(trim($baseUrl ?? ''))) {
-            return null;
+            $projectRef = 'fxovkmcrdeezrotwqjhb'; // default fallback
+            $dbUser = env('DB_USERNAME', '');
+            if (str_contains($dbUser, '.')) {
+                $parts = explode('.', $dbUser);
+                $projectRef = end($parts);
+            }
+            $baseUrl = "https://{$projectRef}.supabase.co";
         }
 
         $bucket = config('supabase.bucket', 'profile-images');
