@@ -53,9 +53,6 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
-                    <button type="button" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
-                        Filter
-                    </button>
                     <button type="button" @click.prevent="openExport()" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
                         Export
                     </button>

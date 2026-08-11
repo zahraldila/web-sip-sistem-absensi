@@ -244,7 +244,7 @@ class EmployeeManagementService
                 'email' => $data['email'] ?? null,
                 'username' => $username,
                 'password' => Hash::make($data['password'] ?? 'password123'),
-                'role' => 'Karyawan',
+                'role' => 'pegawai',
                 'status' => $data['status'] ?? 'Aktif',
             ];
 

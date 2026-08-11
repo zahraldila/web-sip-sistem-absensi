@@ -14,7 +14,7 @@ class Pegawai extends Model
     protected $primaryKey = 'pegawai_id';
     public $incrementing = true;
     protected $keyType = 'int';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'pegawai_id',
