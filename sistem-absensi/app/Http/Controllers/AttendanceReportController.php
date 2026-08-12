@@ -15,7 +15,7 @@ class AttendanceReportController extends Controller
 {
     private function attendanceQuery(Request $request)
     {
-        $query = Attendance::with('pegawai');
+        $query = Attendance::with('pegawai.masterDivisi');
 
         if ($search = trim((string) $request->query('search', ''))) {
             $searchTerm = "%{$search}%";
@@ -81,9 +81,11 @@ class AttendanceReportController extends Controller
             $query->whereDate('tanggal_absensi', '<=', $endDate);
         }
 
-        if ($modeKerja = $request->query('mode_kerja')) {
-            if ($modeKerja !== 'Semua') {
-                $query->where('skema_kerja', $modeKerja);
+        if ($divisiId = $request->query('divisi_id')) {
+            if ($divisiId !== 'Semua') {
+                $query->whereHas('pegawai', function ($q) use ($divisiId) {
+                    $q->where('divisi_id', $divisiId);
+                });
             }
         }
 
@@ -215,13 +217,14 @@ class AttendanceReportController extends Controller
         });
 
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get(['pegawai_id', 'nama_pegawai']);
-
         $statusOptions = ['Semua', 'Hadir', 'Tepat Waktu', 'Terlambat', 'Tidak Hadir'];
+        $divisions = \App\Models\MasterDivisi::orderBy('nama_divisi')->get(['divisi_id', 'nama_divisi']);
 
         return view('admin.laporan-kehadiran', [
             'attendances' => $attendances,
             'pegawaiList' => $pegawaiList,
             'statusOptions' => $statusOptions,
+            'divisions' => $divisions,
         ]);
     }
 
