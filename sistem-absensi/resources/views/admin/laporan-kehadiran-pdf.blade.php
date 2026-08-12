@@ -28,6 +28,7 @@
         <thead>
             <tr>
                 <th>Nama</th>
+                <th>Divisi</th>
                 <th>Tanggal</th>
                 <th>Jam Masuk</th>
                 <th>Jam Keluar</th>
@@ -41,6 +42,7 @@
             @foreach($rows as $row)
                 <tr>
                     <td>{{ $row['nama'] }}</td>
+                    <td>{{ $row['divisi'] }}</td>
                     <td>{{ $row['tanggal'] }}</td>
                     <td>{{ $row['jam_masuk'] }}</td>
                     <td>{{ $row['jam_keluar'] }}</td>

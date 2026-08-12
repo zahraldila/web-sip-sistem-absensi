@@ -334,6 +334,7 @@ class AttendanceReportController extends Controller
             $rows = $this->getAbsentRecords($request)->map(function (Attendance $attendance) {
                 return [
                     'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                    'Divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
                     'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
                     'Jam Masuk' => '-',
                     'Jam Keluar' => '-',
@@ -360,6 +361,7 @@ class AttendanceReportController extends Controller
                     }
                     return [
                         'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                        'Divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
                         'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
                         'Jam Masuk' => $this->formatTime($attendance->jam_checkin),
                         'Jam Keluar' => $this->formatTime($attendance->jam_checkout),
@@ -407,6 +409,7 @@ class AttendanceReportController extends Controller
             $rows = $this->getAbsentRecords($request)->map(function (Attendance $attendance) {
                 return [
                     'nama' => $attendance->pegawai?->nama_pegawai ?? '-',
+                    'divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
                     'tanggal' => $this->formatDate($attendance->tanggal_absensi),
                     'jam_masuk' => '-',
                     'jam_keluar' => '-',
@@ -433,6 +436,7 @@ class AttendanceReportController extends Controller
                     }
                     return [
                         'nama' => $attendance->pegawai?->nama_pegawai ?? '-',
+                        'divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
                         'tanggal' => $this->formatDate($attendance->tanggal_absensi),
                         'jam_masuk' => $this->formatTime($attendance->jam_checkin),
                         'jam_keluar' => $this->formatTime($attendance->jam_checkout),
