@@ -44,7 +44,7 @@ class DashboardControllers extends Controller
                         : null,
                     'status' => $attendance->skema_kerja ?? 'WFO',
                     'jam'    => $attendance->jam_checkin
-                        ? substr($attendance->jam_checkin, 0, 5) . ' WIB'
+                        ? Carbon::parse($attendance->jam_checkin)->format('H:i')
                         : '-',
                 ];
             });
