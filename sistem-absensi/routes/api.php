@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuditLogControllers;
 
 Route::prefix('api')->middleware(['api'])->group(function () {
     // Auth
@@ -16,4 +17,7 @@ Route::prefix('api')->middleware(['api'])->group(function () {
 
     // Dashboard
     Route::get('dashboard/admin', [App\Http\Controllers\DashboardControllers::class, 'admin'])->middleware('auth:sanctum');
+
+    // Audit Log
+    Route::get('audit-log', [App\Http\Controllers\AuditLogControllers::class, 'index'])->middleware('auth:sanctum');
 });

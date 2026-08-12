@@ -22,3 +22,5 @@ if (file_exists($path = base_path('routes/pegawai.php'))) {
 if (file_exists($path = base_path('routes/auth.php'))) {
     require $path;
 }
+
+Route::get('/admin/log-aktivitas', [\App\Http\Controllers\AuditLogControllers::class, 'webIndex'])->name('admin.log-aktivitas');
