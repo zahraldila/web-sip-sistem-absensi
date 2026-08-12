@@ -47,7 +47,8 @@
                             <div class="space-y-3">
                                 <x-forms.select name="status" label="Status">
                                     <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                                    <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                                    <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
+                                    <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
                                     <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                                     <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
                                 </x-forms.select>
@@ -249,7 +250,8 @@
                 <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-2">
                     <x-forms.select name="status" label="Status">
                         <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                        <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
+                        <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
                         <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                         <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
                     </x-forms.select>
