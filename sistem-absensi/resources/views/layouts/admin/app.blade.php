@@ -113,5 +113,7 @@
     {{-- Sprint selanjutnya --}}
     {{-- ===================== --}}
 
+    @stack('scripts')
+
 </body>
 </html>

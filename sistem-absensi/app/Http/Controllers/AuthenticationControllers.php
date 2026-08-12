@@ -7,6 +7,7 @@ use App\Models\Akun;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\logHelpers;
 
 class AuthenticationControllers extends Controller
 {
@@ -74,6 +75,13 @@ class AuthenticationControllers extends Controller
             'email_pegawai' => $pegawai ? $pegawai->email : null,
         ]);
 
+        // ---------------------------------------------------------
+        // INJEKSI LOG ACTIVITY: Mencatat bahwa user berhasil login
+        // ---------------------------------------------------------
+        $roleName = ucfirst($akun->role); // Membuat huruf pertama kapital (misal: 'Admin' atau 'Pegawai')
+        logHelpers::record($akun->akun_id, "{$roleName} berhasil login ke dalam sistem");
+        // ---------------------------------------------------------
+
         return redirect()->intended(route('admin.dashboard'));
     }
 
@@ -88,6 +96,19 @@ class AuthenticationControllers extends Controller
      */
     public function logout(Request $request)
     {
+        // ---------------------------------------------------------
+        // INJEKSI LOG ACTIVITY: Mencatat bahwa user melakukan logout
+        // Pastikan kita ambil ID sebelum user benar-benar di-logout
+        // ---------------------------------------------------------
+        if (Auth::check()) {
+            $akunId = Auth::user()->akun_id; 
+            // Atau bisa juga menggunakan ID dari session: $request->session()->get('akun_id');
+            
+            $roleName = ucfirst(Auth::user()->role);
+            logHelpers::record($akunId, "{$roleName} melakukan logout dari sistem");
+        }
+        // ---------------------------------------------------------
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

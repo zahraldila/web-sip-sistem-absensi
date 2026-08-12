@@ -1,5 +1,4 @@
 <div class="flex h-full w-full flex-col bg-white overflow-y-auto">
-
     {{-- ========================= --}}
     {{-- HEADER --}}
     {{-- ========================= --}}
@@ -8,11 +7,10 @@
         <div class="flex items-start gap-3">
 
             {{-- Logo --}}
-            <div
-                class="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-300 bg-white shadow-sm">
+            <div class>
 
                 <img
-                    src="{{ asset('images/logo.png') }}"
+                    src="{{ asset('images/logo-sip.png') }}"
                     alt="Logo SIP"
                     class="h-10 w-10 object-contain">
 
@@ -53,7 +51,7 @@
 
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
-                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} px-4 py-3 transition">
+                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} px-4 py-3 transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -283,41 +281,107 @@
     {{-- ========================= --}}
     {{-- LOGOUT --}}
     {{-- ========================= --}}
-    <div class="p-5">
+    <div class="p-5" x-data="{ logoutOpen: false }">
 
-        <form method="POST" action="{{ route('logout') }}">
+        {{-- Hidden logout form --}}
+        <form id="logout-form" method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button
-                type="submit"
-                class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
-
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 17l5-5-5-5"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M21 12H9"/>
-
-                </svg>
-
-                Logout
-
-            </button>
-
         </form>
+
+        {{-- Trigger button --}}
+        <button
+            type="button"
+            @click="logoutOpen = true"
+            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 17l5-5-5-5"/>
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 12H9"/>
+
+            </svg>
+
+            Logout
+
+        </button>
+
+        {{-- Confirmation Modal --}}
+        <div
+            x-show="logoutOpen"
+            x-cloak
+            class="fixed inset-0 z-[60] flex items-center justify-center"
+            aria-modal="true"
+            role="dialog">
+
+            {{-- Backdrop --}}
+            <div
+                class="absolute inset-0 bg-white/70 backdrop-blur-sm"
+                @click="logoutOpen = false">
+            </div>
+
+            {{-- Dialog Card --}}
+            <div
+                x-show="logoutOpen"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="relative w-full max-w-sm rounded-3xl bg-white px-10 py-10 shadow-2xl text-center">
+                {{-- Warning Icon --}}
+                <div class="flex justify-center mb-6">
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full bg-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-12 w-12 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 5a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0V8a1 1 0 0 1 1-1zm0 10a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 17z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                {{-- Message --}}
+                <p class="mb-8 text-base font-medium text-slate-800">
+                    Apakah anda ingin keluar?
+                </p>
+
+                {{-- Actions --}}
+                <div class="flex items-center justify-center gap-4">
+
+                    <button
+                        type="button"
+                        @click="logoutOpen = false"
+                        class="rounded-full border border-red-300 bg-red-50 px-8 py-2.5 text-sm font-semibold text-red-500 transition hover:bg-red-100">
+                        Tidak
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="document.getElementById('logout-form').submit()"
+                        class="rounded-full bg-red-500 px-8 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600">
+                        Ya
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
