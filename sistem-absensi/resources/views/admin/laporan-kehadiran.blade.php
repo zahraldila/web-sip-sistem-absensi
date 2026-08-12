@@ -3,7 +3,7 @@
 @section('title', 'Laporan Kehadiran')
 
 @section('content')
-<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'excel' }" class="min-h-screen bg-slate-50 p-6">
+<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'excel' }">
 
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-900">Laporan Kehadiran</h1>
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="flex items-center">
-                    <div class="relative">
+                    <div class="relative" @click.outside="filterOpen = false">
                         <button
                             type="button"
                             @click="filterOpen = !filterOpen"
@@ -47,9 +47,17 @@
                             <div class="space-y-3">
                                 <x-forms.select name="status" label="Status">
                                     <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                                    <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                                    <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
+                                    <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
                                     <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                                     <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
+                                </x-forms.select>
+
+                                <x-forms.select name="divisi_id" label="Divisi">
+                                    <option value="Semua" {{ request('divisi_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
+                                    @foreach($divisions as $division)
+                                        <option value="{{ $division->divisi_id }}" {{ (string) request('divisi_id') === (string) $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
+                                    @endforeach
                                 </x-forms.select>
 
                                 <div class="grid gap-3 sm:grid-cols-2">
@@ -99,6 +107,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Karyawan</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Divisi</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tanggal</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Masuk</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Keluar</th>
@@ -126,7 +135,11 @@
                                         <p class="truncate text-sm font-medium text-gray-900">{{ $attendance->pegawai?->nama_pegawai ?? '-' }}</p>
                                     </div>
                                 </div>
-                            </td>
+                             </td>
+
+                             <td class="px-4 py-3 text-sm text-gray-700">
+                                 {{ $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-' }}
+                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700">{{ \Carbon\Carbon::parse($attendance->tanggal_absensi)->translatedFormat('d F Y') }}</td>
                             <td class="px-4 py-3 text-sm text-gray-700">{{ $attendance->jam_checkin ? \Carbon\Carbon::parse($attendance->jam_checkin)->format('H:i') : '-' }}</td>
@@ -151,7 +164,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-12 text-center text-sm text-gray-500">
+                            <td colspan="9" class="px-4 py-12 text-center text-sm text-gray-500">
                                 Tidak ada data kehadiran.
                             </td>
                         </tr>
@@ -246,12 +259,20 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-2">
+                <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-3">
                     <x-forms.select name="status" label="Status">
                         <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                        <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                        <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
+                        <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
                         <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                         <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
+                    </x-forms.select>
+
+                    <x-forms.select name="divisi_id" label="Divisi">
+                        <option value="Semua" {{ request('divisi_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
+                        @foreach($divisions as $division)
+                            <option value="{{ $division->divisi_id }}" {{ (string) request('divisi_id') === (string) $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
+                        @endforeach
                     </x-forms.select>
 
                     <x-forms.select name="pegawai_id" label="Pegawai">
