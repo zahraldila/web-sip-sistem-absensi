@@ -53,18 +53,7 @@
             <a href="{{ route('admin.dashboard') }}"
                 class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} px-4 py-3 transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M3 3h7v7H3zM14 3h7v4h-7zM14 11h7v10h-7zM3 14h7v7H3z"/>
-
-                </svg>
+                <i class="fa-solid fa-house fa-fw text-lg"></i>
 
                 <span class="text-sm font-semibold">
                     Dashboard
@@ -82,18 +71,7 @@
             <a href="{{ route('admin.laporan-kehadiran') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 19v-10M12 19V5M20 19v-14"/>
-
-                </svg>
+                <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Laporan Kehadiran
@@ -105,27 +83,7 @@
             <a href="{{ route('admin.manajemen-akun') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 3.13a4 4 0 0 1 0 7.75"/>
-
-                </svg>
+                <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Manajemen Akun
@@ -137,22 +95,7 @@
             <a href="{{ route('admin.persetujuan') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 7a4 4 0 0 0-8 0v1a4 4 0 0 0 4 4h1a2 2 0 0 1 2 2v2a3 3 0 0 1-3 3H8"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 15l2 2 4-4"/>
-
-                </svg>
+                <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Persetujuan
@@ -164,22 +107,7 @@
             <a href="{{ route('admin.log-aktivitas') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 3h10v2H7z"/>
-
-                </svg>
+                <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Log Aktivitas
@@ -191,22 +119,7 @@
             <a href="{{ route('admin.tampilan-branding') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M20.24 4.24a5 5 0 0 0-7.07 0L7 10.41 4.76 7.76a5 5 0 0 0-7.07 7.07l7.07 7.07 11.17-11.17a5 5 0 0 0 0-7.07z"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 10.41L13.59 4"/>
-
-                </svg>
+                <i class="fa-solid fa-palette fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Tampilan & Branding
@@ -218,22 +131,7 @@
             <a href="{{ route('admin.pengaturan') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.pengaturan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83l-1.41 1.41a2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0L2.29 19.7a2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 2.68 15a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83L3.7 2.29a2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.29 2a1.65 1.65 0 0 0 1.82.33H10a1.65 1.65 0 0 0 1-1.51V1a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09c.03.44.23.86.57 1.16l.06.06a1.65 1.65 0 0 0 1.82.33h.01z"/>
-
-                </svg>
+                <i class="fa-solid fa-gear fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Pengaturan
@@ -245,23 +143,7 @@
             <a href="{{ route('admin.bantuan') }}"
                 class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 9a3 3 0 1 0-3-3"/>
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 17h.01"/>
-                    <circle cx="12" cy="12" r="9"/>
-
-                </svg>
+                <i class="fa-solid fa-circle-question fa-fw text-lg"></i>
 
                 <span class="text-sm font-medium">
                     Bantuan
@@ -294,26 +176,7 @@
             @click="logoutOpen = true"
             class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
-
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 17l5-5-5-5"/>
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12H9"/>
-
-            </svg>
+            <i class="fa-solid fa-right-from-bracket fa-fw text-lg"></i>
 
             Logout
 
