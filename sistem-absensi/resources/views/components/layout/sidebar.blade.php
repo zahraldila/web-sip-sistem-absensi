@@ -69,85 +69,113 @@
 
             {{-- Laporan Kehadiran --}}
             <a href="{{ route('admin.laporan-kehadiran') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Laporan Kehadiran
                 </span>
+
+                @if(request()->routeIs('admin.laporan-kehadiran'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Manajemen Akun --}}
             <a href="{{ route('admin.manajemen-akun') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Manajemen Akun
                 </span>
+
+                @if(request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Persetujuan --}}
             <a href="{{ route('admin.persetujuan') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Persetujuan
                 </span>
+
+                @if(request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Log Aktivitas --}}
             <a href="{{ route('admin.log-aktivitas') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Log Aktivitas
                 </span>
+
+                @if(request()->routeIs('admin.log-aktivitas'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Tampilan & Branding --}}
             <a href="{{ route('admin.tampilan-branding') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-palette fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Tampilan & Branding
                 </span>
+
+                @if(request()->routeIs('admin.tampilan-branding'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Pengaturan --}}
             <a href="{{ route('admin.pengaturan') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.pengaturan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.pengaturan') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-gear fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Pengaturan
                 </span>
+
+                @if(request()->routeIs('admin.pengaturan'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
             {{-- Bantuan --}}
             <a href="{{ route('admin.bantuan') }}"
-                class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-slate-50 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
                 <i class="fa-solid fa-circle-question fa-fw text-lg"></i>
 
-                <span class="text-sm font-medium">
+                <span class="text-sm font-semibold">
                     Bantuan
                 </span>
+
+                @if(request()->routeIs('admin.bantuan'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @endif
 
             </a>
 
