@@ -259,13 +259,20 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-2">
+                <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-3">
                     <x-forms.select name="status" label="Status">
                         <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
                         <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
                         <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
                         <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
                         <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
+                    </x-forms.select>
+
+                    <x-forms.select name="divisi_id" label="Divisi">
+                        <option value="Semua" {{ request('divisi_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
+                        @foreach($divisions as $division)
+                            <option value="{{ $division->divisi_id }}" {{ (string) request('divisi_id') === (string) $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
+                        @endforeach
                     </x-forms.select>
 
                     <x-forms.select name="pegawai_id" label="Pegawai">
