@@ -89,11 +89,22 @@ class AttendanceReportController extends Controller
             }
         }
 
+        if ($modeKerja = $request->query('mode_kerja')) {
+            if ($modeKerja !== 'Semua') {
+                $query->where('skema_kerja', $modeKerja);
+            }
+        }
+
         return $query;
     }
 
     private function getAbsentRecords(Request $request): Collection
     {
+        $modeKerja = $request->query('mode_kerja');
+        if ($modeKerja && $modeKerja !== 'Semua') {
+            return collect();
+        }
+
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         
