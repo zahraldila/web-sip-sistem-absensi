@@ -47,4 +47,9 @@ class Pegawai extends Model
     {
         return $this->hasOne(Nfc::class, 'pegawai_id', 'pegawai_id');
     }
+
+    public function absensi(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Attendance::class, 'pegawai_id', 'pegawai_id');
+    }
 }

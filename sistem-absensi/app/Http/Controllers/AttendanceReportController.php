@@ -92,6 +92,77 @@ class AttendanceReportController extends Controller
         return $query;
     }
 
+    private function getAbsentRecords(Request $request): Collection
+    {
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        
+        $dates = [];
+        if ($startDate && $endDate) {
+            try {
+                $start = Carbon::parse($startDate);
+                $end = Carbon::parse($endDate);
+                if ($start->gt($end)) {
+                    $dates[] = $startDate;
+                } else {
+                    for ($d = $start->copy(); $d->lte($end); $d->addDay()) {
+                        $dates[] = $d->toDateString();
+                    }
+                }
+            } catch (\Throwable $e) {
+                $dates[] = Carbon::today()->toDateString();
+            }
+        } elseif ($startDate) {
+            $dates[] = $startDate;
+        } elseif ($endDate) {
+            $dates[] = $endDate;
+        } else {
+            $dates[] = Carbon::today()->toDateString();
+        }
+
+        $records = collect();
+        $divisiId = $request->query('divisi_id');
+        $search = trim((string) $request->query('search', ''));
+        $searchTerm = "%{$search}%";
+
+        foreach ($dates as $date) {
+            $query = Pegawai::with('masterDivisi')
+                ->whereDoesntHave('absensi', function ($q) use ($date) {
+                    $q->whereDate('tanggal_absensi', $date);
+                });
+
+            if ($divisiId && $divisiId !== 'Semua') {
+                $query->where('divisi_id', $divisiId);
+            }
+
+            if ($search !== '') {
+                $query->where('nama_pegawai', 'ilike', $searchTerm);
+            }
+
+            $pegawais = $query->orderBy('nama_pegawai')->get();
+
+            foreach ($pegawais as $pegawai) {
+                if ($pegawai->status !== 'Aktif') {
+                    continue;
+                }
+
+                $attendance = new Attendance();
+                $attendance->pegawai = $pegawai;
+                $attendance->tanggal_absensi = $date;
+                $attendance->status_kehadiran = 'Tidak Hadir';
+                $attendance->jam_checkin = null;
+                $attendance->jam_checkout = null;
+                $attendance->skema_kerja = '-';
+                $attendance->latitude = null;
+                $attendance->longitude = null;
+                
+                $records->push($attendance);
+            }
+        }
+
+        return $records->sortByDesc('tanggal_absensi')->values();
+    }
+
     private function formatDuration(?string $checkin, ?string $checkout): string
     {
         if (empty($checkin) || empty($checkout)) {
@@ -196,25 +267,41 @@ class AttendanceReportController extends Controller
     {
         Carbon::setLocale('id');
 
-        $attendances = $this->attendanceQuery($request)
-            ->orderByDesc('tanggal_absensi')
-            ->orderBy('jam_checkin')
-            ->paginate(5)
-            ->withQueryString();
+        if ($request->query('status') === 'Tidak Hadir') {
+            $absentRecords = $this->getAbsentRecords($request);
+            $page = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+            $perPage = 5;
+            $currentPageItems = $absentRecords->slice(($page - 1) * $perPage, $perPage)->values();
+            
+            $attendances = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageItems,
+                $absentRecords->count(),
+                $perPage,
+                $page,
+                ['path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath()]
+            );
+            $attendances->withQueryString();
+        } else {
+            $attendances = $this->attendanceQuery($request)
+                ->orderByDesc('tanggal_absensi')
+                ->orderBy('jam_checkin')
+                ->paginate(5)
+                ->withQueryString();
 
-        $attendances->getCollection()->transform(function ($attendance) {
-            if ($attendance->jam_checkin) {
-                $schedule = \DB::table('jadwal_kerja')
-                    ->where('jadwal_id', $attendance->jadwal_id)
-                    ->first();
-                if ($schedule && $schedule->jam_masuk) {
-                    $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
-                    $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
-                    $attendance->status_kehadiran = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
+            $attendances->getCollection()->transform(function ($attendance) {
+                if ($attendance->jam_checkin) {
+                    $schedule = \DB::table('jadwal_kerja')
+                        ->where('jadwal_id', $attendance->jadwal_id)
+                        ->first();
+                    if ($schedule && $schedule->jam_masuk) {
+                        $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
+                        $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
+                        $attendance->status_kehadiran = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
+                    }
                 }
-            }
-            return $attendance;
-        });
+                return $attendance;
+            });
+        }
 
         $pegawaiList = Pegawai::orderBy('nama_pegawai')->get(['pegawai_id', 'nama_pegawai']);
         $statusOptions = ['Semua', 'Hadir', 'Tepat Waktu', 'Terlambat', 'Tidak Hadir'];
@@ -232,31 +319,46 @@ class AttendanceReportController extends Controller
     {
         Carbon::setLocale('id');
 
-        $rows = $this->attendanceQuery($request)
-            ->get()
-            ->map(function (Attendance $attendance) {
-                $status = $attendance->status_kehadiran ?? 'Hadir';
-                if ($attendance->jam_checkin) {
-                    $schedule = \DB::table('jadwal_kerja')
-                        ->where('jadwal_id', $attendance->jadwal_id)
-                        ->first();
-                    if ($schedule && $schedule->jam_masuk) {
-                        $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
-                        $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
-                        $status = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
-                    }
-                }
+        if ($request->query('status') === 'Tidak Hadir') {
+            $rows = $this->getAbsentRecords($request)->map(function (Attendance $attendance) {
                 return [
                     'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
                     'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
-                    'Jam Masuk' => $this->formatTime($attendance->jam_checkin),
-                    'Jam Keluar' => $this->formatTime($attendance->jam_checkout),
-                    'Durasi Kehadiran' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
-                    'Mode Kerja' => $attendance->skema_kerja ?? '-',
-                    'Lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
-                    'Status' => $status,
+                    'Jam Masuk' => '-',
+                    'Jam Keluar' => '-',
+                    'Durasi Kehadiran' => '-',
+                    'Mode Kerja' => '-',
+                    'Lokasi' => '-',
+                    'Status' => 'Tidak Hadir',
                 ];
             });
+        } else {
+            $rows = $this->attendanceQuery($request)
+                ->get()
+                ->map(function (Attendance $attendance) {
+                    $status = $attendance->status_kehadiran ?? 'Hadir';
+                    if ($attendance->jam_checkin) {
+                        $schedule = \DB::table('jadwal_kerja')
+                            ->where('jadwal_id', $attendance->jadwal_id)
+                            ->first();
+                        if ($schedule && $schedule->jam_masuk) {
+                            $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
+                            $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
+                            $status = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
+                        }
+                    }
+                    return [
+                        'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                        'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
+                        'Jam Masuk' => $this->formatTime($attendance->jam_checkin),
+                        'Jam Keluar' => $this->formatTime($attendance->jam_checkout),
+                        'Durasi Kehadiran' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
+                        'Mode Kerja' => $attendance->skema_kerja ?? '-',
+                        'Lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
+                        'Status' => $status,
+                    ];
+                });
+        }
 
         if ($rows->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
@@ -290,31 +392,46 @@ class AttendanceReportController extends Controller
     {
         Carbon::setLocale('id');
 
-        $rows = $this->attendanceQuery($request)
-            ->get()
-            ->map(function (Attendance $attendance) {
-                $status = $attendance->status_kehadiran ?? 'Hadir';
-                if ($attendance->jam_checkin) {
-                    $schedule = \DB::table('jadwal_kerja')
-                        ->where('jadwal_id', $attendance->jadwal_id)
-                        ->first();
-                    if ($schedule && $schedule->jam_masuk) {
-                        $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
-                        $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
-                        $status = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
-                    }
-                }
+        if ($request->query('status') === 'Tidak Hadir') {
+            $rows = $this->getAbsentRecords($request)->map(function (Attendance $attendance) {
                 return [
                     'nama' => $attendance->pegawai?->nama_pegawai ?? '-',
                     'tanggal' => $this->formatDate($attendance->tanggal_absensi),
-                    'jam_masuk' => $this->formatTime($attendance->jam_checkin),
-                    'jam_keluar' => $this->formatTime($attendance->jam_checkout),
-                    'durasi' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
-                    'mode' => $attendance->skema_kerja ?? '-',
-                    'lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
-                    'status' => $status,
+                    'jam_masuk' => '-',
+                    'jam_keluar' => '-',
+                    'durasi' => '-',
+                    'mode' => '-',
+                    'lokasi' => '-',
+                    'status' => 'Tidak Hadir',
                 ];
             });
+        } else {
+            $rows = $this->attendanceQuery($request)
+                ->get()
+                ->map(function (Attendance $attendance) {
+                    $status = $attendance->status_kehadiran ?? 'Hadir';
+                    if ($attendance->jam_checkin) {
+                        $schedule = \DB::table('jadwal_kerja')
+                            ->where('jadwal_id', $attendance->jadwal_id)
+                            ->first();
+                        if ($schedule && $schedule->jam_masuk) {
+                            $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
+                            $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
+                            $status = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
+                        }
+                    }
+                    return [
+                        'nama' => $attendance->pegawai?->nama_pegawai ?? '-',
+                        'tanggal' => $this->formatDate($attendance->tanggal_absensi),
+                        'jam_masuk' => $this->formatTime($attendance->jam_checkin),
+                        'jam_keluar' => $this->formatTime($attendance->jam_checkout),
+                        'durasi' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
+                        'mode' => $attendance->skema_kerja ?? '-',
+                        'lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
+                        'status' => $status,
+                    ];
+                });
+        }
 
         $pdf = Pdf::loadView('admin.laporan-kehadiran-pdf', [
             'rows' => $rows,
