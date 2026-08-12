@@ -244,20 +244,43 @@ class AttendanceReportController extends Controller
                     }
                 }
                 return [
-                    $attendance->pegawai?->nama_pegawai ?? '-',
-                    $this->formatDate($attendance->tanggal_absensi),
-                    $this->formatTime($attendance->jam_checkin),
-                    $this->formatTime($attendance->jam_checkout),
-                    $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
-                    $attendance->skema_kerja ?? '-',
-                    $this->formatLocation($attendance->latitude, $attendance->longitude),
-                    $status,
+                    'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                    'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
+                    'Jam Masuk' => $this->formatTime($attendance->jam_checkin),
+                    'Jam Keluar' => $this->formatTime($attendance->jam_checkout),
+                    'Durasi Kehadiran' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
+                    'Mode Kerja' => $attendance->skema_kerja ?? '-',
+                    'Lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
+                    'Status' => $status,
                 ];
             });
 
-        $filename = 'laporan-kehadiran-' . now()->format('Ymd-His') . '.xlsx';
+        if ($rows->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
+        }
 
-        return Excel::download(new AttendanceReportExport($rows), $filename);
+        $filename = 'laporan-kehadiran-' . date('Ymd_His') . '.xlsx';
+
+        $callback = function () use ($rows) {
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray(array_keys($rows->first()), null, 'A1');
+
+            $rowIndex = 2;
+            foreach ($rows as $row) {
+                $sheet->fromArray(array_values($row), null, 'A' . $rowIndex++);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+        };
+
+        return new \Symfony\Component\HttpFoundation\StreamedResponse($callback, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'public',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        ]);
     }
 
     public function exportPdf(Request $request)
