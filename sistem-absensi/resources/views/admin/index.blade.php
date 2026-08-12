@@ -283,8 +283,13 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-100 flex-shrink-0">
-                                {{-- Placeholder avatar --}}
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($item['nama']) }}&background=123D91&color=fff&bold=true" alt="{{ $item['nama'] }}" class="h-full w-full object-cover">
+                                @if($item['foto'])
+                                    <img src="{{ $item['foto'] }}" alt="{{ $item['nama'] }}" class="h-full w-full object-cover">
+                                @else
+                                    <div class="flex h-full w-full items-center justify-center bg-[#123D91] text-xs font-bold text-white">
+                                        {{ getInitials($item['nama']) }}
+                                    </div>
+                                @endif
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-slate-900">
