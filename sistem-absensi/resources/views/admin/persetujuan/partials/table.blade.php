@@ -37,7 +37,7 @@
                             @endif
                             <div>
                                 <p class="font-semibold text-slate-900">{{ $approval->pegawai?->nama_pegawai ?? '-' }}</p>
-                                <p class="text-sm text-slate-400">{{ $approval->pegawai?->jabatan ?? '-' }}</p>
+                                <p class="text-xs text-slate-400">{{ $approval->pegawai?->masterDivisi?->nama_divisi ?? '-' }}</p>
                             </div>
                         </div>
                     </td>

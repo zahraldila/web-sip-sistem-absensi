@@ -24,7 +24,7 @@ class ApprovalControllers extends Controller
     
         $ditolak = Approval::where('status_pengajuan', 'Ditolak')->count();
     
-        $query = Approval::with('pegawai');
+        $query = Approval::with('pegawai.masterDivisi');
     
         /*
         |--------------------------------------------------------------------------
