@@ -3,41 +3,18 @@
 {{-- ======================================== --}}
 
 <div class="overflow-x-auto">
-
-    <table class="min-w-full">
-
-        <thead class="bg-slate-50">
-
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
             <tr>
-
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-500">
-                    Karyawan
-                </th>
-
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-500">
-                    Jenis Pengajuan
-                </th>
-
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-500">
-                    Tanggal Pengajuan
-                </th>
-
-                <th class="px-6 py-4 text-left text-sm font-semibold text-slate-500">
-                    Status
-                </th>
-
-                <th class="px-6 py-4 text-center text-sm font-semibold text-slate-500">
-                    Aksi
-                </th>
-
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Karyawan</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Jenis Pengajuan</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tanggal Pengajuan</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Aksi</th>
             </tr>
-
         </thead>
-
-        <tbody>
-
+        <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($approvals as $approval)
-
                 @php
                     $statusClass = match($approval->status_pengajuan) {
                         'Pending' => 'bg-yellow-100 text-yellow-700',
@@ -47,108 +24,49 @@
                         default => 'bg-slate-100 text-slate-700',
                     };
                 @endphp
-
-                <tr class="border-t border-slate-100 transition hover:bg-slate-50">
-
-                    {{-- KARYAWAN --}}
-                    <td class="px-6 py-5">
-
+                <tr class="transition hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="flex items-center gap-4">
-
-                            <div
-                                class="flex h-11 w-11 items-center justify-center rounded-full bg-[#123D91] font-semibold text-white">
-
-                                {{ strtoupper(substr($approval->pegawai?->nama_pegawai ?? 'U', 0, 1)) }}
-
-                            </div>
-
+                            @php $photoUrl = supabase_public_url($approval->pegawai?->foto_profile); @endphp
+                            @if($photoUrl)
+                                <img src="{{ $photoUrl }}" alt="{{ $approval->pegawai?->nama_pegawai }}" class="h-10 w-10 rounded-full object-cover" />
+                            @else
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700">
+                                    {{ strtoupper(substr($approval->pegawai?->nama_pegawai ?? 'U', 0, 1)) }}
+                                </div>
+                            @endif
                             <div>
-
-                                <p class="font-semibold text-slate-900">
-                                    {{ $approval->pegawai?->nama_pegawai ?? '-' }}
-                                </p>
-
-                                <p class="text-sm text-slate-400">
-                                    {{ $approval->pegawai?->jabatan ?? '-' }}
-                                </p>
-
+                                <p class="font-semibold text-slate-900">{{ $approval->pegawai?->nama_pegawai ?? '-' }}</p>
+                                <p class="text-sm text-slate-400">{{ $approval->pegawai?->jabatan ?? '-' }}</p>
                             </div>
-
                         </div>
-
                     </td>
-
-                    {{-- JENIS PENGAJUAN --}}
-                    <td class="px-6 py-5">
-
-                        <span class="font-medium text-slate-700">
-                            {{ $approval->jenis_pengajuan ?? '-' }}
-                        </span>
-
+                    <td class="px-4 py-3 text-sm text-gray-700">
+                        <span class="font-medium text-slate-700">{{ $approval->jenis_pengajuan ?? '-' }}</span>
                     </td>
-
-                    {{-- TANGGAL PENGAJUAN --}}
-                    <td class="px-6 py-5">
-
+                    <td class="px-4 py-3 text-sm text-gray-700">
                         @if($approval->tanggal_pengajuan)
-
                             {{ \Carbon\Carbon::parse($approval->tanggal_pengajuan)->translatedFormat('d F Y') }}
-
                         @else
-
                             -
-
                         @endif
-
                     </td>
-
-                    {{-- STATUS --}}
-                    <td class="px-6 py-5">
-
-                        <span
-                            class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClass }}">
-
-                            {{ $approval->status_pengajuan ?? '-' }}
-
-                        </span>
-
+                    <td class="px-4 py-3 text-sm">
+                        <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClass }}">{{ $approval->status_pengajuan ?? '-' }}</span>
                     </td>
-
-                    {{-- AKSI --}}
-                    <td class="px-6 py-5 text-center">
-
-                        <a
-                            href="{{ route('admin.persetujuan.detail', $approval) }}"
-                            class="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-
-                            Detail
-
-                        </a>
-
+                    <td class="px-4 py-3 text-center">
+                        <a href="{{ route('admin.persetujuan.detail', $approval) }}" class="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200">Detail</a>
                     </td>
-
                 </tr>
-
             @empty
-
                 <tr>
-
                     <td colspan="5" class="py-16 text-center">
-
-                        <p class="text-slate-400">
-                            Belum ada data pengajuan.
-                        </p>
-
+                        <p class="text-slate-400">Belum ada data pengajuan.</p>
                     </td>
-
                 </tr>
-
             @endforelse
-
         </tbody>
-
     </table>
-
 </div>
 
 
