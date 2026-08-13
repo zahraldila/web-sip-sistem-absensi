@@ -74,33 +74,75 @@
 {{-- PAGINATION --}}
 {{-- ======================================== --}}
 
-<div
-    class="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 lg:flex-row">
-
+<div class="flex flex-col gap-4 border-t border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
     <p class="text-sm text-slate-500">
-
-        Menampilkan
-
-        <span class="font-semibold">
-            {{ $approvals->firstItem() ?? 0 }}
-        </span>
-
-        -
-
-        <span class="font-semibold">
-            {{ $approvals->lastItem() ?? 0 }}
-        </span>
-
-        dari
-
-        <span class="font-semibold">
-            {{ $approvals->total() }}
-        </span>
-
-        data
-
+        Menampilkan {{ $approvals->firstItem() ?? 0 }} - {{ $approvals->lastItem() ?? 0 }} dari {{ $approvals->total() }} data
     </p>
 
-    {{ $approvals->onEachSide(1)->links() }}
+    <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm" aria-label="Pagination">
+        <a
+            class="inline-flex h-[46px] w-[46px] items-center justify-center border-r border-slate-200 text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $approvals->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+            href="{{ $approvals->onFirstPage() ? '#' : $approvals->previousPageUrl() }}"
+            aria-disabled="{{ $approvals->onFirstPage() ? 'true' : 'false' }}"
+        >
+            ‹
+        </a>
 
+        @php
+            $currentPage = $approvals->currentPage();
+            $lastPage = $approvals->lastPage();
+            $paginationElements = [];
+
+            if ($lastPage <= 7) {
+                for ($i = 1; $i <= $lastPage; $i++) {
+                    $paginationElements[] = $i;
+                }
+            } else {
+                if ($currentPage <= 4) {
+                    for ($i = 1; $i <= 5; $i++) {
+                        $paginationElements[] = $i;
+                    }
+                    $paginationElements[] = '...';
+                    $paginationElements[] = $lastPage;
+                } elseif ($currentPage >= $lastPage - 3) {
+                    $paginationElements[] = 1;
+                    $paginationElements[] = '...';
+                    for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+                        $paginationElements[] = $i;
+                    }
+                } else {
+                    $paginationElements[] = 1;
+                    $paginationElements[] = '...';
+                    for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                        $paginationElements[] = $i;
+                    }
+                    $paginationElements[] = '...';
+                    $paginationElements[] = $lastPage;
+                }
+            }
+        @endphp
+
+        @foreach ($paginationElements as $element)
+            @if ($element === '...')
+                <span class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium text-slate-400 bg-white select-none">
+                    ...
+                </span>
+            @else
+                <a
+                    class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
+                    href="{{ $approvals->url($element) }}"
+                >
+                    {{ $element }}
+                </a>
+            @endif
+        @endforeach
+
+        <a
+            class="inline-flex h-[46px] w-[46px] items-center justify-center text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $approvals->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+            href="{{ $approvals->hasMorePages() ? $approvals->nextPageUrl() : '#' }}"
+            aria-disabled="{{ ! $approvals->hasMorePages() ? 'true' : 'false' }}"
+        >
+            ›
+        </a>
+    </nav>
 </div>
