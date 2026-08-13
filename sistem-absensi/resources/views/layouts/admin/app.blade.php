@@ -116,6 +116,8 @@
     {{-- Sprint selanjutnya --}}
     {{-- ===================== --}}
 
+    @stack('modals')
+
     @stack('scripts')
 
 </body>

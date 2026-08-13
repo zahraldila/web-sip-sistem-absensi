@@ -320,6 +320,7 @@
 {{-- ======================================== --}}
 {{-- FILTER MODAL --}}
 {{-- ======================================== --}}
+@push('modals')
 
 <div
     id="filter-modal"
@@ -599,6 +600,294 @@
 {{-- ======================================== --}}
 {{-- EXPORT MODAL --}}
 {{-- ======================================== --}}
+
+<div
+    id="export-modal"
+    class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm"
+    aria-labelledby="export-modal-title"
+    role="dialog"
+    aria-modal="true">
+
+    <div class="relative flex min-h-full items-center justify-center p-4">
+
+        <div
+            id="export-modal-content"
+            class="relative w-full max-w-xl rounded-3xl bg-white shadow-2xl">
+
+            {{-- HEADER --}}
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+
+                <div>
+
+                    <h2
+                        id="export-modal-title"
+                        class="text-xl font-bold text-slate-900">
+
+                        Export Pengajuan
+
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+
+                        Pilih format dan data yang ingin diekspor.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="close-export-modal"
+                    class="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"/>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            {{-- FORM --}}
+            <form id="export-form">
+
+                <div class="space-y-5 px-6 py-6">
+
+                    {{-- FORMAT --}}
+                    <div>
+
+                        <label class="mb-3 block text-sm font-semibold text-slate-700">
+
+                            Format
+
+                        </label>
+
+                        <div class="grid grid-cols-2 gap-3">
+
+                            {{-- PDF --}}
+                            <label
+                                class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-300 p-4 transition hover:bg-slate-50">
+
+                                <input
+                                    type="radio"
+                                    name="format"
+                                    value="pdf"
+                                    class="h-4 w-4 text-[#123D91] focus:ring-[#123D91]">
+
+                                <div>
+
+                                    <p class="text-sm font-semibold text-slate-800">
+                                        PDF
+                                    </p>
+
+                                    <p class="text-xs text-slate-500">
+                                        Export sebagai PDF
+                                    </p>
+
+                                </div>
+
+                            </label>
+
+
+                            {{-- EXCEL --}}
+                            <label
+                                class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-300 p-4 transition hover:bg-slate-50">
+
+                                <input
+                                    type="radio"
+                                    name="format"
+                                    value="excel"
+                                    class="h-4 w-4 text-[#123D91] focus:ring-[#123D91]">
+
+                                <div>
+
+                                    <p class="text-sm font-semibold text-slate-800">
+                                        Excel
+                                    </p>
+
+                                    <p class="text-xs text-slate-500">
+                                        Export sebagai Excel
+                                    </p>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- RENTANG TANGGAL --}}
+                    <div>
+
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+
+                            Rentang Tanggal
+
+                        </label>
+
+                        <div class="grid gap-3 sm:grid-cols-2">
+
+                            <div>
+
+                                <label
+                                    for="export-tanggal-awal"
+                                    class="mb-1 block text-xs text-slate-500">
+
+                                    Tanggal Awal
+
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="export-tanggal-awal"
+                                    name="tanggal_awal"
+                                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/10">
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="export-tanggal-akhir"
+                                    class="mb-1 block text-xs text-slate-500">
+
+                                    Tanggal Akhir
+
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="export-tanggal-akhir"
+                                    name="tanggal_akhir"
+                                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/10">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- STATUS --}}
+                    <div>
+
+                        <label
+                            for="export-status"
+                            class="mb-2 block text-sm font-semibold text-slate-700">
+
+                            Status
+
+                        </label>
+
+                        <select
+                            id="export-status"
+                            name="status"
+                            class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/10">
+
+                            <option value="">
+                                Semua
+                            </option>
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="Diproses">
+                                Diproses
+                            </option>
+
+                            <option value="Disetujui">
+                                Disetujui
+                            </option>
+
+                            <option value="Ditolak">
+                                Ditolak
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    {{-- PEGAWAI --}}
+                    <div>
+
+                        <label
+                            for="export-pegawai"
+                            class="mb-2 block text-sm font-semibold text-slate-700">
+
+                            Pegawai
+
+                        </label>
+
+                        <select
+                            id="export-pegawai"
+                            name="pegawai_id"
+                            class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/10">
+
+                            <option value="">
+                                Semua Pegawai
+                            </option>
+
+                            @foreach($pegawai as $item)
+
+                                <option value="{{ $item->pegawai_id }}">
+                                    {{ $item->nama_pegawai }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                {{-- FOOTER --}}
+                <div class="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-5">
+
+                    <button
+                        type="button"
+                        id="cancel-export"
+                        class="rounded-2xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="rounded-2xl bg-[#123D91] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0f3278]">
+
+                        Unduh
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 
 <div
     id="export-modal"
@@ -1403,5 +1692,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
+@endpush
 
 @endsection
