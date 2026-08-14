@@ -56,11 +56,15 @@ if (! function_exists('getInitials')) {
 }
 
 if (! function_exists('supabase_public_url')) {
-    function supabase_public_url(?string $path): ?string
+    function supabase_public_url(?string $path, ?string $bucket = null): ?string
     {
         $path = trim($path ?? '');
         if ($path === '') {
             return null;
+        }
+
+        if (preg_match('/^https?:\/\//i', $path)) {
+            return $path;
         }
 
         $baseUrl = config('supabase.url') ?: env('SUPABASE_URL');
@@ -74,7 +78,7 @@ if (! function_exists('supabase_public_url')) {
             $baseUrl = "https://{$projectRef}.supabase.co";
         }
 
-        $bucket = config('supabase.bucket', 'profile-images');
+        $bucket = $bucket ?: config('supabase.bucket', 'profile-images');
         $bucket = trim($bucket ?: 'profile-images');
         $path = ltrim($path, '/');
 
@@ -96,3 +100,20 @@ if (! function_exists('supabase_public_url')) {
         return rtrim($baseUrl, '/') . '/storage/v1/object/public/' . rawurlencode($bucket) . '/' . implode('/', $segments);
     }
 }
+
+if (! function_exists('supabase_submission_url')) {
+    function supabase_submission_url(?string $path): ?string
+    {
+        $path = trim($path ?? '');
+        if ($path === '') {
+            return null;
+        }
+
+        if (preg_match('/^https?:\/\//i', $path)) {
+            return $path;
+        }
+
+        return supabase_public_url($path, 'submission-files');
+    }
+}
+

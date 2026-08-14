@@ -314,90 +314,142 @@
 
 </div>
 
-{{-- DETAIL MODAL --}}
-<!-- DETAIL MODAL -->
-<div x-show="showDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm" x-cloak>
-    <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl" @click.away="closeDetail()">
-        <!-- Header with profile picture -->
-        <div class="flex items-center gap-4 mb-6">
-            <template x-if="approval.foto_profile">
-                <img :src="approval.foto_profile" alt="Foto Karyawan" class="h-16 w-16 rounded-full object-cover" />
-            </template>
-            <template x-if="!approval.foto_profile">
-                <div class="h-16 w-16 flex items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-700"
-                     x-text="approval.nama_pegawai ? approval.nama_pegawai.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '-'">
+    {{-- DETAIL MODAL --}}
+    <div x-show="showDetail" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeDetail()">
+        <div class="relative w-full max-w-2xl overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-6 py-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900">Detail Pengajuan</h2>
+                        <p class="mt-1 text-sm text-slate-500">Informasi lengkap pengajuan yang dipilih.</p>
+                    </div>
+                    <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                        @click="closeDetail()" aria-label="Tutup modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-            </template>
-            <div>
-                <h3 class="text-lg font-semibold text-slate-900" x-text="approval.nama_pegawai"></h3>
-                <p class="text-sm text-slate-500" x-text="approval.divisi_name"></p>
             </div>
-        </div>
-        <!-- Detail Section -->
-        <h2 class="text-xl font-bold mb-2">Detail Pengajuan</h2>
-        <div class="space-y-2 text-sm">
-            <p><span class="font-medium text-slate-600">Jenis Pengajuan:</span> <span x-text="approval.jenis_pengajuan"></span></p>
-            <p><span class="font-medium text-slate-600">Tanggal Pengajuan:</span> <span x-text="approval.tanggal_pengajuan"></span></p>
-            <p><span class="font-medium text-slate-600">Status:</span> <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="statusClass(approval.status_pengajuan)" x-text="approval.status_pengajuan"></span></p>
-        </div>
-        <!-- Keterangan -->
-        <div class="mt-4">
-            <h3 class="text-lg font-medium mb-1">Keterangan</h3>
-            <p class="text-slate-900" x-text="approval.keterangan"></p>
-        </div>
-        <!-- Lampiran -->
-        <div class="mt-4">
-            <template x-if="approval.lampiran_path">
-                <div>
-                    <h3 class="text-lg font-medium mb-1">Lampiran</h3>
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span x-text="approval.lampiran_path.split('/').pop()"></span>
-                        <a :href="`{{ config('supabase.url') }}/storage/v1/object/public/submission-files/${approval.lampiran_path.split('/').slice(1).join('/')}`" target="_blank" class="text-blue-600 underline">Unduh</a>
+            <div class="px-6 py-6">
+                <div class="grid gap-6 lg:grid-cols-[220px_1fr] items-center">
+                    <div class="flex flex-col items-center justify-center text-center">
+                        <template x-if="detailData.foto_profile">
+                            <img :src="detailData.foto_profile" alt="Foto Pegawai" class="mx-auto h-28 w-28 rounded-full object-cover" />
+                        </template>
+                        <template x-if="!detailData.foto_profile">
+                            <div class="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-slate-200 text-3xl font-semibold text-slate-700" x-text="detailInitials()"></div>
+                        </template>
+                        <div class="mt-4 text-lg font-semibold text-slate-900" x-text="detailData.nama_pegawai"></div>
+                        <div class="mt-1 text-sm text-slate-500" x-text="detailData.divisi_name"></div>
+                    </div>
+                    <div class="grid gap-4">
+                        <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                            <div class="text-sm text-slate-500">Department</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.divisi_name || '-' "></div>
+
+                            <div class="text-sm text-slate-500">Jenis Pengajuan</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.jenis_pengajuan || '-' "></div>
+
+                            <div class="text-sm text-slate-500">Tanggal Pengajuan</div>
+                            <div class="font-medium text-slate-900" x-text="detailData.tanggal_pengajuan || '-' "></div>
+
+                            <div class="text-sm text-slate-500">Status</div>
+                            <div>
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                    :class="statusClass(detailData.status_pengajuan)"
+                                    x-text="detailData.status_pengajuan || '-' "></span>
+                            </div>
+
+                            <div class="text-sm text-slate-500">Keterangan</div>
+                            <div class="font-medium text-slate-900 break-words" x-text="detailData.keterangan || '-' "></div>
+
+                            <div class="text-sm text-slate-500">Lampiran</div>
+                            <div>
+                                <template x-if="detailData.lampiran_url">
+                                    <a :href="detailData.lampiran_url" target="_blank" download class="inline-flex items-center gap-1.5 font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span class="truncate max-w-[160px]" :title="detailData.lampiran_name" x-text="detailData.lampiran_name || 'Unduh Lampiran'"></span>
+                                    </a>
+                                </template>
+                                <template x-if="!detailData.lampiran_url">
+                                    <span class="text-sm text-slate-400">Tidak ada lampiran</span>
+                                </template>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </template>
-            <template x-if="!approval.lampiran_path">
-                <p class="text-sm text-slate-400">Tidak ada lampiran</p>
-            </template>
-        </div>
-        <!-- Close button -->
-        <div class="text-right mt-6">
-            <button @click="closeDetail()" class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">Tutup</button>
+            </div>
+            <div class="border-t border-slate-200 bg-white px-6 py-4 text-right">
+                <button type="button" @click="closeDetail()"
+                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
+                    Tutup
+                </button>
+            </div>
         </div>
     </div>
-</div>
-<script>
-function statusClass(status) {
-    switch (status) {
-        case 'Pending': return 'bg-yellow-100 text-yellow-700';
-        case 'Diproses': return 'bg-blue-100 text-blue-700';
-        case 'Disetujui': return 'bg-green-100 text-green-700';
-        case 'Ditolak': return 'bg-red-100 text-red-700';
-        default: return 'bg-slate-100 text-slate-700';
-    }
-}
-</script>
 
-<script>
-function approvalModal() {
-    return {
-        showDetail: false,
-        approval: {},
-        openApproval(event) {
-            const data = event.currentTarget.dataset.approval;
-            if (data) {
-                this.approval = JSON.parse(data);
-                this.showDetail = true;
-            }
-        },
-        closeDetail() {
-            this.showDetail = false;
+    <script>
+    function statusClass(status) {
+        switch (status) {
+            case 'Pending': return 'bg-yellow-100 text-yellow-700';
+            case 'Diproses': return 'bg-blue-100 text-blue-700';
+            case 'Disetujui': return 'bg-green-100 text-green-700';
+            case 'Ditolak': return 'bg-red-100 text-red-700';
+            default: return 'bg-slate-100 text-slate-700';
         }
-    };
-}
-</script>
+    }
 
+    function approvalModal() {
+        return {
+            showDetail: false,
+            detailData: {
+                approval_id: '',
+                nama_pegawai: '',
+                divisi_name: '',
+                jenis_pengajuan: '',
+                tanggal_pengajuan: '',
+                status_pengajuan: '',
+                keterangan: '',
+                lampiran_path: null,
+                lampiran_url: null,
+                lampiran_name: null,
+                foto_profile: ''
+            },
+            detailInitials() {
+                if (!this.detailData.nama_pegawai || this.detailData.nama_pegawai === '-') {
+                    return '-';
+                }
+                return this.detailData.nama_pegawai.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
+            },
+            openApproval(event) {
+                const raw = event.currentTarget.dataset.approval;
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    this.detailData = {
+                        approval_id: data.approval_id || '',
+                        nama_pegawai: data.nama_pegawai || '-',
+                        divisi_name: data.divisi_name || '-',
+                        jenis_pengajuan: data.jenis_pengajuan || '-',
+                        tanggal_pengajuan: data.tanggal_pengajuan || '-',
+                        status_pengajuan: data.status_pengajuan || '-',
+                        keterangan: data.keterangan || '-',
+                        lampiran_path: data.lampiran_path || null,
+                        lampiran_url: data.lampiran_url || null,
+                        lampiran_name: data.lampiran_name || (data.lampiran_path ? data.lampiran_path.split('/').pop() : null),
+                        foto_profile: data.foto_profile || ''
+                    };
+                    this.showDetail = true;
+                }
+            },
+            closeDetail() {
+                this.showDetail = false;
+            }
+        };
+    }
+    </script>
 </section>
 
 
@@ -1423,6 +1475,9 @@ document.addEventListener('DOMContentLoaded', function () {
             */
 
             tableContainer.innerHTML = data.html;
+            if (window.Alpine) {
+                window.Alpine.initTree(tableContainer);
+            }
 
 
             /*
@@ -1697,6 +1752,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
 
             tableContainer.innerHTML = data.html;
+            if (window.Alpine) {
+                window.Alpine.initTree(tableContainer);
+            }
 
 
             if (pushState) {
