@@ -187,14 +187,54 @@
                     ‹
                 </a>
 
-                @for ($page = 1; $page <= $attendances->lastPage(); $page++)
-                    <a
-                        class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $page === $attendances->currentPage() ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
-                        href="{{ $attendances->url($page) }}"
-                    >
-                        {{ $page }}
-                    </a>
-                @endfor
+                @php
+    $currentPage = $attendances->currentPage();
+    $lastPage = $attendances->lastPage();
+    $paginationElements = [];
+
+    if ($lastPage <= 7) {
+        for ($i = 1; $i <= $lastPage; $i++) {
+            $paginationElements[] = $i;
+        }
+    } else {
+        if ($currentPage <= 4) {
+            for ($i = 1; $i <= 5; $i++) {
+                $paginationElements[] = $i;
+            }
+            $paginationElements[] = '...';
+            $paginationElements[] = $lastPage;
+        } elseif ($currentPage >= $lastPage - 3) {
+            $paginationElements[] = 1;
+            $paginationElements[] = '...';
+            for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+                $paginationElements[] = $i;
+            }
+        } else {
+            $paginationElements[] = 1;
+            $paginationElements[] = '...';
+            for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                $paginationElements[] = $i;
+            }
+            $paginationElements[] = '...';
+            $paginationElements[] = $lastPage;
+        }
+    }
+@endphp
+
+@foreach ($paginationElements as $element)
+    @if ($element === '...')
+        <span class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium text-slate-400 bg-white select-none">
+            ...
+        </span>
+    @else
+        <a
+            class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
+            href="{{ $attendances->url($element) }}"
+        >
+            {{ $element }}
+        </a>
+    @endif
+@endforeach
 
                 <a
                     class="inline-flex h-[46px] w-[46px] items-center justify-center text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $attendances->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
