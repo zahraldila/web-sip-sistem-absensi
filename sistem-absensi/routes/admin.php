@@ -33,6 +33,12 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     )->name('admin.persetujuan.export.excel');
     Route::get('/persetujuan/{approval}', [ApprovalControllers::class, 'show'])
         ->name('admin.persetujuan.detail');
+    Route::post('/persetujuan/{pengajuan}/approve', [ApprovalControllers::class, 'approve'])
+        ->name('admin.persetujuan.approve');
+    Route::post('/persetujuan/{pengajuan}/reject', [ApprovalControllers::class, 'reject'])
+        ->name('admin.persetujuan.reject');
+    Route::post('/persetujuan/{pengajuan}/process', [ApprovalControllers::class, 'process'])
+        ->name('admin.persetujuan.process');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');

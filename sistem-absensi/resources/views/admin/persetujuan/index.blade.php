@@ -45,7 +45,7 @@
                             Pending
                         </p>
 
-                        <h2 class="mt-2 text-4xl font-bold text-slate-900">
+                        <h2 class="mt-2 text-4xl font-bold text-slate-900" x-text="counts.pending">
                             {{ $pending }}
                         </h2>
 
@@ -89,7 +89,7 @@
                             Diproses
                         </p>
 
-                        <h2 class="mt-2 text-4xl font-bold text-slate-900">
+                        <h2 class="mt-2 text-4xl font-bold text-slate-900" x-text="counts.diproses">
                             {{ $diproses }}
                         </h2>
 
@@ -133,7 +133,7 @@
                             Disetujui
                         </p>
 
-                        <h2 class="mt-2 text-4xl font-bold text-slate-900">
+                        <h2 class="mt-2 text-4xl font-bold text-slate-900" x-text="counts.disetujui">
                             {{ $disetujui }}
                         </h2>
 
@@ -177,7 +177,7 @@
                             Ditolak
                         </p>
 
-                        <h2 class="mt-2 text-4xl font-bold text-slate-900">
+                        <h2 class="mt-2 text-4xl font-bold text-slate-900" x-text="counts.ditolak">
                             {{ $ditolak }}
                         </h2>
 
@@ -382,13 +382,144 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t border-slate-200 bg-white px-6 py-4 text-right">
-                <button type="button" @click="closeDetail()"
-                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
-                    Tutup
+<div class="border-t border-slate-200 bg-white px-6 py-4 flex items-center justify-end gap-2">
+    <template x-if="detailData.status_pengajuan === 'Pending'">
+        <div class="flex items-center gap-2">
+            <button type="button"
+                @click="confirmApprove(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
+                class="inline-flex items-center justify-center rounded-[10px] bg-green-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-green-700 shadow-sm">
+                Setujui
+            </button>
+            <button type="button"
+                @click="openRejectModal(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
+                class="inline-flex items-center justify-center rounded-[10px] bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-red-700 shadow-sm">
+                Tolak
+            </button>
+        </div>
+    </template>
+</div>
+        </div>
+    </div>
+
+    {{-- REJECT MODAL --}}
+    <div x-show="showRejectModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeRejectModal()">
+        <div class="relative w-full max-w-lg overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 border border-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-6 py-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Tolak Pengajuan</h2>
+                        <p class="mt-1 text-sm text-slate-500">
+                            Pengajuan <span class="font-semibold text-slate-700" x-text="rejectData.jenis_pengajuan"></span> oleh <span class="font-semibold text-slate-700" x-text="rejectData.nama_pegawai"></span>
+                        </p>
+                    </div>
+                    <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                        @click="closeRejectModal()" aria-label="Tutup modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <form @submit.prevent="submitReject()">
+                <div class="px-6 py-5 space-y-4">
+                    <div>
+                        <label for="reject-reason" class="mb-2 block text-sm font-semibold text-slate-700">
+                            Alasan Penolakan <span class="text-rose-600">*</span>
+                        </label>
+                        <textarea
+                            id="reject-reason"
+                            x-model="rejectData.alasan"
+                            rows="4"
+                            placeholder="Tuliskan alasan penolakan secara jelas untuk diinfokan kepada pegawai..."
+                            class="w-full rounded-2xl border border-slate-300 bg-white p-3.5 text-sm text-slate-700 outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 placeholder:text-slate-400"
+                            :class="{'border-rose-500 ring-2 ring-rose-500/10': rejectData.errorMessage}"
+                            required></textarea>
+                        <template x-if="rejectData.errorMessage">
+                            <p class="mt-1.5 text-xs text-rose-600 flex items-center gap-1 font-medium" x-text="rejectData.errorMessage"></p>
+                        </template>
+                    </div>
+                </div>
+                <div class="border-t border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-end gap-3">
+                    <button type="button" @click="closeRejectModal()" :disabled="rejectData.isSubmitting"
+                        class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50">
+                        Batal
+                    </button>
+                    <button type="submit" :disabled="rejectData.isSubmitting"
+                        class="inline-flex items-center justify-center gap-2 rounded-[10px] bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50 shadow-sm">
+                        <template x-if="rejectData.isSubmitting">
+                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </template>
+                        <span x-text="rejectData.isSubmitting ? 'Memproses...' : 'Konfirmasi Tolak'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- APPROVE CONFIRMATION MODAL --}}
+    <div x-show="showApproveModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeApproveModal()">
+        <div class="relative w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 border border-slate-200" @click.stop>
+            <div class="p-6 text-center">
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Setujui Pengajuan?</h3>
+                <p class="mt-2 text-sm text-slate-500">
+                    Apakah Anda yakin ingin menyetujui pengajuan <span class="font-semibold text-slate-700" x-text="approveData.jenis_pengajuan"></span> milik <span class="font-semibold text-slate-700" x-text="approveData.nama_pegawai"></span>?
+                </p>
+                <template x-if="approveData.errorMessage">
+                    <p class="mt-3 text-xs text-rose-600 font-medium" x-text="approveData.errorMessage"></p>
+                </template>
+            </div>
+            <div class="border-t border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-center gap-3">
+                <button type="button" @click="closeApproveModal()" :disabled="approveData.isSubmitting"
+                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50">
+                    Batal
+                </button>
+                <button type="button" @click="submitApprove()" :disabled="approveData.isSubmitting"
+                    class="inline-flex items-center justify-center gap-2 rounded-[10px] bg-green-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50 shadow-sm">
+                    <template x-if="approveData.isSubmitting">
+                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </template>
+                    <span x-text="approveData.isSubmitting ? 'Memproses...' : 'Ya, Setujui'"></span>
                 </button>
             </div>
         </div>
+    </div>
+
+    {{-- TOAST NOTIFICATION --}}
+    <div x-show="toast.show" x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform translate-y-4"
+        class="fixed bottom-6 right-6 z-[70] flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-2xl text-sm font-medium border text-white"
+        :class="toast.type === 'success' ? 'bg-slate-900/90 backdrop-blur-sm border-slate-700 text-white' : 'bg-rose-900/90 backdrop-blur-sm border-rose-700 text-white'">
+        <template x-if="toast.type === 'success'">
+            <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </template>
+        <template x-if="toast.type === 'error'">
+            <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </template>
+        <span x-text="toast.message" class="text-sm font-medium"></span>
     </div>
 
     <script>
@@ -405,6 +536,20 @@
     function approvalModal() {
         return {
             showDetail: false,
+            showRejectModal: false,
+            showApproveModal: false,
+            counts: {
+                pending: {{ $pending }},
+                diproses: {{ $diproses }},
+                disetujui: {{ $disetujui }},
+                ditolak: {{ $ditolak }}
+            },
+            toast: {
+                show: false,
+                message: '',
+                type: 'success',
+                timeout: null
+            },
             detailData: {
                 approval_id: '',
                 nama_pegawai: '',
@@ -418,6 +563,30 @@
                 lampiran_name: null,
                 foto_profile: ''
             },
+            rejectData: {
+                pengajuan_id: null,
+                jenis_pengajuan: '',
+                nama_pegawai: '',
+                alasan: '',
+                isSubmitting: false,
+                errorMessage: ''
+            },
+            approveData: {
+                pengajuan_id: null,
+                jenis_pengajuan: '',
+                nama_pegawai: '',
+                isSubmitting: false,
+                errorMessage: ''
+            },
+            showToast(message, type = 'success') {
+                if (this.toast.timeout) clearTimeout(this.toast.timeout);
+                this.toast.message = message;
+                this.toast.type = type;
+                this.toast.show = true;
+                this.toast.timeout = setTimeout(() => {
+                    this.toast.show = false;
+                }, 4000);
+            },
             detailInitials() {
                 if (!this.detailData.nama_pegawai || this.detailData.nama_pegawai === '-') {
                     return '-';
@@ -429,7 +598,7 @@
                 if (raw) {
                     const data = JSON.parse(raw);
                     this.detailData = {
-                        approval_id: data.approval_id || '',
+                        approval_id: data.pengajuan_id || data.approval_id || '',
                         nama_pegawai: data.nama_pegawai || '-',
                         divisi_name: data.divisi_name || '-',
                         jenis_pengajuan: data.jenis_pengajuan || '-',
@@ -446,6 +615,128 @@
             },
             closeDetail() {
                 this.showDetail = false;
+            },
+            confirmApprove(id, jenis, namaPegawai) {
+                this.approveData = {
+                    pengajuan_id: id,
+                    jenis_pengajuan: jenis || 'Pengajuan',
+                    nama_pegawai: namaPegawai || 'Pegawai',
+                    isSubmitting: false,
+                    errorMessage: ''
+                };
+                this.showApproveModal = true;
+            },
+            closeApproveModal() {
+                if (this.approveData.isSubmitting) return;
+                this.showApproveModal = false;
+            },
+            submitApprove() {
+                if (!this.approveData.pengajuan_id) return;
+                this.approveData.isSubmitting = true;
+                this.approveData.errorMessage = '';
+
+                fetch(`/admin/persetujuan/${this.approveData.pengajuan_id}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Gagal menyetujui pengajuan.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    this.showApproveModal = false;
+                    this.showDetail = false;
+                    this.showToast(data.message || 'Pengajuan berhasil disetujui.', 'success');
+                    if (data.counts) {
+                        this.counts = data.counts;
+                    }
+                    if (typeof window.refreshApprovalTable === 'function') {
+                        window.refreshApprovalTable();
+                    }
+                })
+                .catch((error) => {
+                    this.approveData.errorMessage = error.message;
+                    this.showToast(error.message, 'error');
+                })
+                .finally(() => {
+                    this.approveData.isSubmitting = false;
+                });
+            },
+            openRejectModal(id, jenis, namaPegawai) {
+                this.rejectData = {
+                    pengajuan_id: id,
+                    jenis_pengajuan: jenis || 'Pengajuan',
+                    nama_pegawai: namaPegawai || 'Pegawai',
+                    alasan: '',
+                    isSubmitting: false,
+                    errorMessage: ''
+                };
+                this.showRejectModal = true;
+            },
+            closeRejectModal() {
+                if (this.rejectData.isSubmitting) return;
+                this.showRejectModal = false;
+            },
+            submitReject() {
+                if (!this.rejectData.pengajuan_id) return;
+                const alasan = (this.rejectData.alasan || '').trim();
+                if (!alasan) {
+                    this.rejectData.errorMessage = 'Alasan penolakan wajib diisi.';
+                    return;
+                }
+                if (alasan.length < 3) {
+                    this.rejectData.errorMessage = 'Alasan penolakan minimal harus berisi 3 karakter.';
+                    return;
+                }
+
+                this.rejectData.isSubmitting = true;
+                this.rejectData.errorMessage = '';
+
+                fetch(`/admin/persetujuan/${this.rejectData.pengajuan_id}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        catatan_admin: alasan
+                    })
+                })
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Gagal menolak pengajuan.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    this.showRejectModal = false;
+                    this.showDetail = false;
+                    this.showToast(data.message || 'Pengajuan berhasil ditolak.', 'success');
+                    if (data.counts) {
+                        this.counts = data.counts;
+                    }
+                    if (typeof window.refreshApprovalTable === 'function') {
+                        window.refreshApprovalTable();
+                    }
+                })
+                .catch((error) => {
+                    this.rejectData.errorMessage = error.message;
+                    this.showToast(error.message, 'error');
+                })
+                .finally(() => {
+                    this.rejectData.isSubmitting = false;
+                });
             }
         };
     }
@@ -1756,6 +2047,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.Alpine.initTree(tableContainer);
             }
 
+            if (data.counts) {
+                const rootElem = document.querySelector('[x-data]');
+                if (rootElem && rootElem._x_dataStack && rootElem._x_dataStack[0]) {
+                    rootElem._x_dataStack[0].counts = data.counts;
+                }
+            }
+
 
             if (pushState) {
 
@@ -1779,6 +2077,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+    window.refreshApprovalTable = function () {
+        const currentActiveTab = Array.from(tabs).find(t => t.classList.contains('bg-white'));
+        const status = currentActiveTab ? currentActiveTab.dataset.status : (new URLSearchParams(window.location.search).get('status') || '');
+        loadApprovals(status, false);
+    };
 
 
     /*
