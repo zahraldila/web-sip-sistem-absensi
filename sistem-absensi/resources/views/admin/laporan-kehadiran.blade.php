@@ -209,7 +209,7 @@
 
     <div x-show="exportModalOpen"
         x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div class="relative w-full max-w-2xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 px-8 py-6">
                 <div>
