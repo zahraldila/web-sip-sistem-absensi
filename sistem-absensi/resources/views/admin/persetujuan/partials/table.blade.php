@@ -55,7 +55,17 @@
                         <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClass }}">{{ $approval->status_pengajuan ?? '-' }}</span>
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <a href="{{ route('admin.persetujuan.detail', $approval) }}" class="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200">Detail</a>
+                        <button type="button" @click.prevent="openApproval($event)" data-approval="{{ json_encode([
+    'approval_id' => $approval->approval_id ?? '',
+    'nama_pegawai' => $approval->pegawai->nama_pegawai ?? '-',
+    'divisi_name' => $approval->pegawai->masterDivisi->nama_divisi ?? '-',
+    'jenis_pengajuan' => $approval->jenis_pengajuan ?? '-',
+    'tanggal_pengajuan' => $approval->tanggal_pengajuan ? \Carbon\Carbon::parse($approval->tanggal_pengajuan)->format('d F Y') : '-',
+    'status_pengajuan' => $approval->status_pengajuan ?? '-',
+    'keterangan' => $approval->keterangan ?? '-',
+    'lampiran_path' => $approval->lampiran ?? null,
+    'foto_profile' => $photoUrl
+], JSON_HEX_APOS | JSON_HEX_QUOT) }}" class="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200">Detail</button>
                     </td>
                 </tr>
             @empty

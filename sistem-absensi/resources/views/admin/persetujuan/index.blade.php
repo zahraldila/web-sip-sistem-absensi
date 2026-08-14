@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="space-y-8">
+<div class="space-y-8" x-data="approvalModal()">
 
     {{-- ======================================== --}}
     {{-- HEADER --}}
@@ -313,6 +313,90 @@
     ])
 
 </div>
+
+{{-- DETAIL MODAL --}}
+<!-- DETAIL MODAL -->
+<div x-show="showDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm" x-cloak>
+    <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl" @click.away="closeDetail()">
+        <!-- Header with profile picture -->
+        <div class="flex items-center gap-4 mb-6">
+            <template x-if="approval.foto_profile">
+                <img :src="approval.foto_profile" alt="Foto Karyawan" class="h-16 w-16 rounded-full object-cover" />
+            </template>
+            <template x-if="!approval.foto_profile">
+                <div class="h-16 w-16 flex items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-700"
+                     x-text="approval.nama_pegawai ? approval.nama_pegawai.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '-'">
+                </div>
+            </template>
+            <div>
+                <h3 class="text-lg font-semibold text-slate-900" x-text="approval.nama_pegawai"></h3>
+                <p class="text-sm text-slate-500" x-text="approval.divisi_name"></p>
+            </div>
+        </div>
+        <!-- Detail Section -->
+        <h2 class="text-xl font-bold mb-2">Detail Pengajuan</h2>
+        <div class="space-y-2 text-sm">
+            <p><span class="font-medium text-slate-600">Jenis Pengajuan:</span> <span x-text="approval.jenis_pengajuan"></span></p>
+            <p><span class="font-medium text-slate-600">Tanggal Pengajuan:</span> <span x-text="approval.tanggal_pengajuan"></span></p>
+            <p><span class="font-medium text-slate-600">Status:</span> <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="statusClass(approval.status_pengajuan)" x-text="approval.status_pengajuan"></span></p>
+        </div>
+        <!-- Keterangan -->
+        <div class="mt-4">
+            <h3 class="text-lg font-medium mb-1">Keterangan</h3>
+            <p class="text-slate-900" x-text="approval.keterangan"></p>
+        </div>
+        <!-- Lampiran -->
+        <div class="mt-4">
+            <template x-if="approval.lampiran_path">
+                <div>
+                    <h3 class="text-lg font-medium mb-1">Lampiran</h3>
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span x-text="approval.lampiran_path.split('/').pop()"></span>
+                        <a :href="`{{ config('supabase.url') }}/storage/v1/object/public/submission-files/${approval.lampiran_path.split('/').slice(1).join('/')}`" target="_blank" class="text-blue-600 underline">Unduh</a>
+                    </div>
+                </div>
+            </template>
+            <template x-if="!approval.lampiran_path">
+                <p class="text-sm text-slate-400">Tidak ada lampiran</p>
+            </template>
+        </div>
+        <!-- Close button -->
+        <div class="text-right mt-6">
+            <button @click="closeDetail()" class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">Tutup</button>
+        </div>
+    </div>
+</div>
+<script>
+function statusClass(status) {
+    switch (status) {
+        case 'Pending': return 'bg-yellow-100 text-yellow-700';
+        case 'Diproses': return 'bg-blue-100 text-blue-700';
+        case 'Disetujui': return 'bg-green-100 text-green-700';
+        case 'Ditolak': return 'bg-red-100 text-red-700';
+        default: return 'bg-slate-100 text-slate-700';
+    }
+}
+</script>
+
+<script>
+function approvalModal() {
+    return {
+        showDetail: false,
+        approval: {},
+        openApproval(event) {
+            const data = event.currentTarget.dataset.approval;
+            if (data) {
+                this.approval = JSON.parse(data);
+                this.showDetail = true;
+            }
+        },
+        closeDetail() {
+            this.showDetail = false;
+        }
+    };
+}
+</script>
 
 </section>
 
