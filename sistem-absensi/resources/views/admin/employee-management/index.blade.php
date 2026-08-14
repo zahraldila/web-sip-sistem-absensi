@@ -304,8 +304,8 @@
                 </div>
             </div>
             <div class="px-6 py-6">
-                <div class="grid gap-6 lg:grid-cols-[220px_1fr]">
-                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center">
+                <div class="grid gap-6 lg:grid-cols-[220px_1fr] items-center">
+                    <div class="flex flex-col items-center justify-center text-center">
                         <template x-if="detailData.foto_profile">
                             <img :src="detailData.foto_profile" alt="Foto Pegawai" class="mx-auto h-28 w-28 rounded-full object-cover" />
                         </template>
