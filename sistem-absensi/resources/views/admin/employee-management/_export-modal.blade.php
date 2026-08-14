@@ -1,4 +1,7 @@
-<div x-show="exportModalOpen" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+<div x-show="exportModalOpen"
+    x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
+    @click.self="closeExport()">
     <div class="relative w-full max-w-2xl overflow-hidden rounded-[28px] bg-white shadow-2xl" @click.stop>
         <form method="POST" action="{{ route('admin.employee-management.export') }}" @submit.prevent="submitExport($event)">
             @csrf

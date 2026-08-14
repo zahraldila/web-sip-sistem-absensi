@@ -1,10 +1,7 @@
 <div x-show="modalOpen"
     x-cloak
-    x-transition.opacity
-    class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-
-    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-        @click="closeModal()"></div>
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8"
+    @click.self="closeModal()">
 
     <div class="relative w-full overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" style="width: min(90vw, 600px); max-height: 90vh;"
         @click.stop>

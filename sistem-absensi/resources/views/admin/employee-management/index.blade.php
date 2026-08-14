@@ -202,8 +202,7 @@
     @include('admin.employee-management._employee-form-modal')
     @include('admin.employee-management._export-modal')
 
-    <div x-show="divisionModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="closeDivisionModal()"></div>
+    <div x-show="divisionModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeDivisionModal()">
         <div class="relative w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
             <div class="border-b border-slate-200 px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
@@ -244,8 +243,7 @@
         </div>
     </div>
 
-    <div x-show="roleModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="closeRoleModal()"></div>
+    <div x-show="roleModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeRoleModal()">
         <div class="relative w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
             <div class="border-b border-slate-200 px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
@@ -286,8 +284,7 @@
         </div>
     </div>
 
-    <div x-show="detailModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="closeDetail()"></div>
+    <div x-show="detailModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeDetail()">
         <div class="relative w-full max-w-2xl overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
             <div class="border-b border-slate-200 px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
