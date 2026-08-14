@@ -64,7 +64,7 @@
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-slate-700">Employee ID</label>
+                            <label class="mb-1 block text-sm font-medium text-slate-700">NIP</label>
                             <input type="text" name="nip" x-model="form.nip" placeholder="Contoh : EMP-0101010"
                                 class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                             @error('nip')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror

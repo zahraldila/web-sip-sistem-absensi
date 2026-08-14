@@ -68,7 +68,7 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Photo</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Nama</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Employee ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">NIP</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Department</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
@@ -317,8 +317,6 @@
                     </div>
                     <div class="grid gap-4">
                         <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                            <div class="text-sm text-slate-500">Employee ID</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.pegawai_id"></div>
                             <div class="text-sm text-slate-500">NIP</div>
                             <div class="font-medium text-slate-900" x-text="detailData.nip || '-' "></div>
                             <div class="text-sm text-slate-500">Email</div>
