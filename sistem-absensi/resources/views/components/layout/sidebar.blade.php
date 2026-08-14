@@ -136,21 +136,7 @@
 
             </a>
 
-            {{-- Bantuan --}}
-            <a href="{{ route('admin.bantuan') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-circle-question fa-fw text-lg"></i>
-
-                <span class="text-sm font-semibold">
-                    Bantuan
-                </span>
-
-                @if(request()->routeIs('admin.bantuan'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
 
         </div>
 
