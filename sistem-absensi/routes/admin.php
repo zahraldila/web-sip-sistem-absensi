@@ -35,6 +35,9 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
         ->name('admin.persetujuan.detail');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');
+    Route::post('/tampilan-branding/simpan', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanBranding'])->name('admin.tampilan-branding.simpan');
+    Route::post('/tampilan-branding/reset', [App\Http\Controllers\AdminPlaceholderController::class, 'resetBranding'])->name('admin.tampilan-branding.reset');
+    Route::post('/tampilan-branding/logo', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanLogo'])->name('admin.tampilan-branding.logo');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');
     Route::get('/bantuan', [App\Http\Controllers\AdminPlaceholderController::class, 'bantuan'])->name('admin.bantuan');
     Route::get('/', [App\Http\Controllers\DashboardControllers::class, 'admin'])->name('admin.dashboard');

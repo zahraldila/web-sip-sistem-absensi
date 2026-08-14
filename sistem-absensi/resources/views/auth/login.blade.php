@@ -18,10 +18,7 @@
 
     {{-- Logo --}}
     <div class="mb-6 flex justify-center">
-        <img
-            src="{{ asset('images/logo-sip.png') }}"
-            alt="Logo SIP"
-            class="h-20 w-20 rounded-2xl object-cover shadow-lg" />
+        <img src="{{ asset(\App\Models\Setting::get('company_logo', 'assets/logo.png')) }}" alt="SIP Logo" class="h-16 object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';">
     </div>
 
     {{-- Heading --}}
@@ -49,7 +46,7 @@
         {{-- Email --}}
         <div>
             <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">Email</label>
-            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
+            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
                 </svg>
@@ -67,7 +64,7 @@
         {{-- Password --}}
         <div>
             <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password</label>
-            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
+            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 0 1 8 0v4" />
@@ -94,23 +91,23 @@
         {{-- Remember + Forgot --}}
         <div class="flex items-center justify-between text-sm">
             <label class="flex items-center gap-2 text-slate-600">
-                <input type="checkbox" name="remember" class="rounded border-slate-300 text-[#123D91] focus:ring-[#123D91]" />
+                <input type="checkbox" name="remember" class="rounded border-slate-300 text-primary focus:ring-primary" />
                 Ingat Saya
             </label>
-            <a href="#" class="font-semibold text-[#123D91] hover:underline">Lupa Kata Sandi?</a>
+            <a href="#" class="font-semibold text-primary hover:underline">Lupa Kata Sandi?</a>
         </div>
 
         {{-- Submit --}}
         <button
             type="submit"
-            class="w-full rounded-2xl bg-[#123D91] py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#0F3277] active:scale-95">
+            class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-lg transition hover:bg-primary-hover active:scale-95">
             Masuk
         </button>
 
         {{-- Help --}}
         <p class="text-center text-sm text-slate-500">
             Butuh bantuan?
-            <a href="#" class="font-semibold text-[#123D91] hover:underline">Hubungi IT Support</a>
+            <a href="#" class="font-semibold text-primary hover:underline">Hubungi IT Support</a>
         </p>
     </form>
 </div>

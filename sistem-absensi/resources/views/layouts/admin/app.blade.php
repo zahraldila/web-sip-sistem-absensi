@@ -13,6 +13,17 @@
         'resources/css/app.css',
         'resources/js/app.js'
     ])
+    
+    <style>
+        :root {
+            @php
+                $primaryColor = \App\Models\Setting::get('primary_color', '#123D91');
+            @endphp
+            --color-primary: {{ $primaryColor }};
+            /* Using CSS color-mix to create a darker hover shade */
+            --color-primary-hover: color-mix(in srgb, {{ $primaryColor }} 80%, black);
+        }
+    </style>
 </head>
 
 <body class="bg-[#F5F7FB] text-gray-800">

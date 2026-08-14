@@ -78,7 +78,7 @@
                     class="absolute right-0 mt-2 w-72 rounded-[2rem] bg-white p-6 shadow-xl border border-slate-100 z-50">
                     
                     <div class="flex items-center gap-4 mb-5">
-                        <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#020F35] text-xl font-serif text-white">
+                        <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xl font-serif text-white">
                             {{ strtoupper(substr($topbarName, 0, 1)) }}
                         </div>
                         <div class="overflow-hidden">
@@ -89,7 +89,7 @@
 
                     <hr class="mb-5 border-t border-slate-900">
 
-                    <a href="#" class="flex items-center gap-4 text-slate-900 transition hover:text-[#123D91]">
+                    <a href="#" class="flex items-center gap-4 text-slate-900 transition hover:text-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>

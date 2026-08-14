@@ -25,7 +25,7 @@
 
         <button
             @click="editJamOpen = true"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-[#0E337A]">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-primary-hover">
 
             <svg xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5"
@@ -86,7 +86,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <h2 class="text-[40px] leading-none font-bold text-[#123D91]">
+                <h2 class="text-[40px] leading-none font-bold text-primary">
                     {{ $totalPegawai }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-blue-400">
@@ -195,7 +195,7 @@
 
                     <button
                         @click="open = !open"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#123D91] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0E337A]">
+                        class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-hover">
                         <span id="filter-label">Pilih Filter</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -326,7 +326,7 @@
                 <h2 class="text-xl font-semibold text-slate-900">
                     Menunggu Persetujuan
                 </h2>
-                <div class="flex items-center gap-2 rounded-full bg-[#123D91] px-3 py-1.5 text-xs font-semibold text-white">
+                <div class="flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -377,7 +377,7 @@
             </div>
 
             <div class="mt-6 flex justify-end">
-                <a href="{{ route('admin.persetujuan') }}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-[#123D91] transition">
+                <a href="{{ route('admin.persetujuan') }}" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-primary transition">
                     Lihat Semua
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -442,7 +442,7 @@
                             id="jam_masuk"
                             name="jam_masuk"
                             type="time"
-                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/20"
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                             placeholder="00:00">
                         <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -463,7 +463,7 @@
                             id="jam_pulang"
                             name="jam_pulang"
                             type="time"
-                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-[#123D91] focus:ring-2 focus:ring-[#123D91]/20"
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                             placeholder="00:00">
                         <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -486,7 +486,7 @@
 
                     <button
                         type="submit"
-                        class="rounded-2xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0E337A]">
+                        class="rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover">
                         Simpan
                     </button>
 
