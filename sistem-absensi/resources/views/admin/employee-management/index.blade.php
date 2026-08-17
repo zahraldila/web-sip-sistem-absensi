@@ -1,17 +1,17 @@
 @extends('layouts.admin.app')
 
 @section('content')
-<div class="p-6" x-data="employeeModal()" x-init="init()">
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+<div x-data="employeeModal()" x-init="init()">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-semibold text-gray-900">Manajemen Akun Karyawan</h1>
-            <p class="text-sm text-gray-600">Kelola akun dan data pegawai yang terhubung dengan sistem absensi.</p>
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Manajemen Akun Karyawan</h1>
+            <p class="mt-1 text-xs sm:text-sm text-gray-600">Kelola akun dan data pegawai yang terhubung dengan sistem absensi.</p>
         </div>
-        <button type="button" @click.prevent="openCreate()" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#123D91] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button type="button" @click.prevent="openCreate()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-[#123D91] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#0F3277] flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Tambah Pegawai
+            <span>Tambah Pegawai</span>
         </button>
     </div>
 
@@ -39,9 +39,9 @@
 
     <div class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <form method="GET" action="{{ route('admin.employee-management.index') }}">
-            <div class="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-end">
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Cari Karyawan</label>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div class="flex-1">
+                    <label class="mb-1 block text-xs sm:text-sm font-medium text-gray-700">Cari Karyawan</label>
                     <div class="relative mt-1">
                         <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,8 +52,8 @@
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <button type="button" @click.prevent="openExport()" class="inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
+                <div class="flex items-center">
+                    <button type="button" @click.prevent="openExport()" class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
                         Export
                     </button>
                 </div>
@@ -63,43 +63,43 @@
 
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="min-w-[750px] w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Photo</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Nama</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">NIP</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Department</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Action</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Photo</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Nama</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">NIP</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Department</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse ($employees as $employee)
                         <tr>
-                            <td class="px-4 py-3 text-sm text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">
                                 <div class="flex items-center gap-3">
                                     @php $photoUrl = supabase_public_url($employee->foto_profile); @endphp
                                     @if ($photoUrl)
-                                        <img src="{{ $photoUrl }}" alt="{{ $employee->nama_pegawai }}" class="h-10 w-10 rounded-full object-cover" />
+                                        <img src="{{ $photoUrl }}" alt="{{ $employee->nama_pegawai }}" class="h-10 w-10 rounded-full object-cover flex-shrink-0" />
                                     @else
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700 flex-shrink-0">
                                             {{ getInitials($employee->nama_pegawai) }}
                                         </div>
                                     @endif
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-900">{{ $employee->nama_pegawai }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $employee->nip ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $employee->masterDivisi->nama_divisi ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $employee->masterJabatan->nama_jabatan ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $employee->nama_pegawai }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $employee->nip ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $employee->masterDivisi->nama_divisi ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $employee->masterJabatan->nama_jabatan ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
                                     {{ $employee->status ?? 'Aktif' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <button type="button" @click.prevent="openDetail($event)"
                                         data-employee="{{ json_encode([
                                             'pegawai_id' => $employee->pegawai_id,
@@ -150,14 +150,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-sm text-gray-500">Belum ada data pegawai.</td>
+                            <td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500">Belum ada data pegawai.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div class="mt-4 flex flex-col gap-4 border-t border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <div class="mt-4 flex flex-col gap-4 border-t border-slate-200 bg-white p-4 sm:p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             @php
                 $from = $employees->firstItem() ?: 0;
                 $to = $employees->lastItem() ?: 0;
@@ -166,87 +166,89 @@
                 $lastPage = $employees->lastPage();
             @endphp
 
-            <p class="text-sm text-slate-500">
+            <p class="text-xs sm:text-sm text-slate-500 text-center sm:text-left">
                 Menampilkan {{ $from }} - {{ $to }} dari {{ $total }} data
             </p>
 
-            <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm" aria-label="Pagination">
-                <a
-                    class="inline-flex h-[46px] w-[46px] items-center justify-center border-r border-slate-200 text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $employees->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
-                    href="{{ $employees->onFirstPage() ? '#' : $employees->previousPageUrl() }}"
-                    aria-disabled="{{ $employees->onFirstPage() ? 'true' : 'false' }}"
-                >
-                    ‹
-                </a>
+            <div class="overflow-x-auto pb-1 sm:pb-0 flex justify-center sm:justify-end">
+                <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm flex-shrink-0" aria-label="Pagination">
+                    <a
+                        class="inline-flex h-[40px] sm:h-[46px] w-[40px] sm:w-[46px] items-center justify-center border-r border-slate-200 text-base sm:text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $employees->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                        href="{{ $employees->onFirstPage() ? '#' : $employees->previousPageUrl() }}"
+                        aria-disabled="{{ $employees->onFirstPage() ? 'true' : 'false' }}"
+                    >
+                        ‹
+                    </a>
 
-                @php
-                    $paginationElements = [];
+                    @php
+                        $paginationElements = [];
 
-                    if ($lastPage <= 7) {
-                        for ($i = 1; $i <= $lastPage; $i++) {
-                            $paginationElements[] = $i;
-                        }
-                    } else {
-                        if ($currentPage <= 4) {
-                            for ($i = 1; $i <= 5; $i++) {
-                                $paginationElements[] = $i;
-                            }
-                            $paginationElements[] = '...';
-                            $paginationElements[] = $lastPage;
-                        } elseif ($currentPage >= $lastPage - 3) {
-                            $paginationElements[] = 1;
-                            $paginationElements[] = '...';
-                            for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+                        if ($lastPage <= 7) {
+                            for ($i = 1; $i <= $lastPage; $i++) {
                                 $paginationElements[] = $i;
                             }
                         } else {
-                            $paginationElements[] = 1;
-                            $paginationElements[] = '...';
-                            for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
-                                $paginationElements[] = $i;
+                            if ($currentPage <= 4) {
+                                for ($i = 1; $i <= 5; $i++) {
+                                    $paginationElements[] = $i;
+                                }
+                                $paginationElements[] = '...';
+                                $paginationElements[] = $lastPage;
+                            } elseif ($currentPage >= $lastPage - 3) {
+                                $paginationElements[] = 1;
+                                $paginationElements[] = '...';
+                                for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+                                    $paginationElements[] = $i;
+                                }
+                            } else {
+                                $paginationElements[] = 1;
+                                $paginationElements[] = '...';
+                                for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                                    $paginationElements[] = $i;
+                                }
+                                $paginationElements[] = '...';
+                                $paginationElements[] = $lastPage;
                             }
-                            $paginationElements[] = '...';
-                            $paginationElements[] = $lastPage;
                         }
-                    }
-                @endphp
+                    @endphp
 
-                @foreach ($paginationElements as $element)
-                    @if ($element === '...')
-                        <span class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium text-slate-400 bg-white select-none">
-                            ...
-                        </span>
-                    @else
-                        <a
-                            class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
-                            href="{{ $employees->url($element) }}"
-                        >
-                            {{ $element }}
-                        </a>
-                    @endif
-                @endforeach
+                    @foreach ($paginationElements as $element)
+                        @if ($element === '...')
+                            <span class="inline-flex h-[40px] sm:h-[46px] min-w-[36px] sm:min-w-[50px] items-center justify-center border-r border-slate-200 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-400 bg-white select-none">
+                                ...
+                            </span>
+                        @else
+                            <a
+                                class="inline-flex h-[40px] sm:h-[46px] min-w-[36px] sm:min-w-[50px] items-center justify-center border-r border-slate-200 px-2 sm:px-4 text-xs sm:text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
+                                href="{{ $employees->url($element) }}"
+                            >
+                                {{ $element }}
+                            </a>
+                        @endif
+                    @endforeach
 
-                <a
-                    class="inline-flex h-[46px] w-[46px] items-center justify-center text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $employees->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
-                    href="{{ $employees->hasMorePages() ? $employees->nextPageUrl() : '#' }}"
-                    aria-disabled="{{ ! $employees->hasMorePages() ? 'true' : 'false' }}"
-                >
-                    ›
-                </a>
-            </nav>
+                    <a
+                        class="inline-flex h-[40px] sm:h-[46px] w-[40px] sm:w-[46px] items-center justify-center text-base sm:text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $employees->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                        href="{{ $employees->hasMorePages() ? $employees->nextPageUrl() : '#' }}"
+                        aria-disabled="{{ ! $employees->hasMorePages() ? 'true' : 'false' }}"
+                    >
+                        ›
+                    </a>
+                </nav>
+            </div>
         </div>
     </div>
 
     @include('admin.employee-management._employee-form-modal')
     @include('admin.employee-management._export-modal')
 
-    <div x-show="divisionModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeDivisionModal()">
-        <div class="relative w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
-            <div class="border-b border-slate-200 px-6 py-4">
+    <div x-show="divisionModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeDivisionModal()">
+        <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold text-slate-900">Tambah Divisi</h2>
-                        <p class="mt-1 text-sm text-slate-500">Tambahkan divisi baru tanpa meninggalkan halaman ini.</p>
+                        <h2 class="text-lg sm:text-xl font-semibold text-slate-900">Tambah Divisi</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500">Tambahkan divisi baru tanpa meninggalkan halaman ini.</p>
                     </div>
                     <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                         @click="closeDivisionModal()" aria-label="Tutup modal">
@@ -256,10 +258,10 @@
                     </button>
                 </div>
             </div>
-            <div class="px-6 py-5">
+            <div class="px-5 sm:px-6 py-5">
                 <div class="space-y-3">
                     <div>
-                        <label class="mb-1 block text-sm font-medium text-slate-700">Nama Divisi</label>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Nama Divisi</label>
                         <input type="text" x-model="newDivisionName" placeholder="Contoh: HR"
                             class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                         <template x-if="divisionError">
@@ -268,26 +270,26 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t border-slate-200 bg-white px-6 py-4 flex justify-end gap-3">
+            <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                 <button type="button" @click="closeDivisionModal()"
-                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
                     Batal
                 </button>
                 <button type="button" @click="saveDivision()"
-                    class="inline-flex items-center justify-center rounded-[10px] bg-[#123D91] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0F3277]"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-[10px] bg-[#123D91] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0F3277]"
                     x-bind:disabled="isSavingDivision"
                     x-text="isSavingDivision ? 'Menyimpan...' : 'Simpan'"></button>
             </div>
         </div>
     </div>
 
-    <div x-show="roleModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeRoleModal()">
-        <div class="relative w-full max-w-md overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
-            <div class="border-b border-slate-200 px-6 py-4">
+    <div x-show="roleModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeRoleModal()">
+        <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold text-slate-900">Tambah Jabatan</h2>
-                        <p class="mt-1 text-sm text-slate-500">Tambahkan jabatan baru tanpa meninggalkan halaman ini.</p>
+                        <h2 class="text-lg sm:text-xl font-semibold text-slate-900">Tambah Jabatan</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500">Tambahkan jabatan baru tanpa meninggalkan halaman ini.</p>
                     </div>
                     <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                         @click="closeRoleModal()" aria-label="Tutup modal">
@@ -297,10 +299,10 @@
                     </button>
                 </div>
             </div>
-            <div class="px-6 py-5">
+            <div class="px-5 sm:px-6 py-5">
                 <div class="space-y-3">
                     <div>
-                        <label class="mb-1 block text-sm font-medium text-slate-700">Nama Jabatan</label>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Nama Jabatan</label>
                         <input type="text" x-model="newJabatanName" placeholder="Contoh: HR Manager"
                             class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                         <template x-if="roleError">
@@ -309,26 +311,26 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t border-slate-200 bg-white px-6 py-4 flex justify-end gap-3">
+            <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                 <button type="button" @click="closeRoleModal()"
-                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
                     Batal
                 </button>
                 <button type="button" @click="saveRole()"
-                    class="inline-flex items-center justify-center rounded-[10px] bg-[#123D91] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0F3277]"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-[10px] bg-[#123D91] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0F3277]"
                     x-bind:disabled="isSavingRole"
                     x-text="isSavingRole ? 'Menyimpan...' : 'Simpan'"></button>
             </div>
         </div>
     </div>
 
-    <div x-show="detailModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-8" @click.self="closeDetail()">
-        <div class="relative w-full max-w-2xl overflow-hidden rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
-            <div class="border-b border-slate-200 px-6 py-4">
+    <div x-show="detailModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeDetail()">
+        <div class="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-[0_35px_100px_rgba(15,23,42,0.16)] ring-1 ring-slate-200" @click.stop>
+            <div class="border-b border-slate-200 px-5 sm:px-6 py-4 flex-shrink-0">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold text-slate-900">Detail Pegawai</h2>
-                        <p class="mt-1 text-sm text-slate-500">Informasi lengkap pegawai yang dipilih.</p>
+                        <h2 class="text-lg sm:text-xl font-semibold text-slate-900">Detail Pegawai</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500">Informasi lengkap pegawai yang dipilih.</p>
                     </div>
                     <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                         @click="closeDetail()" aria-label="Tutup modal">
@@ -338,43 +340,59 @@
                     </button>
                 </div>
             </div>
-            <div class="px-6 py-6">
-                <div class="grid gap-6 lg:grid-cols-[220px_1fr] items-center">
+            <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 sm:py-6">
+                <div class="grid gap-6 grid-cols-1 md:grid-cols-[180px_1fr] items-center">
                     <div class="flex flex-col items-center justify-center text-center">
                         <template x-if="detailData.foto_profile">
-                            <img :src="detailData.foto_profile" alt="Foto Pegawai" class="mx-auto h-28 w-28 rounded-full object-cover" />
+                            <img :src="detailData.foto_profile" alt="Foto Pegawai" class="mx-auto h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover" />
                         </template>
                         <template x-if="!detailData.foto_profile">
-                            <div class="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-slate-200 text-3xl font-semibold text-slate-700" x-text="detailInitials"></div>
+                            <div class="mx-auto flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-slate-200 text-2xl sm:text-3xl font-semibold text-slate-700" x-text="detailInitials"></div>
                         </template>
-                        <div class="mt-4 text-lg font-semibold text-slate-900" x-text="detailData.nama_pegawai"></div>
-                        <div class="mt-1 text-sm text-slate-500" x-text="detailData.status"></div>
+                        <div class="mt-3 sm:mt-4 text-base sm:text-lg font-semibold text-slate-900" x-text="detailData.nama_pegawai"></div>
+                        <div class="mt-1 text-xs sm:text-sm text-slate-500" x-text="detailData.status"></div>
                     </div>
                     <div class="grid gap-4">
-                        <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                            <div class="text-sm text-slate-500">NIP</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.nip || '-' "></div>
-                            <div class="text-sm text-slate-500">Email</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.email || '-' "></div>
-                            <div class="text-sm text-slate-500">Nomor HP</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.no_handphone || '-' "></div>
-                            <div class="text-sm text-slate-500">Department</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.divisi_name || '-' "></div>
-                            <div class="text-sm text-slate-500">Jabatan</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.jabatan_name || '-' "></div>
-                            <div class="text-sm text-slate-500">Role</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.username ? 'pegawai' : '-' "></div>
-                            <div class="text-sm text-slate-500">Username</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.username || '-' "></div>
-                            <div class="text-sm text-slate-500">NFC ID</div>
-                            <div class="font-medium text-slate-900" x-text="detailData.nfc_id || '-' "></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5 text-sm">
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">NIP</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.nip || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Email</div>
+                                <div class="font-medium text-slate-900 break-all" x-text="detailData.email || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Nomor HP</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.no_handphone || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Department</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.divisi_name || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Jabatan</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.jabatan_name || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Role</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.username ? 'pegawai' : '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">Username</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.username || '-' "></div>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm text-slate-500">NFC ID</div>
+                                <div class="font-medium text-slate-900" x-text="detailData.nfc_id || '-' "></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="border-t border-slate-200 bg-white px-6 py-4 text-right">
+            <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 flex justify-end flex-shrink-0">
                 <button type="button" @click="closeDetail()"
-                    class="inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-[10px] border border-slate-300 bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-200">
                     Tutup
                 </button>
             </div>
