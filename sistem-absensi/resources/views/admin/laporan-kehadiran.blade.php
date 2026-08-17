@@ -6,15 +6,15 @@
 <div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'excel' }">
 
     <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Laporan Kehadiran</h1>
-        <p class="mt-1 text-sm text-gray-600">Ringkasan Laporan Kehadiran Karyawan secara menyeluruh.</p>
+        <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Laporan Kehadiran</h1>
+        <p class="mt-1 text-xs sm:text-sm text-gray-600">Ringkasan Laporan Kehadiran Karyawan secara menyeluruh.</p>
     </div>
 
     <div class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <form method="GET" action="{{ route('admin.laporan-kehadiran') }}">
-            <div class="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-end">
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Cari Karyawan</label>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div class="flex-1">
+                    <label class="mb-1 block text-xs sm:text-sm font-medium text-gray-700">Cari Karyawan</label>
                     <div class="relative mt-1">
                         <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,19 +31,19 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <div class="relative" @click.outside="filterOpen = false">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="relative flex-1 sm:flex-initial" @click.outside="filterOpen = false">
                         <button
                             type="button"
                             @click="filterOpen = !filterOpen"
-                            class="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
-                            Filter
+                            <span>Filter</span>
                         </button>
 
-                        <div x-show="filterOpen" x-transition x-cloak class="absolute right-0 top-full z-20 mt-2 w-[320px] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                        <div x-show="filterOpen" x-transition x-cloak class="absolute left-0 sm:left-auto sm:right-0 top-full z-20 mt-2 w-[calc(100vw-3rem)] sm:w-[320px] max-w-[340px] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
                             <div class="space-y-3">
                                 <x-forms.select name="status" label="Status">
                                     <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
@@ -60,7 +60,7 @@
                                     @endforeach
                                 </x-forms.select>
 
-                                <div class="grid gap-3 sm:grid-cols-2">
+                                <div class="grid gap-3 grid-cols-1 sm:grid-cols-2">
                                     <x-forms.date-picker name="start_date" label="Tanggal Awal" value="{{ request('start_date') }}" />
                                     <x-forms.date-picker name="end_date" label="Tanggal Akhir" value="{{ request('end_date') }}" />
                                 </div>
@@ -87,15 +87,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex items-center justify-end">
-                    <button
-                        type="button"
-                        @click="exportModalOpen = true"
-                        class="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
-                        Export
-                    </button>
+                    <div class="flex-1 sm:flex-initial">
+                        <button
+                            type="button"
+                            @click="exportModalOpen = true"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
+                            Export
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -103,31 +103,31 @@
 
     <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+            <table class="min-w-[800px] w-full divide-y divide-gray-200 text-left text-sm">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Karyawan</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Divisi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Masuk</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Keluar</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Durasi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Mode</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Lokasi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Karyawan</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Divisi</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Tanggal</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Masuk</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Keluar</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Durasi</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Mode</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Lokasi</th>
+                        <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse($attendances as $attendance)
                         <tr class="transition hover:bg-gray-50">
-                            <td class="px-4 py-3">
+                            <td class="whitespace-nowrap px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     @php $photoUrl = supabase_public_url($attendance->pegawai?->foto_profile); @endphp
                                     @if ($photoUrl)
-                                        <img src="{{ $photoUrl }}" alt="{{ $attendance->pegawai?->nama_pegawai ?? '-' }}" class="h-10 w-10 rounded-full object-cover" />
+                                        <img src="{{ $photoUrl }}" alt="{{ $attendance->pegawai?->nama_pegawai ?? '-' }}" class="h-10 w-10 rounded-full object-cover flex-shrink-0" />
                                     @else
-                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-700 flex-shrink-0">
                                             {{ getInitials($attendance->pegawai?->nama_pegawai) }}
                                         </div>
                                     @endif
@@ -137,14 +137,14 @@
                                 </div>
                              </td>
 
-                             <td class="px-4 py-3 text-sm text-gray-700">
+                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
                                  {{ $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-' }}
                              </td>
 
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ \Carbon\Carbon::parse($attendance->tanggal_absensi)->translatedFormat('d F Y') }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $attendance->jam_checkin ? \Carbon\Carbon::parse($attendance->jam_checkin)->format('H:i') : '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $attendance->jam_checkout ? \Carbon\Carbon::parse($attendance->jam_checkout)->format('H:i') : '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ \Carbon\Carbon::parse($attendance->tanggal_absensi)->translatedFormat('d F Y') }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $attendance->jam_checkin ? \Carbon\Carbon::parse($attendance->jam_checkin)->format('H:i') : '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $attendance->jam_checkout ? \Carbon\Carbon::parse($attendance->jam_checkout)->format('H:i') : '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
                                 @php
                                     if ($attendance->jam_checkin && $attendance->jam_checkout) {
                                         $durationMinutes = \Carbon\Carbon::parse($attendance->jam_checkin)->diffInMinutes($attendance->jam_checkout);
@@ -156,9 +156,9 @@
                                     }
                                 @endphp
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $attendance->skema_kerja ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">{{ $attendance->latitude !== null && $attendance->longitude !== null ? $attendance->latitude . ', ' . $attendance->longitude : '-' }}</td>
-                            <td class="px-4 py-3 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $attendance->skema_kerja ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $attendance->latitude !== null && $attendance->longitude !== null ? $attendance->latitude . ', ' . $attendance->longitude : '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <x-status-badge :status="$attendance->status_kehadiran ?? '-'" />
                             </td>
                         </tr>
@@ -173,88 +173,90 @@
             </table>
         </div>
 
-        <div class="mt-4 flex flex-col gap-4 border-t border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
-            <p class="text-sm text-slate-500">
+        <div class="mt-4 flex flex-col gap-4 border-t border-slate-200 bg-white p-4 sm:p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs sm:text-sm text-slate-500 text-center sm:text-left">
                 Menampilkan {{ $attendances->firstItem() ?? 0 }} - {{ $attendances->lastItem() ?? 0 }} dari {{ $attendances->total() }} data
             </p>
 
-            <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm" aria-label="Pagination">
-                <a
-                    class="inline-flex h-[46px] w-[46px] items-center justify-center border-r border-slate-200 text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $attendances->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
-                    href="{{ $attendances->onFirstPage() ? '#' : $attendances->withQueryString()->previousPageUrl() }}"
-                    aria-disabled="{{ $attendances->onFirstPage() ? 'true' : 'false' }}"
-                >
-                    ‹
-                </a>
+            <div class="overflow-x-auto pb-1 sm:pb-0 flex justify-center sm:justify-end">
+                <nav class="inline-flex overflow-hidden rounded-[16px] border border-slate-200 bg-white shadow-sm flex-shrink-0" aria-label="Pagination">
+                    <a
+                        class="inline-flex h-[40px] sm:h-[46px] w-[40px] sm:w-[46px] items-center justify-center border-r border-slate-200 text-base sm:text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-l-[16px] {{ $attendances->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                        href="{{ $attendances->onFirstPage() ? '#' : $attendances->withQueryString()->previousPageUrl() }}"
+                        aria-disabled="{{ $attendances->onFirstPage() ? 'true' : 'false' }}"
+                    >
+                        ‹
+                    </a>
 
-                @php
-    $currentPage = $attendances->currentPage();
-    $lastPage = $attendances->lastPage();
-    $paginationElements = [];
+                    @php
+        $currentPage = $attendances->currentPage();
+        $lastPage = $attendances->lastPage();
+        $paginationElements = [];
 
-    if ($lastPage <= 7) {
-        for ($i = 1; $i <= $lastPage; $i++) {
-            $paginationElements[] = $i;
-        }
-    } else {
-        if ($currentPage <= 4) {
-            for ($i = 1; $i <= 5; $i++) {
-                $paginationElements[] = $i;
-            }
-            $paginationElements[] = '...';
-            $paginationElements[] = $lastPage;
-        } elseif ($currentPage >= $lastPage - 3) {
-            $paginationElements[] = 1;
-            $paginationElements[] = '...';
-            for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+        if ($lastPage <= 7) {
+            for ($i = 1; $i <= $lastPage; $i++) {
                 $paginationElements[] = $i;
             }
         } else {
-            $paginationElements[] = 1;
-            $paginationElements[] = '...';
-            for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
-                $paginationElements[] = $i;
+            if ($currentPage <= 4) {
+                for ($i = 1; $i <= 5; $i++) {
+                    $paginationElements[] = $i;
+                }
+                $paginationElements[] = '...';
+                $paginationElements[] = $lastPage;
+            } elseif ($currentPage >= $lastPage - 3) {
+                $paginationElements[] = 1;
+                $paginationElements[] = '...';
+                for ($i = $lastPage - 4; $i <= $lastPage; $i++) {
+                    $paginationElements[] = $i;
+                }
+            } else {
+                $paginationElements[] = 1;
+                $paginationElements[] = '...';
+                for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                    $paginationElements[] = $i;
+                }
+                $paginationElements[] = '...';
+                $paginationElements[] = $lastPage;
             }
-            $paginationElements[] = '...';
-            $paginationElements[] = $lastPage;
         }
-    }
-@endphp
+    @endphp
 
-@foreach ($paginationElements as $element)
-    @if ($element === '...')
-        <span class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium text-slate-400 bg-white select-none">
-            ...
-        </span>
-    @else
-        <a
-            class="inline-flex h-[46px] min-w-[50px] items-center justify-center border-r border-slate-200 px-4 text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
-            href="{{ $attendances->url($element) }}"
-        >
-            {{ $element }}
-        </a>
-    @endif
-@endforeach
+    @foreach ($paginationElements as $element)
+        @if ($element === '...')
+            <span class="inline-flex h-[40px] sm:h-[46px] min-w-[36px] sm:min-w-[50px] items-center justify-center border-r border-slate-200 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-400 bg-white select-none">
+                ...
+            </span>
+        @else
+            <a
+                class="inline-flex h-[40px] sm:h-[46px] min-w-[36px] sm:min-w-[50px] items-center justify-center border-r border-slate-200 px-2 sm:px-4 text-xs sm:text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-slate-100 text-[#123D91]' : 'bg-white text-slate-700' }}"
+                href="{{ $attendances->url($element) }}"
+            >
+                {{ $element }}
+            </a>
+        @endif
+    @endforeach
 
-                <a
-                    class="inline-flex h-[46px] w-[46px] items-center justify-center text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $attendances->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
-                    href="{{ $attendances->hasMorePages() ? $attendances->withQueryString()->nextPageUrl() : '#' }}"
-                    aria-disabled="{{ ! $attendances->hasMorePages() ? 'true' : 'false' }}"
-                >
-                    ›
-                </a>
-            </nav>
+                    <a
+                        class="inline-flex h-[40px] sm:h-[46px] w-[40px] sm:w-[46px] items-center justify-center text-base sm:text-lg font-medium text-slate-700 transition hover:bg-slate-50 rounded-r-[16px] {{ ! $attendances->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                        href="{{ $attendances->hasMorePages() ? $attendances->withQueryString()->nextPageUrl() : '#' }}"
+                        aria-disabled="{{ ! $attendances->hasMorePages() ? 'true' : 'false' }}"
+                    >
+                        ›
+                    </a>
+                </nav>
+            </div>
         </div>
     </section>
 
     <div x-show="exportModalOpen"
         x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-        <div class="relative w-full max-w-2xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-8 py-6">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">Export Laporan</h2>
-                    <p class="mt-1 text-sm text-slate-500">Pilih format dan rentang filter untuk unduh laporan.</p>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900">Export Laporan</h2>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Pilih format dan rentang filter untuk unduh laporan.</p>
                 </div>
                 <button type="button" @click="exportModalOpen = false" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -263,35 +265,35 @@
                 </button>
             </div>
 
-            <form x-ref="exportForm" method="GET" action="{{ route('admin.laporan-kehadiran.export.excel') }}" class="space-y-6 px-8 py-6">
+            <form x-ref="exportForm" method="GET" action="{{ route('admin.laporan-kehadiran.export.excel') }}" class="space-y-5 sm:space-y-6 px-5 sm:px-8 py-5 sm:py-6">
                 <input type="hidden" name="search" value="{{ request('search') }}" />
                 <input type="hidden" name="mode_kerja" value="{{ request('mode_kerja') }}" />
 
-                <div class="grid gap-6 lg:grid-cols-2">
-                    <div class="space-y-4">
-                        <p class="text-sm font-semibold text-slate-900">Format Export</p>
+                <div class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
+                    <div class="space-y-3 sm:space-y-4">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Format Export</p>
 
                         <div class="space-y-3">
-                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
                                 <input type="radio" name="format" value="excel" class="mt-1 h-4 w-4 text-[#123D91]" x-model="exportFormat" checked />
                                 <div class="flex-1">
-                                    <p class="font-medium text-slate-900">Export Excel</p>
+                                    <p class="text-sm font-medium text-slate-900">Export Excel</p>
                                     <p class="text-xs text-slate-500">Unduh file Excel dengan data tabel.</p>
                                 </div>
                             </label>
 
-                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
                                 <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-[#123D91]" x-model="exportFormat" />
                                 <div class="flex-1">
-                                    <p class="font-medium text-slate-900">Export PDF</p>
+                                    <p class="text-sm font-medium text-slate-900">Export PDF</p>
                                     <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <p class="text-sm font-semibold text-slate-900">Rentang Tanggal & Filter</p>
+                    <div class="space-y-3 sm:space-y-4">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Rentang Tanggal & Filter</p>
                         <div class="space-y-3">
                             <x-forms.date-picker name="start_date" label="Tanggal Awal" value="{{ request('start_date') }}" />
                             <x-forms.date-picker name="end_date" label="Tanggal Akhir" value="{{ request('end_date') }}" />
@@ -299,7 +301,7 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 border-t border-slate-200 pt-6 lg:grid-cols-3">
+                <div class="grid gap-3 sm:gap-4 border-t border-slate-200 pt-5 sm:pt-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                     <x-forms.select name="status" label="Status">
                         <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
                         <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
@@ -323,8 +325,8 @@
                     </x-forms.select>
                 </div>
 
-                <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-end">
-                    <button type="button" @click="exportModalOpen = false" class="rounded-3xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
+                    <button type="button" @click="exportModalOpen = false" class="w-full sm:w-auto rounded-3xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                         Batal
                     </button>
                     <button
@@ -333,7 +335,7 @@
                             $refs.exportForm.action = exportFormat === 'excel' ? '{{ route('admin.laporan-kehadiran.export.excel') }}' : '{{ route('admin.laporan-kehadiran.export.pdf') }}';
                             $refs.exportForm.submit();
                         "
-                        class="rounded-3xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0E337A]">
+                        class="w-full sm:w-auto rounded-3xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0E337A]">
                         Unduh
                     </button>
                 </div>
