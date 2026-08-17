@@ -75,7 +75,7 @@
                     x-transition:leave="transition ease-in duration-150"
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
-                    class="absolute right-0 mt-2 w-72 rounded-[2rem] bg-white p-6 shadow-xl border border-slate-100 z-50">
+                    class="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-[2rem] bg-white p-6 shadow-xl border border-slate-100 z-50">
                     
                     <div class="flex items-center gap-4 mb-5">
                         <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#020F35] text-xl font-serif text-white">

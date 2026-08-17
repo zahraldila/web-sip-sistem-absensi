@@ -9,15 +9,15 @@
     {{-- ===================================================== --}}
     {{-- HEADER --}}
     {{-- ===================================================== --}}
-    <section class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <section class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
 
-            <h1 class="text-[34px] font-bold text-slate-900">
+            <h1 class="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 leading-tight">
                 Dashboard Kehadiran Pegawai
             </h1>
 
-            <p class="mt-2 text-[15px] text-slate-500">
+            <p class="mt-1.5 sm:mt-2 text-sm sm:text-[15px] text-slate-500">
                 Monitoring kehadiran pegawai secara real-time.
             </p>
 
@@ -25,7 +25,7 @@
 
         <button
             @click="editJamOpen = true"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-[#0E337A]">
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#123D91] px-5 sm:px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-[#0E337A] flex-shrink-0">
 
             <svg xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5"
@@ -71,10 +71,10 @@
     {{-- SUMMARY CARD --}}
     {{-- ===================================================== --}}
 
-    <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
 
         {{-- Total Pegawai --}}
-        <div class="rounded-3xl bg-blue-50 p-6 shadow-sm border border-blue-100/50">
+        <div class="rounded-3xl bg-blue-50 p-5 sm:p-6 shadow-sm border border-blue-100/50">
 
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-blue-600">
@@ -86,7 +86,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <h2 class="text-[40px] leading-none font-bold text-[#123D91]">
+                <h2 class="text-3xl sm:text-[36px] lg:text-[40px] leading-none font-bold text-[#123D91]">
                     {{ $totalPegawai }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-blue-400">
@@ -97,7 +97,7 @@
         </div>
 
         {{-- Hadir Hari Ini --}}
-        <div class="rounded-3xl bg-green-50 p-6 shadow-sm border border-green-100/50">
+        <div class="rounded-3xl bg-green-50 p-5 sm:p-6 shadow-sm border border-green-100/50">
 
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-green-700">
@@ -109,7 +109,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <h2 class="text-[40px] leading-none font-bold text-green-600">
+                <h2 class="text-3xl sm:text-[36px] lg:text-[40px] leading-none font-bold text-green-600">
                     {{ $hadirHariIni }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-green-500">
@@ -120,7 +120,7 @@
         </div>
 
         {{-- WFO --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-white p-5 sm:p-6 shadow-card">
 
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-slate-700">
@@ -132,7 +132,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <h2 class="text-[40px] leading-none font-bold text-slate-800">
+                <h2 class="text-3xl sm:text-[36px] lg:text-[40px] leading-none font-bold text-slate-800">
                     {{ $wfoCount }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-slate-400">
@@ -143,7 +143,7 @@
         </div>
 
         {{-- WFH/WFC --}}
-        <div class="rounded-3xl bg-orange-50 p-6 shadow-sm border border-orange-100/50">
+        <div class="rounded-3xl bg-orange-50 p-5 sm:p-6 shadow-sm border border-orange-100/50">
 
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-orange-600">
@@ -155,7 +155,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <h2 class="text-[40px] leading-none font-bold text-orange-600">
+                <h2 class="text-3xl sm:text-[36px] lg:text-[40px] leading-none font-bold text-orange-600">
                     {{ $wfhWfcCount }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-orange-400">
@@ -169,22 +169,22 @@
         {{-- ===================================================== --}}
     {{-- STATISTIK & LIVE CHECK IN --}}
     {{-- ===================================================== --}}
-    <section class="grid gap-6 xl:grid-cols-3">
+    <section class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
 
         {{-- ============================= --}}
         {{-- STATISTIK --}}
         {{-- ============================= --}}
-        <div class="xl:col-span-2 rounded-3xl bg-white p-6 shadow-card">
+        <div class="xl:col-span-2 rounded-3xl bg-white p-5 sm:p-6 shadow-card">
 
-            <div class="mb-6 flex items-center justify-between">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
 
                 <div>
 
-                    <h2 class="text-xl font-semibold text-slate-900">
+                    <h2 class="text-lg sm:text-xl font-semibold text-slate-900">
                         Statistik Kehadiran
                     </h2>
 
-                    <p id="chart-subtitle" class="mt-1 text-sm text-slate-500">
+                    <p id="chart-subtitle" class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500">
                         7 hari terakhir
                     </p>
 
@@ -195,9 +195,9 @@
 
                     <button
                         @click="open = !open"
-                        class="inline-flex items-center gap-2 rounded-xl bg-[#123D91] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0E337A]">
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#123D91] px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-[#0E337A]">
                         <span id="filter-label">Pilih Filter</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
@@ -206,18 +206,18 @@
                         x-show="open"
                         @click.outside="open = false"
                         x-transition
-                        class="absolute right-0 mt-2 w-40 rounded-xl border border-slate-100 bg-white py-1 shadow-lg z-20">
+                        class="absolute right-0 mt-2 w-36 sm:w-40 rounded-xl border border-slate-100 bg-white py-1 shadow-lg z-20">
 
                         <button onclick="loadChart('minggu')" @click="open=false"
-                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            class="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 hover:bg-slate-50">
                             Per Minggu
                         </button>
                         <button onclick="loadChart('bulan')" @click="open=false"
-                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            class="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 hover:bg-slate-50">
                             Per Bulan
                         </button>
                         <button onclick="loadChart('tahun')" @click="open=false"
-                            class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            class="w-full px-4 py-2 text-left text-xs sm:text-sm text-slate-700 hover:bg-slate-50">
                             Per Tahun
                         </button>
 
@@ -228,12 +228,12 @@
             </div>
 
             {{-- Chart Canvas --}}
-            <div class="relative h-[320px] w-full">
+            <div class="relative h-[250px] sm:h-[300px] md:h-[320px] w-full">
                 <canvas id="attendanceChart"></canvas>
             </div>
 
             {{-- Legend --}}
-            <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center">
+            <div class="mt-4 flex flex-wrap items-center gap-x-4 sm:gap-x-5 gap-y-2 justify-center">
                 @foreach([
                     ['WFO',      '#FB923C'],
                     ['WFH/WFC',  '#A78BFA'],
@@ -256,13 +256,13 @@
         {{-- ============================= --}}
         {{-- LIVE CHECK IN --}}
         {{-- ============================= --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card flex flex-col h-[400px]">
+        <div class="rounded-3xl bg-white p-5 sm:p-6 shadow-card flex flex-col h-[380px] sm:h-[400px]">
 
-            <div class="mb-5 text-center">
-                <h2 class="text-lg font-bold text-slate-900">
+            <div class="mb-4 sm:mb-5 text-center">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">
                     Live Check In
                 </h2>
-                <p class="mt-1 text-[11px] text-slate-500">
+                <p class="mt-0.5 sm:mt-1 text-[11px] text-slate-500">
                     Aktivitas absensi hari ini
                 </p>
                 <hr class="mt-3 border-slate-200">
@@ -272,8 +272,8 @@
 
                 @foreach($liveCheckIns as $item)
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-100 flex-shrink-0">
                                 @if($item['foto'])
                                     <img src="{{ $item['foto'] }}" alt="{{ $item['nama'] }}" class="h-full w-full object-cover">
@@ -283,16 +283,16 @@
                                     </div>
                                 @endif
                             </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-slate-900">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-semibold text-slate-900 truncate">
                                     {{ $item['nama'] }}
                                 </h3>
-                                <p class="text-[11px] font-medium text-slate-500">
+                                <p class="text-[11px] font-medium text-slate-500 truncate">
                                     Check in - <span class="text-green-500">{{ $item['status'] }}</span>
                                 </p>
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right flex-shrink-0">
                             <p class="text-xs font-semibold text-slate-400">
                                 {{ $item['jam'] }} WIB
                             </p>
@@ -303,7 +303,7 @@
 
             </div>
 
-            <div class="mt-5 pt-4">
+            <div class="mt-4 sm:mt-5 pt-3 sm:pt-4">
                 <a href="{{ route('admin.log-aktivitas') }}" class="block w-full text-center rounded-full border border-slate-200 py-2 text-[13px] font-semibold text-slate-700 transition hover:bg-slate-50">
                     Lihat Semua Aktivitas
                 </a>
@@ -320,13 +320,13 @@
         {{-- ======================================== --}}
         {{-- MENUNGGU PERSETUJUAN --}}
         {{-- ======================================== --}}
-        <div class="rounded-3xl bg-white p-6 shadow-card">
+        <div class="rounded-3xl bg-white p-5 sm:p-6 shadow-card">
 
-            <div class="mb-6 flex items-center justify-between">
-                <h2 class="text-xl font-semibold text-slate-900">
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-lg sm:text-xl font-semibold text-slate-900">
                     Menunggu Persetujuan
                 </h2>
-                <div class="flex items-center gap-2 rounded-full bg-[#123D91] px-3 py-1.5 text-xs font-semibold text-white">
+                <div class="flex items-center gap-2 rounded-full bg-[#123D91] px-3 py-1.5 text-xs font-semibold text-white flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -338,7 +338,7 @@
                 <div class="flex items-center justify-between border-b border-slate-100 py-3">
                     <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
                         </svg>
                         Cuti
                     </div>
@@ -395,7 +395,7 @@
     <div
         x-show="editJamOpen"
         x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
         aria-modal="true"
         role="dialog">
 
@@ -414,17 +414,17 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
-            class="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+            class="relative w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-2xl">
 
             {{-- Label breadcrumb --}}
-            <p class="mb-6 text-xs text-slate-400">edit-jam-masuk</p>
+            <p class="mb-4 sm:mb-6 text-xs text-slate-400">edit-jam-masuk</p>
 
             {{-- Title --}}
-            <h2 class="text-2xl font-bold text-slate-900">
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">
                 Edit Jam Masuk
             </h2>
 
-            <p class="mt-2 text-sm text-slate-500">
+            <p class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-500">
                 Atur jam kerja standar untuk perhitungan keterlambatan.
             </p>
 

@@ -85,10 +85,11 @@
             <main
                 class="
                 flex-1
-                p-6
+                p-4
+                sm:p-6
                 lg:p-8">
 
-                <div class="max-w-[1600px] mx-auto">
+                <div class="max-w-[1600px] mx-auto w-full">
 
                     @yield('content')
 
