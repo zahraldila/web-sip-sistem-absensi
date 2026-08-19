@@ -59,6 +59,15 @@ class EmployeeManagementController extends Controller
             'foto_profile.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
+        // Minimal salah satu Email atau Username wajib diisi agar pegawai bisa login.
+        if (empty(trim($data['email'] ?? '')) && empty(trim($data['username'] ?? ''))) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'email' => 'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.',
+                ]);
+        }
+
         // Include uploaded file instance for the service
         $data['foto_profile_file'] = $request->file('foto_profile');
 

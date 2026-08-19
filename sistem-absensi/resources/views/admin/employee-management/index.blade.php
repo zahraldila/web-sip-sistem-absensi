@@ -631,6 +631,102 @@
                 closeModal() {
                     this.modalOpen = false;
                 },
+                /**
+                 * Validasi client-side form Tambah/Edit Pegawai.
+                 * Memeriksa field wajib dan menampilkan pesan error inline
+                 * agar user langsung mengetahui field mana yang harus diisi
+                 * sebelum data dikirim ke server.
+                 */
+                validateForm() {
+                    // Hapus semua error client-side yang sudah ada sebelumnya
+                    const form = document.getElementById('employeeForm');
+                    if (!form) return true;
+
+                    form.querySelectorAll('.client-error').forEach(el => el.remove());
+                    form.querySelectorAll('.border-client-error').forEach(el => {
+                        el.classList.remove('border-red-400', 'ring-1', 'ring-red-300', 'border-client-error');
+                    });
+
+                    let isValid = true;
+
+                    const showError = (inputEl, message) => {
+                        if (!inputEl) return;
+                        inputEl.classList.add('border-red-400', 'ring-1', 'ring-red-300', 'border-client-error');
+                        const existing = inputEl.parentElement.querySelector('.client-error');
+                        if (!existing) {
+                            const p = document.createElement('p');
+                            p.className = 'client-error mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5';
+                            p.innerHTML = '<i class="fa-solid fa-circle-exclamation text-xs"></i> <span>' + message + '</span>';
+                            inputEl.parentElement.appendChild(p);
+                        }
+                        isValid = false;
+                    };
+
+                    // Nama Lengkap — wajib untuk tambah dan edit
+                    const namaInput = form.querySelector('input[name="nama_pegawai"]');
+                    if (namaInput && !namaInput.value.trim()) {
+                        showError(namaInput, 'Nama lengkap wajib diisi.');
+                    }
+
+                    // NIP — wajib untuk tambah baru
+                    if (!this.isEdit) {
+                        const nipInput = form.querySelector('input[name="nip"]');
+                        if (nipInput && !nipInput.value.trim()) {
+                            showError(nipInput, 'NIP wajib diisi.');
+                        }
+                    }
+
+                    // Email / Username — minimal salah satu wajib diisi (untuk tambah baru)
+                    // karena login menggunakan email atau username.
+                    if (!this.isEdit) {
+                        const emailInput  = form.querySelector('input[name="email"]');
+                        const usernameInput = form.querySelector('input[name="username"]');
+                        const emailVal    = emailInput  ? emailInput.value.trim()   : '';
+                        const usernameVal = usernameInput ? usernameInput.value.trim() : '';
+                        if (!emailVal && !usernameVal) {
+                            showError(emailInput,    'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
+                            showError(usernameInput, 'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
+                        }
+                    }
+
+                    // Password — wajib untuk tambah baru, opsional untuk edit
+                    if (!this.isEdit) {
+                        const passInput = form.querySelector('input[name="password"]');
+                        if (passInput && !passInput.value.trim()) {
+                            showError(passInput, 'Password wajib diisi.');
+                        } else if (passInput && passInput.value.trim().length < 6) {
+                            showError(passInput, 'Password minimal 6 karakter.');
+                        } else {
+                            // Validasi konfirmasi password
+                            const passConfirm = form.querySelector('input[name="password_confirmation"]');
+                            if (passInput && passConfirm && passInput.value !== passConfirm.value) {
+                                showError(passConfirm, 'Konfirmasi password tidak cocok.');
+                            }
+                        }
+                    } else {
+                        // Edit: jika password diisi, konfirmasi harus cocok
+                        const passInput = form.querySelector('input[name="password"]');
+                        const passConfirm = form.querySelector('input[name="password_confirmation"]');
+                        if (passInput && passInput.value.trim()) {
+                            if (passInput.value.trim().length < 6) {
+                                showError(passInput, 'Password minimal 6 karakter.');
+                            } else if (passConfirm && passInput.value !== passConfirm.value) {
+                                showError(passConfirm, 'Konfirmasi password tidak cocok.');
+                            }
+                        }
+                    }
+
+                    // Scroll ke error pertama jika ada
+                    if (!isValid) {
+                        const firstError = form.querySelector('.client-error');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+
+                    return isValid;
+                },
+
                 openDetail(event) {
                     const button = event.currentTarget;
                     const employee = JSON.parse(button.getAttribute('data-employee'));
