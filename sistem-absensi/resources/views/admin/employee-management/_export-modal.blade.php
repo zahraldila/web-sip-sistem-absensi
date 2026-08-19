@@ -23,7 +23,7 @@
                         <p class="text-xs sm:text-sm font-semibold text-slate-900">Format Export</p>
                         <div class="space-y-3">
                             <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-[#123D91]" checked />
+                                <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-primary focus:ring-primary" checked />
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-slate-900">Excel (.xlsx)</p>
                                     <p class="text-xs text-slate-500">Unduh file Excel dengan data akun karyawan.</p>
@@ -31,7 +31,7 @@
                             </label>
 
                             <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-[#123D91]" />
+                                <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-primary focus:ring-primary" />
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-slate-900">CSV</p>
                                     <p class="text-xs text-slate-500">Unduh file CSV yang mudah diolah.</p>
@@ -39,7 +39,7 @@
                             </label>
 
                             <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-[#123D91]" />
+                                <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-primary focus:ring-primary" />
                                 <div class="flex-1">
                                     <p class="text-sm font-medium text-slate-900">PDF</p>
                                     <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
@@ -53,7 +53,7 @@
                         <div class="grid gap-3 sm:gap-4">
                             <div>
                                 <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Status</label>
-                                <select name="status" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900">
+                                <select name="status" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-primary">
                                     <option value="">Semua</option>
                                     <option value="Aktif">Aktif</option>
                                     <option value="Nonaktif">Nonaktif</option>
@@ -61,7 +61,7 @@
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Divisi</label>
-                                <select name="divisi_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900">
+                                <select name="divisi_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-primary">
                                     <option value="">Semua</option>
                                     @foreach($filters['divisions'] as $div)
                                         <option value="{{ $div->divisi_id }}">{{ $div->nama_divisi }}</option>
@@ -70,7 +70,7 @@
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Role</label>
-                                <select name="jabatan_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900">
+                                <select name="jabatan_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-primary">
                                     <option value="">Semua</option>
                                     @foreach($filters['roles'] as $r)
                                         <option value="{{ $r->jabatan_id }}">{{ $r->nama_jabatan }}</option>
@@ -79,15 +79,15 @@
                             </div>
                             <div>
                                 <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Karyawan (pegawai_id)</label>
-                                <input type="text" name="pegawai_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900" placeholder="Kosong = semua" />
+                                <input type="text" name="pegawai_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-primary" placeholder="Kosong = semua" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
-                    <button type="button" @click="closeExport()" class="w-full sm:w-auto rounded-3xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</button>
-                    <button type="submit" x-bind:disabled="exportIsLoading" class="w-full sm:w-auto rounded-3xl bg-[#123D91] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#0F3277]" x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'"></button>
+                    <button type="button" @click="closeExport()" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</button>
+                    <button type="submit" x-bind:disabled="exportIsLoading" class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm" x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'"></button>
                 </div>
             </div>
         </form>
