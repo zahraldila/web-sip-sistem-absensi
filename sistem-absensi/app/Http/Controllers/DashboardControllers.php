@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\logHelpers;
 use App\Models\Approval;
 use App\Models\Attendance;
 use App\Models\AuditLog;
@@ -239,20 +240,38 @@ class DashboardControllers extends Controller
             'jam_pulang.date_format'   => 'Format jam pulang tidak valid (HH:MM).',
             'jam_pulang.after'         => 'Jam pulang harus setelah jam masuk.',
         ]);
-
-        // Simpan ke tabel pengaturan atau setting — sesuaikan dengan struktur DB Anda.
-        // Contoh menggunakan DB::table jika ada tabel 'pengaturan':
+    
+        // Simpan pengaturan jam kerja
+        // Sesuaikan dengan struktur tabel pengaturan jika sudah tersedia.
+        //
         // DB::table('pengaturan')->updateOrInsert(
         //     ['kunci' => 'jam_masuk'],
         //     ['nilai' => $request->jam_masuk]
         // );
+        //
         // DB::table('pengaturan')->updateOrInsert(
         //     ['kunci' => 'jam_pulang'],
         //     ['nilai' => $request->jam_pulang]
         // );
-
+    
+        // Catat aktivitas admin
+        $user = \Illuminate\Support\Facades\Auth::user();
+    
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                "Mengubah jam kerja: {$request->jam_masuk} - {$request->jam_pulang}"
+            );
+        }
+    
         return redirect()
             ->route('admin.dashboard')
-            ->with('success', 'Jam kerja berhasil diperbarui: Masuk ' . $request->jam_masuk . ' – Pulang ' . $request->jam_pulang);
+            ->with(
+                'success',
+                'Jam kerja berhasil diperbarui: Masuk ' .
+                $request->jam_masuk .
+                ' – Pulang ' .
+                $request->jam_pulang
+            );
     }
 }

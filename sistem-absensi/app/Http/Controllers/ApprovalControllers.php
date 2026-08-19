@@ -196,6 +196,12 @@ class ApprovalControllers extends Controller
 
         $now = Carbon::now();
         $jenisPengajuan = $pengajuan->jenis_pengajuan ?? 'Pengajuan';
+        
+        $pegawai = $pengajuan->pegawai_id
+            ? Pegawai::find($pengajuan->pegawai_id)
+            : null;
+        
+        $namaPegawai = $pegawai?->nama_pegawai ?? 'Pegawai';
 
         DB::beginTransaction();
         try {
@@ -228,10 +234,14 @@ class ApprovalControllers extends Controller
                 ]);
             }
 
-            // 4. Injeksi log aktivitas
-            logHelpers::record($user->akun_id, "Menyetujui pengajuan {$jenisPengajuan} (ID: {$pengajuanId})");
 
             DB::commit();
+
+            // Catat log setelah transaksi berhasil
+            logHelpers::record(
+                $user->akun_id,
+                "Menyetujui pengajuan {$jenisPengajuan} untuk {$namaPegawai}"
+            );
 
             // Ambil data statistik counter terkini
             $counts = [
@@ -299,6 +309,12 @@ class ApprovalControllers extends Controller
         $now = Carbon::now();
         $jenisPengajuan = $pengajuan->jenis_pengajuan ?? 'Pengajuan';
         $alasanPenolakan = trim($request->catatan_admin);
+        
+        $pegawai = $pengajuan->pegawai_id
+            ? Pegawai::find($pengajuan->pegawai_id)
+            : null;
+        
+        $namaPegawai = $pegawai?->nama_pegawai ?? 'Pegawai';
 
         DB::beginTransaction();
         try {
@@ -331,10 +347,13 @@ class ApprovalControllers extends Controller
                 ]);
             }
 
-            // 4. Injeksi log aktivitas
-            logHelpers::record($user->akun_id, "Menolak pengajuan {$jenisPengajuan} (ID: {$pengajuanId}). Alasan: {$alasanPenolakan}");
-
             DB::commit();
+
+            // Catat log setelah transaksi berhasil
+            logHelpers::record(
+                $user->akun_id,
+                "Menolak pengajuan {$jenisPengajuan} untuk {$namaPegawai}. Alasan: {$alasanPenolakan}"
+            );
 
             // Ambil data statistik counter terkini
             $counts = [

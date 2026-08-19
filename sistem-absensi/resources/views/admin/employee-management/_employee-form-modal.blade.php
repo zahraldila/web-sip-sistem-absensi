@@ -29,7 +29,7 @@
                 <input type="hidden" name="form_mode" :value="mode">
                 <input type="hidden" name="pegawai_id" x-model="form.pegawai_id">
                 <input type="hidden" name="foto_profile_existing" x-model="form.foto_profile_existing">
-                <template x-if="mode === 'edit'">
+                <template x-if="isEdit">
                     <input type="hidden" name="_method" value="PUT">
                 </template>
 

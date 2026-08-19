@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AttendanceReportExport;
+use App\Helpers\logHelpers;
 use App\Models\Attendance;
 use App\Models\Pegawai;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -376,7 +378,16 @@ class AttendanceReportController extends Controller
         if ($rows->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
         }
-
+        
+        $user = Auth::user();
+        
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor laporan kehadiran ke Excel'
+            );
+        }
+        
         $filename = 'laporan-kehadiran-' . date('Ymd_His') . '.xlsx';
 
         $callback = function () use ($rows) {
@@ -446,6 +457,15 @@ class AttendanceReportController extends Controller
                         'status' => $status,
                     ];
                 });
+        }
+
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor laporan kehadiran ke PDF'
+            );
         }
 
         $pdf = Pdf::loadView('admin.laporan-kehadiran-pdf', [
