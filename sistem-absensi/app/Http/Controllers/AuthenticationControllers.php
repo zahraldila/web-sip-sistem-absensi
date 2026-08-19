@@ -58,12 +58,21 @@ class AuthenticationControllers extends Controller
                 ->onlyInput('email');
         }
 
-        // Login user
-        Auth::login($akun, $request->boolean('remember'));
+        $remember = $request->boolean('remember');
+
+        // Login user tanpa remember-token DB (kolom remember_token tidak ada di tabel akun).
+        // Fitur "Ingat Saya" ditangani via session: jika dicentang, lastActivityTime tidak
+        // disimpan sehingga SessionTimeout middleware tidak akan men-expire sesi tersebut.
+        Auth::login($akun, false);
 
         // Regenerate session untuk keamanan
         $request->session()->regenerate();
-        $request->session()->put('lastActivityTime', time());
+
+        // Jika "Ingat Saya" TIDAK dicentang, set lastActivityTime agar SessionTimeout aktif.
+        // Jika "Ingat Saya" dicentang, lastActivityTime tidak di-set sehingga sesi tidak expire.
+        if (! $remember) {
+            $request->session()->put('lastActivityTime', time());
+        }
 
         // Menyimpan informasi user/pegawai ke dalam session Laravel
         $pegawai = $akun->pegawai;
@@ -73,6 +82,7 @@ class AuthenticationControllers extends Controller
             'role' => $akun->role,
             'nama_pegawai' => $pegawai ? $pegawai->nama_pegawai : null,
             'email_pegawai' => $pegawai ? $pegawai->email : null,
+            'remember_me' => $remember,
         ]);
 
         // ---------------------------------------------------------
