@@ -532,13 +532,17 @@
             },
             processApproval(approvalId, action, alasan = null) {
                 this.isProcessing = true;
-                const url = '{{ route("admin.persetujuan.process", ":id") }}'.replace(':id', approvalId);
+
+                const url = '{{ route("admin.persetujuan.process", ":id") }}'
+                    .replace(':id', approvalId);
+
                 const bodyData = {
-                    action: action,
+                    status_approval: action === 'setujui' ? 'Disetujui' : 'Ditolak',
                     _token: '{{ csrf_token() }}'
                 };
+
                 if (alasan) {
-                    bodyData.alasan_penolakan = alasan;
+                    bodyData.catatan_admin = alasan;
                 }
 
                 fetch(url, {
@@ -550,18 +554,25 @@
                     },
                     body: JSON.stringify(bodyData)
                 })
-                .then(res => res.json())
+                .then(async res => {
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        throw new Error(data.message || 'Terjadi kesalahan.');
+                    }
+
+                    return data;
+                })
                 .then(data => {
                     this.isProcessing = false;
-                    if (data.success) {
+
+                    if (data.status === 'success') {
                         alert(data.message);
+
                         this.closeRejectModal();
                         this.closeDetail();
-                        if (typeof window.refreshApprovalTable === 'function') {
-                            window.refreshApprovalTable();
-                        } else {
-                            window.location.reload();
-                        }
+
+                        window.location.reload();
                     } else {
                         alert(data.message || 'Terjadi kesalahan saat memproses pengajuan.');
                     }
@@ -569,7 +580,7 @@
                 .catch(err => {
                     this.isProcessing = false;
                     console.error(err);
-                    alert('Gagal menghubungi server.');
+                    alert(err.message || 'Gagal menghubungi server.');
                 });
             }
         };

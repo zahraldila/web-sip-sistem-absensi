@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\logHelpers;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class AdminPlaceholderController extends Controller
 {
     public function dashboard()
@@ -42,9 +43,9 @@ class AdminPlaceholderController extends Controller
             'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'logo'          => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ]);
-
+    
         \App\Models\Setting::set('primary_color', $request->primary_color);
-
+    
         if ($request->hasFile('logo')) {
             $oldLogo = \App\Models\Setting::get('company_logo');
             $newPath = $this->uploadCompanyLogo($request->file('logo'));
@@ -54,9 +55,26 @@ class AdminPlaceholderController extends Controller
                 $this->deleteCompanyLogo($oldLogo);
             }
         }
-
-        return redirect()->back()->with('success', 'Pengaturan tampilan & branding berhasil disimpan.');
+    
+        // Catat aktivitas admin
+        $user = Auth::user();
+    
+        if ($user && $user->akun_id) {
+            $aktivitas = $request->hasFile('logo')
+                ? 'Mengubah tampilan branding dan logo sistem'
+                : 'Mengubah warna branding sistem';
+    
+            logHelpers::record(
+                $user->akun_id,
+                $aktivitas
+            );
+        }
+    
+        return redirect()
+            ->back()
+            ->with('success', 'Pengaturan tampilan & branding berhasil disimpan.');
     }
+    
 
     public function resetBranding()
     {
@@ -67,8 +85,20 @@ class AdminPlaceholderController extends Controller
 
         \App\Models\Setting::where('key', 'primary_color')->delete();
         \App\Models\Setting::where('key', 'company_logo')->delete();
-
-        return redirect()->back()->with('success', 'Tampilan & branding berhasil direset ke pengaturan awal.');
+    
+        // Catat aktivitas admin
+        $user = Auth::user();
+    
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mereset tampilan branding sistem ke pengaturan awal'
+            );
+        }
+    
+        return redirect()
+            ->back()
+            ->with('success', 'Tampilan & branding berhasil direset ke pengaturan awal.');
     }
 
     public function simpanLogo(Request $request)
@@ -76,7 +106,7 @@ class AdminPlaceholderController extends Controller
         $request->validate([
             'logo' => 'required|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ]);
-
+    
         if ($request->hasFile('logo')) {
             $oldLogo = \App\Models\Setting::get('company_logo');
             $newPath = $this->uploadCompanyLogo($request->file('logo'));
@@ -86,8 +116,20 @@ class AdminPlaceholderController extends Controller
                 $this->deleteCompanyLogo($oldLogo);
             }
         }
-
-        return redirect()->back()->with('success', 'Logo berhasil diperbarui.');
+    
+        // Catat aktivitas admin
+        $user = Auth::user();
+    
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengubah logo sistem'
+            );
+        }
+    
+        return redirect()
+            ->back()
+            ->with('success', 'Logo berhasil diperbarui.');
     }
 
     protected function uploadCompanyLogo($file): string

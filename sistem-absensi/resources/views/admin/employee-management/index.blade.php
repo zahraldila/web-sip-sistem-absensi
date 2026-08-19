@@ -437,6 +437,7 @@
             return {
                 modalOpen: false,
                 isEdit: false,
+                formAction: '',
                 divisionModalOpen: false,
                 roleModalOpen: false,
                 newDivisionName: '',
@@ -491,6 +492,8 @@
                 },
                 openCreate() {
                     this.isEdit = false;
+                    this.formAction = "{{ route('admin.employee-management.store') }}";
+
                     this.form = {
                         pegawai_id: '',
                         nama_pegawai: '',
@@ -506,16 +509,21 @@
                         password_confirmation: '',
                         photoPreview: '',
                     };
+
                     if (this.previewObjectUrl) {
                         URL.revokeObjectURL(this.previewObjectUrl);
                         this.previewObjectUrl = null;
                     }
+
                     this.modalOpen = true;
                 },
                 openEdit(event) {
                     const button = event.currentTarget;
                     const employee = JSON.parse(button.getAttribute('data-employee'));
+
                     this.isEdit = true;
+                    this.formAction = `/admin/employee-management/${employee.pegawai_id}`;
+
                     this.form = {
                         pegawai_id: employee.pegawai_id || '',
                         nama_pegawai: employee.nama_pegawai || '',
@@ -531,10 +539,12 @@
                         password_confirmation: '',
                         photoPreview: employee.foto_profile || '',
                     };
+
                     if (this.previewObjectUrl) {
                         URL.revokeObjectURL(this.previewObjectUrl);
                         this.previewObjectUrl = null;
                     }
+
                     this.modalOpen = true;
                 },
                 closeModal() {

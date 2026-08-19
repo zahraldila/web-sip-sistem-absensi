@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\logHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\Pegawai;
 use App\Services\EmployeeManagementService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EmployeeManagementController extends Controller
@@ -41,17 +43,30 @@ class EmployeeManagementController extends Controller
             'foto_profile' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
-            'username' => ['nullable','string','max:100','unique:akun,username'],
+            'username' => ['nullable', 'string', 'max:100', 'unique:akun,username'],
             'password' => 'required|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
         ]);
 
-        // include uploaded file instance for the service
+        // Include uploaded file instance for the service
         $data['foto_profile_file'] = $request->file('foto_profile');
 
-        $this->service->saveEmployee($data);
+        // Simpan data pegawai
+        $result = $this->service->saveEmployee($data);
 
-        return redirect()->route('admin.employee-management.index')->with('success', 'Akun karyawan berhasil ditambahkan.');
+        // Catat aktivitas setelah proses berhasil
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                "Menambahkan data pegawai: {$result['pegawai']->nama_pegawai}"
+            );
+        }
+
+        return redirect()
+            ->route('admin.employee-management.index')
+            ->with('success', 'Akun karyawan berhasil ditambahkan.');
     }
 
     public function edit(Pegawai $pegawai)
@@ -74,8 +89,11 @@ class EmployeeManagementController extends Controller
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
             'username' => [
-                'nullable','string','max:100',
-                Rule::unique('akun','username')->ignore($pegawai->akun->akun_id ?? null, 'akun_id')
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('akun', 'username')
+                    ->ignore($pegawai->akun->akun_id ?? null, 'akun_id')
             ],
             'password' => 'nullable|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
@@ -83,9 +101,22 @@ class EmployeeManagementController extends Controller
 
         $data['foto_profile_file'] = $request->file('foto_profile');
 
-        $this->service->updateEmployee($pegawai, $data);
+        // Update data pegawai
+        $result = $this->service->updateEmployee($pegawai, $data);
 
-        return redirect()->route('admin.employee-management.index')->with('success', 'Akun karyawan berhasil diperbarui.');
+        // Catat aktivitas setelah proses berhasil
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                "Memperbarui data pegawai: {$result['pegawai']->nama_pegawai}"
+            );
+        }
+
+        return redirect()
+            ->route('admin.employee-management.index')
+            ->with('success', 'Akun karyawan berhasil diperbarui.');
     }
 
     public function storeDivision(Request $request)
@@ -94,7 +125,18 @@ class EmployeeManagementController extends Controller
             'nama_divisi' => 'required|string|max:255|unique:master_divisi,nama_divisi',
         ]);
 
+        // Simpan divisi
         $division = $this->service->createDivision($data['nama_divisi']);
+
+        // Catat aktivitas setelah proses berhasil
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                "Menambahkan divisi baru: {$division->nama_divisi}"
+            );
+        }
 
         return response()->json([
             'message' => 'Divisi berhasil ditambahkan.',
@@ -108,7 +150,18 @@ class EmployeeManagementController extends Controller
             'nama_jabatan' => 'required|string|max:255|unique:master_jabatan,nama_jabatan',
         ]);
 
+        // Simpan jabatan
         $role = $this->service->createRole($data['nama_jabatan']);
+
+        // Catat aktivitas setelah proses berhasil
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                "Menambahkan jabatan baru: {$role->nama_jabatan}"
+            );
+        }
 
         return response()->json([
             'message' => 'Jabatan berhasil ditambahkan.',
