@@ -3,7 +3,7 @@
 @section('title', 'Laporan Kehadiran')
 
 @section('content')
-<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'xlsx' }">
+<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'xlsx', exportIsLoading: false }">
 
     {{-- Header --}}
     <div class="mb-5 sm:mb-6">
@@ -98,7 +98,7 @@
                     <div>
                         <button
                             type="button"
-                            @click="exportModalOpen = true"
+                            @click="exportIsLoading = false; exportModalOpen = true"
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -358,7 +358,7 @@
                     <h2 class="text-base sm:text-lg font-bold text-slate-900">Export Laporan</h2>
                     <p class="mt-1 text-xs sm:text-sm text-slate-500">Pilih format dan rentang filter untuk unduh laporan.</p>
                 </div>
-                <button type="button" @click="exportModalOpen = false" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                <button type="button" @click="exportIsLoading = false; exportModalOpen = false" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -434,12 +434,15 @@
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
-                    <button type="button" @click="exportModalOpen = false" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    <button type="button" @click="exportIsLoading = false; exportModalOpen = false" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                         Batal
                     </button>
                     <button
                         type="button"
+                        x-bind:disabled="exportIsLoading"
                         @click.prevent="
+                            if (exportIsLoading) return;
+                            exportIsLoading = true;
                             let exportUrl = '{{ route('admin.laporan-kehadiran.export.excel') }}';
                             if (exportFormat === 'csv') {
                                 exportUrl = '{{ route('admin.laporan-kehadiran.export.csv') }}';
@@ -448,9 +451,12 @@
                             }
                             $refs.exportForm.action = exportUrl;
                             $refs.exportForm.submit();
+                            setTimeout(() => {
+                                exportIsLoading = false;
+                            }, 1500);
                         "
-                        class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover">
-                        Unduh
+                        class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm"
+                        x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'">
                     </button>
                 </div>
             </form>

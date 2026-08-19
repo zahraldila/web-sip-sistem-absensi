@@ -499,7 +499,7 @@
                     <button type="button" id="cancel-export" class="w-full sm:w-auto rounded-2xl border border-slate-300 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                         Batal
                     </button>
-                    <button type="submit" class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm">
+                    <button type="submit" id="export-submit-btn" class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm">
                         Unduh
                     </button>
                 </div>
@@ -718,13 +718,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeExportModal = document.getElementById('close-export-modal');
     const cancelExport = document.getElementById('cancel-export');
     const exportForm = document.getElementById('export-form');
+    const exportSubmitBtn = document.getElementById('export-submit-btn');
+    let exportIsLoading = false;
+
+    function setExportLoading(loading) {
+        exportIsLoading = loading;
+        if (exportSubmitBtn) {
+            exportSubmitBtn.disabled = loading;
+            exportSubmitBtn.textContent = loading ? 'Menyiapkan...' : 'Unduh';
+        }
+    }
 
     function openExport() {
+        setExportLoading(false);
         exportModal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
     }
 
     function closeExport() {
+        setExportLoading(false);
         exportModal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
         exportForm.reset();
@@ -736,6 +748,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     exportForm.addEventListener('submit', function (event) {
         event.preventDefault();
+        if (exportIsLoading) {
+            return;
+        }
+
         const formData = new FormData(exportForm);
         const format = formData.get('format');
         const tanggalAwal = formData.get('tanggal_awal');
@@ -748,6 +764,8 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Silakan pilih format export terlebih dahulu.');
             return;
         }
+
+        setExportLoading(true);
 
         let exportUrl = '{{ route("admin.persetujuan.export.excel") }}';
         if (format === 'csv') {
@@ -764,7 +782,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (pegawaiId) url.searchParams.set('pegawai_id', pegawaiId);
 
         window.location.href = url.toString();
-        closeExport();
+        setTimeout(() => {
+            setExportLoading(false);
+        }, 1500);
     });
 
     function setActiveTab(activeTab) {
