@@ -6,7 +6,7 @@
         <div class="flex items-center gap-3">
             {{-- Logo --}}
             <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-white flex items-center justify-center p-1 border border-slate-100 shadow-sm">
-                <img src="{{ asset(\App\Models\Setting::get('company_logo', 'assets/logo.png')) }}" alt="SIP Logo" class="h-full w-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';">
+                <img src="{{ company_logo_url() }}" alt="SIP Logo" class="h-full w-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';">
             </div>
 
             {{-- Company --}}

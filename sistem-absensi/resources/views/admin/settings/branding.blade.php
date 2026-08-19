@@ -6,7 +6,7 @@
 
 @php
     $savedColor = \App\Models\Setting::get('primary_color', '#123D91');
-    $savedLogo  = asset(\App\Models\Setting::get('company_logo', 'images/logo-sip.png'));
+    $savedLogo  = company_logo_url();
 @endphp
 
 <div class="space-y-8" x-data="brandingApp('{{ $savedColor }}', '{{ $savedLogo }}')">

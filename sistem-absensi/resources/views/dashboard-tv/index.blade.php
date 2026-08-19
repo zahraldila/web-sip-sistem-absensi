@@ -45,7 +45,7 @@
             <div class="flex items-center gap-4">
                 <div class="w-14 h-14 bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center p-1.5 overflow-hidden">
                     <img 
-                        src="{{ asset('images/logo-sip.png') }}" 
+                        src="{{ company_logo_url() }}" 
                         alt="Logo SIP" 
                         class="h-full w-full object-contain"
                         onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=SIP';"

@@ -19,7 +19,7 @@
     {{-- Logo --}}
     <div class="mb-5 sm:mb-6 flex justify-center">
         <img
-            src="{{ asset(\App\Models\Setting::get('company_logo', 'images/logo-sip.png')) }}"
+            src="{{ company_logo_url() }}"
             alt="Logo SIP"
             class="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover shadow-lg"
             onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';" />
