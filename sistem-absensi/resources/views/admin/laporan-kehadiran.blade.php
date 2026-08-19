@@ -7,7 +7,7 @@
 
     {{-- Header --}}
     <div class="mb-5 sm:mb-6">
-        <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Laporan Kehadiran</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">Laporan Kehadiran</h1>
         <p class="mt-1 text-xs sm:text-sm text-gray-600">Ringkasan Laporan Kehadiran Karyawan secara menyeluruh.</p>
     </div>
 
@@ -16,7 +16,7 @@
         <form method="GET" action="{{ route('admin.laporan-kehadiran') }}">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 {{-- Search Input --}}
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <label class="mb-1 block text-xs sm:text-sm font-medium text-gray-700">Cari Karyawan</label>
                     <div class="relative mt-1">
                         <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-gray-400">
@@ -35,7 +35,7 @@
                 </div>
 
                 {{-- Action Buttons: Filter & Export --}}
-                <div class="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3">
+                <div class="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 flex-shrink-0">
                     {{-- Filter Dropdown Trigger --}}
                     <div class="relative" @click.outside="filterOpen = false">
                         <button
@@ -112,9 +112,9 @@
     </div>
 
     {{-- ======================================================== --}}
-    {{-- 1. TAMPILAN MOBILE: CARD LIST (Tampil di HP) --}}
+    {{-- 1. TAMPILAN MOBILE: CARD LIST (Layar HP < 640px) --}}
     {{-- ======================================================== --}}
-    <div class="block sm:hidden space-y-3.5 mb-6">
+    <div class="block md:hidden space-y-3.5 mb-6">
         @forelse($attendances as $attendance)
             <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
                 {{-- Header Card: Foto + Nama + Status --}}
@@ -190,11 +190,11 @@
     </div>
 
     {{-- ======================================================== --}}
-    {{-- 2. TAMPILAN DESKTOP: FULL TABLE (Tampil di Laptop/Tablet) --}}
+    {{-- 2. TAMPILAN DESKTOP & TABLET: FULL TABLE (Scrollable Halus) --}}
     {{-- ======================================================== --}}
-    <section class="hidden sm:block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm mb-6">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+    <section class="hidden md:block rounded-2xl border border-gray-200 bg-white shadow-sm mb-6 overflow-hidden">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full min-w-[950px] divide-y divide-gray-200 text-left text-sm">
                 <thead class="bg-gray-50/80">
                     <tr>
                         <th class="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Karyawan</th>
@@ -270,7 +270,7 @@
     </section>
 
     {{-- ======================================================== --}}
-    {{-- 3. PAGINATION (Responsif untuk Mobile & Desktop) --}}
+    {{-- 3. PAGINATION (Responsif untuk Mobile, Tablet, & Desktop) --}}
     {{-- ======================================================== --}}
     <div class="flex flex-col gap-3.5 border-t border-slate-200 bg-white p-4 sm:p-5 rounded-2xl shadow-sm sm:flex-row sm:items-center sm:justify-between mb-6">
         <p class="text-xs sm:text-sm text-slate-500 text-center sm:text-left">

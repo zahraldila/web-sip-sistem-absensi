@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,26 +26,26 @@
     </style>
 </head>
 
-<body class="bg-[#F5F7FB] text-gray-800">
+<body class="bg-[#F5F7FB] text-gray-800 min-h-full flex flex-col antialiased">
 
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex">
+    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-1 w-full relative">
 
         {{-- ===================== --}}
-        {{-- SIDEBAR DESKTOP --}}
+        {{-- SIDEBAR DESKTOP (Layar Lebar >= 1280px / xl) --}}
         {{-- ===================== --}}
         <aside
-            class="hidden lg:flex fixed left-0 top-0 h-screen w-[280px] bg-white border-r border-gray-200 shadow-sm z-40">
+            class="hidden xl:flex fixed left-0 top-0 h-screen w-[280px] bg-white border-r border-gray-200 shadow-sm z-40">
 
             @include('components.layout.sidebar')
 
         </aside>
 
         {{-- ===================== --}}
-        {{-- SIDEBAR MOBILE --}}
+        {{-- SIDEBAR MOBILE & TABLET (< 1280px) --}}
         {{-- ===================== --}}
         <div x-show="sidebarOpen"
             x-cloak
-            class="fixed inset-0 z-50 flex lg:hidden"
+            class="fixed inset-0 z-50 flex xl:hidden"
             aria-hidden="true">
 
             <div x-show="sidebarOpen"
@@ -70,63 +70,34 @@
         </div>
 
         {{-- ===================== --}}
-        {{-- MAIN CONTENT --}}
+        {{-- MAIN CONTENT WRAPPER --}}
         {{-- ===================== --}}
-        <div class="flex-1 lg:ml-[280px] min-h-screen flex flex-col">
-
+        <div class="flex-1 xl:ml-[280px] min-h-screen flex flex-col w-full min-w-0">
 
             {{-- ===================== --}}
             {{-- TOPBAR --}}
             {{-- ===================== --}}
-            <header
-                class="sticky top-0
-                       z-30
-                       bg-[#F5F7FB]
-                       border-b
-                       border-transparent">
-
+            <header class="sticky top-0 z-30 bg-[#F5F7FB] border-b border-transparent">
                 @include('components.layout.topbar')
-
             </header>
-
 
             {{-- ===================== --}}
             {{-- PAGE CONTENT --}}
             {{-- ===================== --}}
-            <main
-                class="
-                flex-1
-                p-4
-                sm:p-6
-                lg:p-8">
-
-                <div class="max-w-[1600px] mx-auto w-full">
-
-                    @yield('content')
-
-                </div>
-
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-[1600px] mx-auto min-w-0">
+                @yield('content')
             </main>
-
 
             {{-- ===================== --}}
             {{-- FOOTER --}}
             {{-- ===================== --}}
-            <footer>
-
+            <footer class="w-full mt-auto">
                 @include('components.layout.footer')
-
             </footer>
 
         </div>
 
     </div>
-
-
-    {{-- ===================== --}}
-    {{-- MOBILE SIDEBAR --}}
-    {{-- Sprint selanjutnya --}}
-    {{-- ===================== --}}
 
     @stack('modals')
 

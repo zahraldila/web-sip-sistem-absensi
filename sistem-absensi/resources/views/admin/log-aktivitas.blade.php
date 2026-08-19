@@ -3,7 +3,7 @@
 @section('title', 'Log Aktivitas')
 
 @section('content')
-<div>
+<div class="w-full">
     {{-- 1. Header Section --}}
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6">
         <div>
@@ -13,7 +13,7 @@
     </div>
 
     {{-- 2. Statistik Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6 mb-5 sm:mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-5 mb-5 sm:mb-6">
         {{-- Card 1: Total Pegawai --}}
         <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-primary flex-shrink-0">
@@ -43,7 +43,7 @@
         </div>
 
         {{-- Card 3: Skema Kerja --}}
-        <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm flex items-center gap-4">
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm flex items-center gap-4 sm:col-span-2 xl:col-span-1">
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 flex-shrink-0">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
@@ -58,11 +58,11 @@
     </div>
 
     {{-- 3. Content Area: Log List & Side Widget --}}
-    <div class="flex flex-col lg:flex-row gap-5 sm:gap-6">
+    <div class="flex flex-col xl:flex-row gap-5 sm:gap-6">
         {{-- Kolom Kiri: Log Aktivitas --}}
         <div class="flex-1 min-w-0">
 
-            {{-- 3a. Mobile Card View (Tampil di Layar HP) --}}
+            {{-- 3a. Mobile Card View (Tampil di Layar HP < 640px) --}}
             <div class="block sm:hidden space-y-3 mb-6">
                 @forelse ($logs as $log)
                     <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
@@ -95,15 +95,15 @@
                 @endforelse
             </div>
 
-            {{-- 3b. Desktop Table View (Tampil di Layar Laptop/Tablet) --}}
-            <div class="hidden sm:block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+            {{-- 3b. Desktop & Tablet Table View (Tampil di Layar Tablet/Desktop >= 640px) --}}
+            <div class="hidden sm:block rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full min-w-[650px] divide-y divide-gray-200 text-left text-sm">
                         <thead class="bg-gray-50/80">
                             <tr>
-                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Waktu</th>
-                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Pengguna</th>
-                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 whitespace-nowrap">Waktu</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 whitespace-nowrap">Pengguna</th>
+                                <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 whitespace-nowrap">Role</th>
                                 <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Aktivitas</th>
                             </tr>
                         </thead>
@@ -146,7 +146,7 @@
         </div>
 
         {{-- Kolom Kanan: Ringkasan Hari ini --}}
-        <div class="w-full lg:w-72 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm self-start shrink-0">
+        <div class="w-full xl:w-72 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm self-start shrink-0">
             <h3 class="font-bold text-gray-900 text-sm sm:text-base mb-4">Ringkasan Hari ini</h3>
             <div class="space-y-3">
                 <div class="flex justify-between items-center text-xs sm:text-sm rounded-xl bg-slate-50 p-3">
