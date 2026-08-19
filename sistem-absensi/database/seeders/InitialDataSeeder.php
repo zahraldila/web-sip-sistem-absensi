@@ -13,13 +13,17 @@ class InitialDataSeeder extends Seeder
     public function run(): void
     {
         // Seed data pegawai id = 5 sesuai spesifikasi
+        $divisiId = DB::table('master_divisi')->where('nama_divisi', 'HR')->value('divisi_id');
+        $jabatanId = DB::table('master_jabatan')->where('nama_jabatan', 'HR Manager')->value('jabatan_id');
+
         $pegawai = Pegawai::updateOrCreate([
-            'id' => 5,
+            'pegawai_id' => 5,
         ], [
-            'nama' => 'Admin HR',
+            'nama_pegawai' => 'Admin HR',
             'email' => 'admin@selada.id',
-            'jabatan' => 'HR Manager',
-            'divisi' => 'HR',
+            'divisi_id' => $divisiId,
+            'jabatan_id' => $jabatanId,
+            'status' => 'Aktif',
         ]);
 
         // Seed data akun admin terhubung ke pegawai_id = 5

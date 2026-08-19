@@ -36,16 +36,16 @@ class AuthenticationControllers extends Controller
 
         $validPassword = false;
         if ($akun) {
-            $storedPassword = $akun->password;
+            $storedPassword = (string) $akun->password;
 
-            // Jika password sudah bcrypt, gunakan Hash::check.
-            // Jika password masih plain-text (legacy import), cocokkan langsung.
-            if (is_string($storedPassword) && preg_match('/^\$2[axyb]\$.{56}$/', $storedPassword)) {
-                $validPassword = Hash::check($password, $storedPassword);
+            // Preferensi: selalu coba Hash::check terlebih dahulu (untuk hashed passwords)
+            if (Hash::check($password, $storedPassword)) {
+                $validPassword = true;
             } else {
-                $validPassword = hash_equals((string) $storedPassword, $password);
-
-                if ($validPassword) {
+                // Fallback untuk akun legacy yang menyimpan password plaintext.
+                // Jika cocok, migrasikan ke hash secara aman.
+                if (hash_equals($storedPassword, (string) $password)) {
+                    $validPassword = true;
                     $akun->password = Hash::make($password);
                     $akun->save();
                 }

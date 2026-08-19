@@ -3,42 +3,54 @@
 @section('title', 'Login | Sistem Absensi')
 
 @section('content')
-<div class="rounded-[40px] border border-slate-100 bg-white px-8 py-10 shadow-2xl sm:px-10">
+<style>
+    /* Override browser autofill background & text colors */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+        -webkit-text-fill-color: #1e293b !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+</style>
+<div class="rounded-3xl sm:rounded-[40px] border border-slate-100 bg-white px-5 py-7 sm:px-8 sm:py-10 shadow-2xl">
 
     {{-- Logo --}}
-    <div class="mb-6 flex justify-center">
+    <div class="mb-5 sm:mb-6 flex justify-center">
         <img
-            src="{{ asset('images/logo-sip.png') }}"
+            src="{{ asset(\App\Models\Setting::get('company_logo', 'images/logo-sip.png')) }}"
             alt="Logo SIP"
-            class="h-20 w-20 rounded-2xl object-cover shadow-lg" />
+            class="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover shadow-lg"
+            onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';" />
     </div>
 
     {{-- Heading --}}
-    <h1 class="text-center text-3xl font-extrabold tracking-tight text-slate-900">Selamat Datang</h1>
-    <p class="mt-2 text-center text-base font-medium text-slate-500">Silahkan masuk ke akun anda</p>
+    <h1 class="text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Selamat Datang</h1>
+    <p class="mt-1.5 sm:mt-2 text-center text-sm sm:text-base font-medium text-slate-500">Silahkan masuk ke akun anda</p>
 
     {{-- Status / Error --}}
     @if (session('status'))
-    <div class="mt-5 rounded-xl bg-green-50 px-4 py-2 text-sm text-green-700">
+    <div class="mt-4 sm:mt-5 rounded-xl bg-green-50 px-4 py-2.5 text-xs sm:text-sm text-green-700">
         {{ session('status') }}
     </div>
     @endif
 
     @if ($errors->any())
-    <div class="mt-5 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-700">
+    <div class="mt-4 sm:mt-5 rounded-xl bg-red-50 px-4 py-2.5 text-xs sm:text-sm text-red-700">
         @foreach ($errors->all() as $error)
         <p>{{ $error }}</p>
         @endforeach
     </div>
     @endif
 
-    <form method="POST" action="{{ url('/login') }}" class="mt-8 space-y-5" x-data="{ showPassword: false }">
+    <form method="POST" action="{{ url('/login') }}" class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false }">
         @csrf
 
         {{-- Email --}}
         <div>
-            <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-700">email:</label>
-            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
+            <label for="email" class="mb-1.5 block text-xs sm:text-sm font-semibold text-slate-700">Email</label>
+            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-3.5 py-3 sm:px-4 sm:py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
                 </svg>
@@ -49,15 +61,14 @@
                     value="{{ old('email') }}"
                     required
                     autofocus
-                    placeholder="admin@spi.co.id"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
+                    class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
             </div>
         </div>
 
         {{-- Password --}}
         <div>
-            <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-700">Password:</label>
-            <div class="flex items-center gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3.5 focus-within:border-[#123D91] focus-within:ring-1 focus-within:ring-[#123D91]">
+            <label for="password" class="mb-1.5 block text-xs sm:text-sm font-semibold text-slate-700">Password</label>
+            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-3.5 py-3 sm:px-4 sm:py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 0 1 8 0v4" />
@@ -67,9 +78,8 @@
                     name="password"
                     id="password"
                     required
-                    placeholder="............"
-                    class="w-full border-0 bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 focus:ring-0" />
-                <button type="button" @click="showPassword = !showPassword" class="shrink-0 text-slate-400 hover:text-slate-600">
+                    class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
+                <button type="button" @click="showPassword = !showPassword" class="shrink-0 p-1 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Toggle password visibility">
                     <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
                         <circle cx="12" cy="12" r="3" stroke-width="2" />
@@ -83,25 +93,25 @@
         </div>
 
         {{-- Remember + Forgot --}}
-        <div class="flex items-center justify-between text-sm">
-            <label class="flex items-center gap-2 text-slate-600">
-                <input type="checkbox" name="remember" class="rounded border-slate-300 text-[#123D91] focus:ring-[#123D91]" />
-                Ingat Saya
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+            <label class="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
+                <input type="checkbox" name="remember" class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                <span>Ingat Saya</span>
             </label>
-            <a href="#" class="font-semibold text-[#123D91] hover:underline">Lupa Kata Sandi?</a>
+            <a href="#" class="font-semibold text-primary hover:underline">Lupa Kata Sandi?</a>
         </div>
 
         {{-- Submit --}}
         <button
             type="submit"
-            class="w-full rounded-2xl bg-[#123D91] py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#0F3277] active:scale-95">
+            class="w-full rounded-2xl bg-primary py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white shadow-lg transition hover:bg-primary-hover active:scale-95">
             Masuk
         </button>
 
         {{-- Help --}}
-        <p class="text-center text-sm text-slate-500">
+        <p class="text-center text-xs sm:text-sm text-slate-500 pt-1">
             Butuh bantuan?
-            <a href="#" class="font-semibold text-[#123D91] hover:underline">Hubungi IT Support</a>
+            <a href="#" class="font-semibold text-primary hover:underline">Hubungi IT Support</a>
         </p>
     </form>
 </div>

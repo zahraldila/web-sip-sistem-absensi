@@ -39,9 +39,12 @@ class DashboardControllers extends Controller
             ->map(function ($attendance) {
                 return [
                     'nama'   => $attendance->pegawai?->nama_pegawai ?? 'Unknown',
+                    'foto'   => $attendance->pegawai?->foto_profile
+                        ? supabase_public_url($attendance->pegawai->foto_profile)
+                        : null,
                     'status' => $attendance->skema_kerja ?? 'WFO',
                     'jam'    => $attendance->jam_checkin
-                        ? substr($attendance->jam_checkin, 0, 5) . ' WIB'
+                        ? Carbon::parse($attendance->jam_checkin)->format('H:i')
                         : '-',
                 ];
             });

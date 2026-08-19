@@ -16,8 +16,8 @@ class EmployeeFactory extends Factory
             'nama_pegawai' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'no_handphone' => '0812' . fake()->numerify('#######'),
-            'jabatan' => 'Staff',
-            'divisi' => 'IT',
+            'jabatan_id' => 1,
+            'divisi_id' => 1,
             'status' => 'Aktif'
         ];
     }
