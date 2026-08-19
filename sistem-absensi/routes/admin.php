@@ -4,12 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApprovalControllers;
 
 Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function () {
-    Route::get('/', function () {
-        return view('admin.index');
-    })->name('admin.dashboard');
-    Route::get('/dashboard', function () {
-        return view('admin.index');
-    })->name('admin.dashboard.index');
+    Route::get('/', [App\Http\Controllers\DashboardControllers::class, 'admin'])->name('admin.dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardControllers::class, 'admin'])->name('admin.dashboard.index');
 
     Route::get('/laporan-kehadiran', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('admin.laporan-kehadiran');
     Route::get('/laporan-kehadiran/export/excel', [App\Http\Controllers\AttendanceReportController::class, 'exportExcel'])->name('admin.laporan-kehadiran.export.excel');
@@ -46,7 +42,6 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     Route::post('/tampilan-branding/logo', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanLogo'])->name('admin.tampilan-branding.logo');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');
     Route::get('/bantuan', [App\Http\Controllers\AdminPlaceholderController::class, 'bantuan'])->name('admin.bantuan');
-    Route::get('/', [App\Http\Controllers\DashboardControllers::class, 'admin'])->name('admin.dashboard');
     Route::get('/chart-statistik', [App\Http\Controllers\DashboardControllers::class, 'chartStatistik'])->name('admin.chart-statistik');
     Route::post('/jam-kerja', [App\Http\Controllers\DashboardControllers::class, 'simpanJamKerja'])->name('admin.jam-kerja.simpan');
 

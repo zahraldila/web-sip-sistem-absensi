@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\logHelpers;
 use App\Models\Approval;
 use App\Models\Attendance;
 use App\Models\AuditLog;
 use App\Models\Pegawai;
+use App\Models\WorkSchedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -89,6 +91,14 @@ class DashboardControllers extends Controller
             ]]);
         }
 
+        $jadwalKerja = DB::table('jadwal_kerja')->orderByDesc('jadwal_id')->first();
+        $jamMasuk = $jadwalKerja && $jadwalKerja->jam_masuk
+            ? Carbon::parse($jadwalKerja->jam_masuk)->format('H:i')
+            : '08:00';
+        $jamPulang = $jadwalKerja && $jadwalKerja->jam_pulang
+            ? Carbon::parse($jadwalKerja->jam_pulang)->format('H:i')
+            : '17:00';
+
         return view('admin.index', compact(
             'totalPegawai',
             'hadirHariIni',
@@ -96,7 +106,9 @@ class DashboardControllers extends Controller
             'wfhWfcCount',
             'liveCheckIns',
             'pendingApprovals',
-            'activities'
+            'activities',
+            'jamMasuk',
+            'jamPulang'
         ));
     }
 
@@ -229,7 +241,7 @@ class DashboardControllers extends Controller
      */
     public function simpanJamKerja(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'jam_masuk'  => ['required', 'date_format:H:i'],
             'jam_pulang' => ['required', 'date_format:H:i', 'after:jam_masuk'],
         ], [
@@ -240,19 +252,37 @@ class DashboardControllers extends Controller
             'jam_pulang.after'         => 'Jam pulang harus setelah jam masuk.',
         ]);
 
-        // Simpan ke tabel pengaturan atau setting — sesuaikan dengan struktur DB Anda.
-        // Contoh menggunakan DB::table jika ada tabel 'pengaturan':
-        // DB::table('pengaturan')->updateOrInsert(
-        //     ['kunci' => 'jam_masuk'],
-        //     ['nilai' => $request->jam_masuk]
-        // );
-        // DB::table('pengaturan')->updateOrInsert(
-        //     ['kunci' => 'jam_pulang'],
-        //     ['nilai' => $request->jam_pulang]
-        // );
+        try {
+            $jadwal = DB::table('jadwal_kerja')->orderByDesc('jadwal_id')->first();
 
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Jam kerja berhasil diperbarui: Masuk ' . $request->jam_masuk . ' – Pulang ' . $request->jam_pulang);
+            if ($jadwal) {
+                DB::table('jadwal_kerja')
+                    ->where('jadwal_id', $jadwal->jadwal_id)
+                    ->update([
+                        'jam_masuk'       => $validated['jam_masuk'],
+                        'jam_pulang'      => $validated['jam_pulang'],
+                        'tanggal_berlaku' => now()->toDateString(),
+                    ]);
+            } else {
+                DB::table('jadwal_kerja')->insert([
+                    'tanggal_berlaku' => now()->toDateString(),
+                    'jam_masuk'       => $validated['jam_masuk'],
+                    'jam_pulang'      => $validated['jam_pulang'],
+                ]);
+            }
+
+            $user = auth()->user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record($user->akun_id, "Memperbarui jam kerja: Masuk {$validated['jam_masuk']} – Pulang {$validated['jam_pulang']}");
+            }
+
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('success', 'Jam kerja berhasil diperbarui: Masuk ' . $validated['jam_masuk'] . ' – Pulang ' . $validated['jam_pulang']);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->withErrors(['error' => 'Gagal memperbarui jam kerja: ' . $e->getMessage()]);
+        }
     }
 }

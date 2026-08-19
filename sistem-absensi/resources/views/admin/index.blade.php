@@ -67,6 +67,31 @@
     </div>
     @endif
 
+    @if(session('error') || (isset($errors) && $errors->any()))
+    <div
+        x-data="{ show: true }"
+        x-show="show"
+        x-init="setTimeout(() => show = false, 6000)"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+            @if(session('error'))
+                <p>{{ session('error') }}</p>
+            @endif
+            @if(isset($errors) && $errors->any())
+                @foreach($errors->all() as $err)
+                    <p>{{ $err }}</p>
+                @endforeach
+            @endif
+        </div>
+    </div>
+    @endif
+
     {{-- ===================================================== --}}
     {{-- SUMMARY CARD --}}
     {{-- ===================================================== --}}
@@ -442,6 +467,8 @@
                             id="jam_masuk"
                             name="jam_masuk"
                             type="time"
+                            value="{{ old('jam_masuk', $jamMasuk ?? '08:00') }}"
+                            required
                             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                             placeholder="00:00">
                         <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -463,6 +490,8 @@
                             id="jam_pulang"
                             name="jam_pulang"
                             type="time"
+                            value="{{ old('jam_pulang', $jamPulang ?? '17:00') }}"
+                            required
                             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-800 outline-none ring-0 transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                             placeholder="00:00">
                         <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">

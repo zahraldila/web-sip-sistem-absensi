@@ -28,6 +28,9 @@ class AttendanceControllers extends Controller
             // 'foto_selfie' => 'required|image' // Buka komen jika ada upload foto
         ]);
 
+        $activeSchedule = DB::table('jadwal_kerja')->orderByDesc('jadwal_id')->first();
+        $jadwalId = $activeSchedule ? $activeSchedule->jadwal_id : 1;
+
         // 3. Simpan data absensi ke database
         DB::table('absensi')->insert([
             'pegawai_id'       => $pegawaiId,
@@ -36,6 +39,8 @@ class AttendanceControllers extends Controller
             'status_kehadiran' => 'Hadir', // Sesuaikan dengan logika bisnismu
             'latitude'         => $request->latitude,
             'longitude'        => $request->longitude,
+            'skema_kerja'      => $request->skema_kerja ?? 'WFO',
+            'jadwal_id'        => $jadwalId,
             // 'foto_selfie'   => $pathFoto,
         ]);
 
