@@ -29,47 +29,54 @@
     <h1 class="text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Selamat Datang</h1>
     <p class="mt-1.5 sm:mt-2 text-center text-sm sm:text-base font-medium text-slate-500">Silahkan masuk ke akun anda</p>
 
-    {{-- Status / Error --}}
+    {{-- Status Alert (e.g. Password reset success) --}}
     @if (session('status'))
-    <div class="mt-4 sm:mt-5 rounded-xl bg-green-50 px-4 py-2.5 text-xs sm:text-sm text-green-700">
-        {{ session('status') }}
-    </div>
+        <div class="mt-4 sm:mt-5 flex items-center gap-2 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-xs sm:text-sm text-green-700">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>{{ session('status') }}</span>
+        </div>
     @endif
 
-    @if ($errors->any())
-    <div class="mt-4 sm:mt-5 rounded-xl bg-red-50 px-4 py-2.5 text-xs sm:text-sm text-red-700">
-        @foreach ($errors->all() as $error)
-        <p>{{ $error }}</p>
-        @endforeach
-    </div>
+    {{-- Error Banner (General login error) --}}
+    @if (session('error'))
+        <div class="mt-4 sm:mt-5 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700">
+            <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+            <span>{{ session('error') }}</span>
+        </div>
     @endif
 
-    <form method="POST" action="{{ url('/login') }}" class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false }">
+    <form method="POST" action="{{ url('/login') }}" novalidate class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false }">
         @csrf
 
-        {{-- Email --}}
+        {{-- Username / Email --}}
         <div>
-            <label for="email" class="mb-1.5 block text-xs sm:text-sm font-semibold text-slate-700">Email</label>
-            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-3.5 py-3 sm:px-4 sm:py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
+            <label for="email" class="mb-1.5 block text-xs sm:text-sm font-semibold text-slate-700">Username atau Email</label>
+            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border @error('email') border-red-400 bg-red-50/30 ring-1 ring-red-300 @else border-slate-300 bg-slate-50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary @enderror px-3.5 py-3 sm:px-4 sm:py-3.5 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 @error('email') text-red-400 @else text-slate-400 @enderror" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <input
-                    type="email"
+                    type="text"
                     name="email"
                     id="email"
                     value="{{ old('email') }}"
-                    required
+                    placeholder="Masukkan username atau email"
                     autofocus
                     class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
             </div>
+            @error('email')
+                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                    <span>{{ $message }}</span>
+                </p>
+            @enderror
         </div>
 
         {{-- Password --}}
         <div>
             <label for="password" class="mb-1.5 block text-xs sm:text-sm font-semibold text-slate-700">Password</label>
-            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border border-slate-300 bg-slate-50 px-3.5 py-3 sm:px-4 sm:py-3.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-2.5 sm:gap-3 rounded-2xl border @error('password') border-red-400 bg-red-50/30 ring-1 ring-red-300 @else border-slate-300 bg-slate-50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary @enderror px-3.5 py-3 sm:px-4 sm:py-3.5 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 @error('password') text-red-400 @else text-slate-400 @enderror" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="4" y="11" width="16" height="9" rx="2" stroke-width="2" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 0 1 8 0v4" />
                 </svg>
@@ -77,19 +84,18 @@
                     :type="showPassword ? 'text' : 'password'"
                     name="password"
                     id="password"
-                    required
+                    placeholder="Masukkan password akun"
                     class="w-full border-none bg-transparent p-0 text-sm text-slate-800 placeholder-slate-400 outline-none focus:outline-none focus:ring-0" />
                 <button type="button" @click="showPassword = !showPassword" class="shrink-0 p-1 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Toggle password visibility">
-                    <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
-                        <circle cx="12" cy="12" r="3" stroke-width="2" />
-                    </svg>
-                    <svg x-show="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-cloak>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l22 22" />
-                    </svg>
+                    <i :class="showPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-sm"></i>
                 </button>
             </div>
+            @error('password')
+                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                    <span>{{ $message }}</span>
+                </p>
+            @enderror
         </div>
 
         {{-- Remember + Forgot --}}
