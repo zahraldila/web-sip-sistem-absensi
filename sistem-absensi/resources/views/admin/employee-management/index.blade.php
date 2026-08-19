@@ -347,6 +347,87 @@
         </div>
     </div>
 
+        {{-- DETAIL MODAL PEGAWAI --}}
+    <div x-show="detailModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeDetail()">
+        <div class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
+            {{-- Header --}}
+            <div class="border-b border-slate-200 px-5 sm:px-6 py-3.5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900">Detail Pegawai</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Informasi lengkap data pegawai dan akun.</p>
+                </div>
+                <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                    @click="closeDetail()" aria-label="Tutup modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="p-4 sm:p-5 space-y-3.5">
+                {{-- Profile Header: Foto di KIRI, Nama & NIP di KANAN --}}
+                <div class="flex items-center gap-3.5 sm:gap-4 bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-100">
+                    <template x-if="detailData.foto_profile">
+                        <img :src="detailData.foto_profile" alt="Foto Pegawai" class="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover shadow-sm border-2 border-white flex-shrink-0" />
+                    </template>
+                    <template x-if="!detailData.foto_profile">
+                        <div class="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-slate-200 text-lg sm:text-xl font-bold text-slate-700 flex-shrink-0 border-2 border-white shadow-sm">
+                            <span x-text="detailData.nama_pegawai ? detailData.nama_pegawai.substring(0, 1).toUpperCase() : 'U'"></span>
+                        </div>
+                    </template>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 truncate" x-text="detailData.nama_pegawai"></h3>
+                        <p class="text-xs text-slate-500 mt-0.5">NIP: <span class="font-semibold text-slate-700" x-text="detailData.nip || '-'"></span></p>
+                        <div class="mt-1">
+                            <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-semibold text-green-700" x-text="detailData.status || 'Aktif'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Detail Grid --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm">
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">Department</p>
+                        <p class="font-semibold text-slate-800 mt-0.5 truncate" x-text="detailData.divisi_name || '-'"></p>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">Role / Jabatan</p>
+                        <p class="font-semibold text-slate-800 mt-0.5 truncate" x-text="detailData.jabatan_name || '-'"></p>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">Email</p>
+                        <p class="font-semibold text-slate-800 mt-0.5 truncate" x-text="detailData.email || '-'"></p>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">No. Telepon</p>
+                        <p class="font-semibold text-slate-800 mt-0.5" x-text="detailData.no_handphone || '-'"></p>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">Username</p>
+                        <p class="font-semibold text-slate-800 mt-0.5" x-text="detailData.username || '-'"></p>
+                    </div>
+
+                    <div class="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <p class="text-slate-400 text-[10px] sm:text-[11px] uppercase font-semibold">Kartu NFC ID</p>
+                        <p class="font-semibold text-slate-800 mt-0.5" x-text="detailData.nfc_id || '-'"></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer --}}
+            <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-3.5 flex justify-end">
+                <button type="button" @click="closeDetail()" class="w-full sm:w-auto rounded-2xl border border-slate-300 bg-white px-5 py-2 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     @include('admin.employee-management._employee-form-modal')
     @include('admin.employee-management._export-modal')
 

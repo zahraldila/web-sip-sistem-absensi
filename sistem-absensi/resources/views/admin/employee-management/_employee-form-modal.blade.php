@@ -10,7 +10,7 @@
         <div class="border-b border-slate-200 px-5 sm:px-6 py-4 flex-shrink-0 bg-white">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-900" x-text="modalTitle"></h2>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900" x-text="isEdit ? 'Edit Pegawai' : 'Tambah Pegawai'">Tambah Pegawai</h2>
                     <p class="mt-0.5 text-xs sm:text-sm text-slate-500">Isi informasi pegawai untuk membuat atau mengubah akun</p>
                 </div>
                 <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
@@ -26,7 +26,7 @@
         <div class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 space-y-4">
             <form id="employeeForm" :action="formAction" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                <input type="hidden" name="form_mode" :value="mode">
+                <input type="hidden" name="form_mode" :value="isEdit ? 'edit' : 'create'">
                 <input type="hidden" name="pegawai_id" x-model="form.pegawai_id">
                 <input type="hidden" name="foto_profile_existing" x-model="form.foto_profile_existing">
                 <template x-if="isEdit">
@@ -163,35 +163,33 @@
 
                     {{-- Password & Konfirmasi Password --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <div>
+                        <div x-data="{ showPass: false }">
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Password</label>
                             <div class="relative">
-                                <input :type="showPassword ? 'text' : 'password'" name="password" x-model="form.password"
+                                <input :type="showPass ? 'text' : 'password'" name="password" x-model="form.password"
                                     placeholder="Minimal 6 karakter"
                                     class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 pr-10 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                                <button type="button" @click="showPassword = !showPassword"
-                                    class="absolute inset-y-0 right-3 inline-flex items-center text-slate-400 transition hover:text-slate-600">
-                                    <template x-if="showPassword">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.26.237-2.46.666-3.576M4.5 4.5L19.5 19.5" />
-                                        </svg>
-                                    </template>
-                                    <template x-if="!showPassword">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </template>
+                                <button type="button" @click="showPass = !showPass"
+                                    class="absolute inset-y-0 right-3 inline-flex items-center text-slate-400 transition hover:text-slate-600 focus:outline-none"
+                                    aria-label="Toggle password visibility">
+                                    <i :class="showPass ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-sm"></i>
                                 </button>
                             </div>
                             @error('password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </div>
 
-                        <div>
+                        <div x-data="{ showPassConfirm: false }">
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Konfirmasi Password</label>
-                            <input :type="showPassword ? 'text' : 'password'" name="password_confirmation" x-model="form.password_confirmation"
-                                placeholder="Ketik ulang password"
-                                class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
+                            <div class="relative">
+                                <input :type="showPassConfirm ? 'text' : 'password'" name="password_confirmation" x-model="form.password_confirmation"
+                                    placeholder="Ketik ulang password"
+                                    class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 pr-10 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
+                                <button type="button" @click="showPassConfirm = !showPassConfirm"
+                                    class="absolute inset-y-0 right-3 inline-flex items-center text-slate-400 transition hover:text-slate-600 focus:outline-none"
+                                    aria-label="Toggle konfirmasi password visibility">
+                                    <i :class="showPassConfirm ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-sm"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,8 +204,9 @@
                     Batal
                 </button>
                 <button type="submit" form="employeeForm"
-                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm"
-                    x-text="submitLabel"></button>
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm min-w-[100px]">
+                    <span x-text="isEdit ? 'Simpan Perubahan' : 'Simpan'">Simpan</span>
+                </button>
             </div>
         </div>
     </div>
