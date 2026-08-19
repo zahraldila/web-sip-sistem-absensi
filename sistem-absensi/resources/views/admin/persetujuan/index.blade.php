@@ -399,50 +399,107 @@
     aria-labelledby="export-modal-title">
 
     <div class="flex min-h-full items-center justify-center">
-        <div class="relative w-full max-w-lg overflow-hidden rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-6 py-4">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
                 <div>
                     <h2 id="export-modal-title" class="text-base sm:text-lg font-bold text-slate-900">
                         Export Pengajuan
                     </h2>
-                    <p class="mt-0.5 text-xs sm:text-sm text-slate-500">
-                        Unduh laporan pengajuan karyawan.
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">
+                        Pilih format dan filter untuk unduh data pengajuan persetujuan.
                     </p>
                 </div>
-                <button type="button" id="close-export-modal" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                <button type="button" id="close-export-modal" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" aria-label="Tutup modal">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
-            <form id="export-form" class="space-y-4 px-5 sm:px-6 py-5">
-                <div>
-                    <label class="mb-1 block text-xs sm:text-sm font-semibold text-slate-700">Format</label>
-                    <div class="grid grid-cols-1 gap-2.5">
-                        <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 p-3 hover:bg-slate-50">
-                            <input type="radio" name="format" value="excel" class="h-4 w-4 text-primary focus:ring-primary" checked>
-                            <span class="text-xs sm:text-sm font-medium text-slate-800">Excel (.xlsx)</span>
-                        </label>
+            <form id="export-form" class="space-y-5 sm:space-y-6 px-5 sm:px-8 py-5 sm:py-6">
+                <div class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
+                    <div class="space-y-3 sm:space-y-4">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Format Export</p>
+                        <div class="space-y-3">
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-primary focus:ring-primary" checked />
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-slate-900">Excel (.xlsx)</p>
+                                    <p class="text-xs text-slate-500">Unduh file Excel dengan data pengajuan persetujuan.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-primary focus:ring-primary" />
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-slate-900">CSV</p>
+                                    <p class="text-xs text-slate-500">Unduh file CSV yang mudah diolah.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-primary focus:ring-primary" />
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-slate-900">PDF</p>
+                                    <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 sm:space-y-4">
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Rentang Tanggal</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Tanggal Awal</label>
+                                <input type="date" name="tanggal_awal" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Tanggal Akhir</label>
+                                <input type="date" name="tanggal_akhir" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="grid gap-3 sm:gap-4 border-t border-slate-200 pt-5 sm:pt-6 grid-cols-1 sm:grid-cols-3">
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Tanggal Awal</label>
-                        <input type="date" name="tanggal_awal" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-primary outline-none" />
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Status</label>
+                        <select name="status" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <option value="">Semua</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Diproses">Diproses</option>
+                            <option value="Disetujui">Disetujui</option>
+                            <option value="Ditolak">Ditolak</option>
+                        </select>
                     </div>
+
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Tanggal Akhir</label>
-                        <input type="date" name="tanggal_akhir" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-primary outline-none" />
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Jenis Pengajuan</label>
+                        <select name="jenis_pengajuan" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <option value="">Semua</option>
+                            @foreach($jenisPengajuan as $jenis)
+                                <option value="{{ $jenis }}">{{ $jenis }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Pegawai</label>
+                        <select name="pegawai_id" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <option value="">Semua</option>
+                            @foreach($pegawai as $p)
+                                <option value="{{ $p->pegawai_id }}">{{ $p->nama_pegawai }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
-                <div class="border-t border-slate-200 pt-4 grid grid-cols-2 gap-3 sm:flex sm:justify-end">
-                    <button type="button" id="cancel-export" class="w-full sm:w-auto rounded-2xl border border-slate-300 bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                <div class="border-t border-slate-200 pt-5 sm:pt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button type="button" id="cancel-export" class="w-full sm:w-auto rounded-2xl border border-slate-300 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                         Batal
                     </button>
-                    <button type="submit" class="w-full sm:w-auto rounded-2xl bg-primary px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm">
+                    <button type="submit" class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm">
                         Unduh
                     </button>
                 </div>
@@ -683,18 +740,31 @@ document.addEventListener('DOMContentLoaded', function () {
         const format = formData.get('format');
         const tanggalAwal = formData.get('tanggal_awal');
         const tanggalAkhir = formData.get('tanggal_akhir');
+        const status = formData.get('status');
+        const jenisPengajuan = formData.get('jenis_pengajuan');
+        const pegawaiId = formData.get('pegawai_id');
 
         if (!format) {
             alert('Silakan pilih format export terlebih dahulu.');
             return;
         }
 
-        if (format === 'excel') {
-            const url = new URL('{{ route("admin.persetujuan.export.excel") }}', window.location.origin);
-            if (tanggalAwal) url.searchParams.set('tanggal_awal', tanggalAwal);
-            if (tanggalAkhir) url.searchParams.set('tanggal_akhir', tanggalAkhir);
-            window.location.href = url.toString();
+        let exportUrl = '{{ route("admin.persetujuan.export.excel") }}';
+        if (format === 'csv') {
+            exportUrl = '{{ route("admin.persetujuan.export.csv") }}';
+        } else if (format === 'pdf') {
+            exportUrl = '{{ route("admin.persetujuan.export.pdf") }}';
         }
+
+        const url = new URL(exportUrl, window.location.origin);
+        if (tanggalAwal) url.searchParams.set('tanggal_awal', tanggalAwal);
+        if (tanggalAkhir) url.searchParams.set('tanggal_akhir', tanggalAkhir);
+        if (status) url.searchParams.set('status', status);
+        if (jenisPengajuan) url.searchParams.set('jenis_pengajuan', jenisPengajuan);
+        if (pegawaiId) url.searchParams.set('pegawai_id', pegawaiId);
+
+        window.location.href = url.toString();
+        closeExport();
     });
 
     function setActiveTab(activeTab) {

@@ -77,10 +77,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div>
-                                <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Karyawan (pegawai_id)</label>
-                                <input type="text" name="pegawai_id" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-primary" placeholder="Kosong = semua" />
-                            </div>
                         </div>
                     </div>
                 </div>

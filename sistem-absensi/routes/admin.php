@@ -9,6 +9,7 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
 
     Route::get('/laporan-kehadiran', [App\Http\Controllers\AttendanceReportController::class, 'index'])->name('admin.laporan-kehadiran');
     Route::get('/laporan-kehadiran/export/excel', [App\Http\Controllers\AttendanceReportController::class, 'exportExcel'])->name('admin.laporan-kehadiran.export.excel');
+    Route::get('/laporan-kehadiran/export/csv', [App\Http\Controllers\AttendanceReportController::class, 'exportCsv'])->name('admin.laporan-kehadiran.export.csv');
     Route::get('/laporan-kehadiran/export/pdf', [App\Http\Controllers\AttendanceReportController::class, 'exportPdf'])->name('admin.laporan-kehadiran.export.pdf');
     Route::get('/manajemen-akun', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.manajemen-akun');
     Route::get('/employee-management', [App\Http\Controllers\Admin\EmployeeManagementController::class, 'index'])->name('admin.employee-management.index');
@@ -27,6 +28,14 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
         '/persetujuan/export/excel',
         [App\Http\Controllers\ApprovalControllers::class, 'exportExcel']
     )->name('admin.persetujuan.export.excel');
+    Route::get(
+        '/persetujuan/export/csv',
+        [App\Http\Controllers\ApprovalControllers::class, 'exportCsv']
+    )->name('admin.persetujuan.export.csv');
+    Route::get(
+        '/persetujuan/export/pdf',
+        [App\Http\Controllers\ApprovalControllers::class, 'exportPdf']
+    )->name('admin.persetujuan.export.pdf');
     Route::get('/persetujuan/{approval}', [ApprovalControllers::class, 'show'])
         ->name('admin.persetujuan.detail');
     Route::post('/persetujuan/{pengajuan}/approve', [ApprovalControllers::class, 'approve'])

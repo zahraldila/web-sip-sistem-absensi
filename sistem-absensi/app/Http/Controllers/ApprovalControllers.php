@@ -149,12 +149,132 @@ class ApprovalControllers extends Controller
             'tanggal_akhir' => $request->query('tanggal_akhir'),
             'status' => $request->query('status'),
             'pegawai_id' => $request->query('pegawai_id'),
+            'jenis_pengajuan' => $request->query('jenis_pengajuan'),
         ];
 
+        $export = new ApprovalExport($filters);
+        if ($export->query()->count() === 0) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
+        }
+
+        $user = Auth::user();
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor data persetujuan ke Excel'
+            );
+        }
+
         return Excel::download(
-            new ApprovalExport($filters),
-            'pengajuan-' . now()->format('Y-m-d-His') . '.xlsx'
+            $export,
+            'persetujuan-' . now()->format('Ymd_His') . '.xlsx'
         );
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $filters = [
+            'tanggal_awal' => $request->query('tanggal_awal'),
+            'tanggal_akhir' => $request->query('tanggal_akhir'),
+            'status' => $request->query('status'),
+            'pegawai_id' => $request->query('pegawai_id'),
+            'jenis_pengajuan' => $request->query('jenis_pengajuan'),
+        ];
+
+        $export = new ApprovalExport($filters);
+        $approvals = $export->query()->get();
+
+        if ($approvals->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
+        }
+
+        $user = Auth::user();
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor data persetujuan ke CSV'
+            );
+        }
+
+        $filename = 'persetujuan-' . date('Ymd_His') . '.csv';
+
+        $callback = function () use ($approvals, $export) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fwrite($out, "sep=;\r\n");
+            fputcsv($out, $export->headings(), ';');
+
+            foreach ($approvals as $approval) {
+                fputcsv($out, $export->map($approval), ';');
+            }
+
+            fclose($out);
+        };
+
+        return new \Symfony\Component\HttpFoundation\StreamedResponse($callback, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'public',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        ]);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        Carbon::setLocale('id');
+
+        $filters = [
+            'tanggal_awal' => $request->query('tanggal_awal'),
+            'tanggal_akhir' => $request->query('tanggal_akhir'),
+            'status' => $request->query('status'),
+            'pegawai_id' => $request->query('pegawai_id'),
+            'jenis_pengajuan' => $request->query('jenis_pengajuan'),
+        ];
+
+        $export = new ApprovalExport($filters);
+        $approvals = $export->query()->get();
+
+        if ($approvals->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
+        }
+
+        $user = Auth::user();
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor data persetujuan ke PDF'
+            );
+        }
+
+        $rows = $approvals->values()->map(function ($approval, $index) {
+            return [
+                'no' => $index + 1,
+                'nama' => $approval->pegawai?->nama_pegawai ?? '-',
+                'divisi' => $approval->pegawai?->masterDivisi?->nama_divisi ?? $approval->pegawai?->jabatan ?? '-',
+                'jenis_pengajuan' => $approval->jenis_pengajuan ?? '-',
+                'tanggal_pengajuan' => $approval->tanggal_pengajuan ? Carbon::parse($approval->tanggal_pengajuan)->translatedFormat('d F Y') : '-',
+                'status' => $approval->status_pengajuan ?? '-',
+                'keterangan' => $approval->keterangan ?? '-',
+            ];
+        });
+
+        $filterLabels = [
+            'status' => (!empty($filters['status']) && $filters['status'] !== 'Semua') ? $filters['status'] : 'Semua',
+            'jenis' => (!empty($filters['jenis_pengajuan']) && $filters['jenis_pengajuan'] !== 'Semua') ? $filters['jenis_pengajuan'] : 'Semua',
+            'pegawai' => (!empty($filters['pegawai_id']) && $filters['pegawai_id'] !== 'Semua') ? (Pegawai::find($filters['pegawai_id'])->nama_pegawai ?? $filters['pegawai_id']) : 'Semua',
+            'tanggal_awal' => !empty($filters['tanggal_awal']) ? Carbon::parse($filters['tanggal_awal'])->translatedFormat('d F Y') : 'Semua',
+            'tanggal_akhir' => !empty($filters['tanggal_akhir']) ? Carbon::parse($filters['tanggal_akhir'])->translatedFormat('d F Y') : 'Semua',
+        ];
+
+        $pdf = app('dompdf.wrapper')->loadView('admin.persetujuan.export-pdf', [
+            'rows' => $rows,
+            'filters' => $filterLabels,
+            'generatedAt' => now()->translatedFormat('d F Y H:i'),
+        ])->setPaper('a4', 'landscape');
+
+        $filename = 'persetujuan-' . now()->format('Ymd_His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     public function show(Approval $approval)

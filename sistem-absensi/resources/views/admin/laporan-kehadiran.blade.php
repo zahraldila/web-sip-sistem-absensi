@@ -3,7 +3,7 @@
 @section('title', 'Laporan Kehadiran')
 
 @section('content')
-<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'excel' }">
+<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'xlsx' }">
 
     {{-- Header --}}
     <div class="mb-5 sm:mb-6">
@@ -375,17 +375,25 @@
 
                         <div class="space-y-3">
                             <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="excel" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" checked />
+                                <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" checked />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium text-slate-900">Export Excel</p>
-                                    <p class="text-xs text-slate-500">Unduh file Excel dengan data tabel.</p>
+                                    <p class="text-sm font-medium text-slate-900">Excel (.xlsx)</p>
+                                    <p class="text-xs text-slate-500">Unduh file Excel dengan data laporan kehadiran.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-slate-900">CSV</p>
+                                    <p class="text-xs text-slate-500">Unduh file CSV yang mudah diolah.</p>
                                 </div>
                             </label>
 
                             <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
                                 <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium text-slate-900">Export PDF</p>
+                                    <p class="text-sm font-medium text-slate-900">PDF</p>
                                     <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
                                 </div>
                             </label>
@@ -432,7 +440,13 @@
                     <button
                         type="button"
                         @click.prevent="
-                            $refs.exportForm.action = exportFormat === 'excel' ? '{{ route('admin.laporan-kehadiran.export.excel') }}' : '{{ route('admin.laporan-kehadiran.export.pdf') }}';
+                            let exportUrl = '{{ route('admin.laporan-kehadiran.export.excel') }}';
+                            if (exportFormat === 'csv') {
+                                exportUrl = '{{ route('admin.laporan-kehadiran.export.csv') }}';
+                            } else if (exportFormat === 'pdf') {
+                                exportUrl = '{{ route('admin.laporan-kehadiran.export.pdf') }}';
+                            }
+                            $refs.exportForm.action = exportUrl;
                             $refs.exportForm.submit();
                         "
                         class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover">

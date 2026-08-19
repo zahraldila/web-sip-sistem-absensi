@@ -97,6 +97,12 @@ class AttendanceReportController extends Controller
             }
         }
 
+        if ($pegawaiId = $request->query('pegawai_id')) {
+            if ($pegawaiId !== 'Semua') {
+                $query->where('pegawai_id', $pegawaiId);
+            }
+        }
+
         return $query;
     }
 
@@ -135,6 +141,7 @@ class AttendanceReportController extends Controller
 
         $records = collect();
         $divisiId = $request->query('divisi_id');
+        $pegawaiId = $request->query('pegawai_id');
         $search = trim((string) $request->query('search', ''));
         $searchTerm = "%{$search}%";
 
@@ -146,6 +153,10 @@ class AttendanceReportController extends Controller
 
             if ($divisiId && $divisiId !== 'Semua') {
                 $query->where('divisi_id', $divisiId);
+            }
+
+            if ($pegawaiId && $pegawaiId !== 'Semua') {
+                $query->where('pegawai_id', $pegawaiId);
             }
 
             if ($search !== '') {
@@ -406,6 +417,89 @@ class AttendanceReportController extends Controller
 
         return new \Symfony\Component\HttpFoundation\StreamedResponse($callback, 200, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'public',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        ]);
+    }
+
+    public function exportCsv(Request $request)
+    {
+        Carbon::setLocale('id');
+
+        if ($request->query('status') === 'Tidak Hadir') {
+            $rows = $this->getAbsentRecords($request)->map(function (Attendance $attendance) {
+                return [
+                    'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                    'Divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
+                    'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
+                    'Jam Masuk' => '-',
+                    'Jam Keluar' => '-',
+                    'Durasi Kehadiran' => '-',
+                    'Mode Kerja' => '-',
+                    'Lokasi' => '-',
+                    'Status' => 'Tidak Hadir',
+                ];
+            });
+        } else {
+            $rows = $this->attendanceQuery($request)
+                ->get()
+                ->map(function (Attendance $attendance) {
+                    $status = $attendance->status_kehadiran ?? 'Hadir';
+                    if ($attendance->jam_checkin) {
+                        $schedule = \DB::table('jadwal_kerja')
+                            ->where('jadwal_id', $attendance->jadwal_id)
+                            ->first();
+                        if ($schedule && $schedule->jam_masuk) {
+                            $checkInTime = Carbon::parse($attendance->jam_checkin)->format('H:i:s');
+                            $jamMasukTime = Carbon::parse($schedule->jam_masuk)->format('H:i:s');
+                            $status = ($checkInTime > $jamMasukTime) ? 'Terlambat' : 'Hadir';
+                        }
+                    }
+                    return [
+                        'Nama Karyawan' => $attendance->pegawai?->nama_pegawai ?? '-',
+                        'Divisi' => $attendance->pegawai?->masterDivisi?->nama_divisi ?? '-',
+                        'Tanggal' => $this->formatDate($attendance->tanggal_absensi),
+                        'Jam Masuk' => $this->formatTime($attendance->jam_checkin),
+                        'Jam Keluar' => $this->formatTime($attendance->jam_checkout),
+                        'Durasi Kehadiran' => $this->formatDuration($attendance->jam_checkin, $attendance->jam_checkout),
+                        'Mode Kerja' => $attendance->skema_kerja ?? '-',
+                        'Lokasi' => $this->formatLocation($attendance->latitude, $attendance->longitude),
+                        'Status' => $status,
+                    ];
+                });
+        }
+
+        if ($rows->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diexport.');
+        }
+
+        $user = Auth::user();
+
+        if ($user && $user->akun_id) {
+            logHelpers::record(
+                $user->akun_id,
+                'Mengekspor laporan kehadiran ke CSV'
+            );
+        }
+
+        $filename = 'laporan-kehadiran-' . date('Ymd_His') . '.csv';
+
+        $callback = function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fwrite($out, "sep=;\r\n");
+            fputcsv($out, array_keys($rows->first()), ';');
+
+            foreach ($rows as $row) {
+                fputcsv($out, array_values($row), ';');
+            }
+
+            fclose($out);
+        };
+
+        return new \Symfony\Component\HttpFoundation\StreamedResponse($callback, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Pragma' => 'public',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',

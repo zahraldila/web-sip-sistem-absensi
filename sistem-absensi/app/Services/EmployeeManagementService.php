@@ -149,10 +149,10 @@ class EmployeeManagementService
         $data = [
             'rows' => $exportRows,
             'filters' => [
-                'status' => $filters['status'] ?: 'Semua',
-                'divisi' => $filters['divisi_id'] ? $this->repository->getDivisions()->firstWhere('divisi_id', $filters['divisi_id'])->nama_divisi ?? 'Semua' : 'Semua',
-                'role' => $filters['jabatan_id'] ? $this->repository->getRoles()->firstWhere('jabatan_id', $filters['jabatan_id'])->nama_jabatan ?? 'Semua' : 'Semua',
-                'pegawai' => $filters['pegawai_id'] ? $this->repository->findByPegawaiId($filters['pegawai_id'])->nama_pegawai ?? $filters['pegawai_id'] : 'Semua',
+                'status' => (!empty($filters['status'])) ? $filters['status'] : 'Semua',
+                'divisi' => (!empty($filters['divisi_id'])) ? ($this->repository->getDivisions()->firstWhere('divisi_id', $filters['divisi_id'])->nama_divisi ?? 'Semua') : 'Semua',
+                'role' => (!empty($filters['jabatan_id'])) ? ($this->repository->getRoles()->firstWhere('jabatan_id', $filters['jabatan_id'])->nama_jabatan ?? 'Semua') : 'Semua',
+                'pegawai' => (!empty($filters['pegawai_id'])) ? ($this->repository->findByPegawaiId($filters['pegawai_id'])->nama_pegawai ?? $filters['pegawai_id']) : 'Semua',
             ],
         ];
 
