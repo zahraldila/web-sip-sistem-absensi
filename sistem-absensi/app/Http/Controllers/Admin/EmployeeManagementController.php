@@ -46,6 +46,17 @@ class EmployeeManagementController extends Controller
             'username' => ['nullable', 'string', 'max:100', 'unique:akun,username'],
             'password' => 'required|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
+        ], [
+            'nama_pegawai.required' => 'Nama lengkap wajib diisi.',
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.unique' => 'NIP sudah terdaftar.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh pegawai lain.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'foto_profile.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
+            'foto_profile.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         // Include uploaded file instance for the service

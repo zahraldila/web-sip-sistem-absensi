@@ -24,7 +24,7 @@
 
         {{-- Modal Body (Scrollable) --}}
         <div class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-4 space-y-4">
-            <form id="employeeForm" :action="formAction" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form id="employeeForm" novalidate :action="formAction" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <input type="hidden" name="form_mode" :value="isEdit ? 'edit' : 'create'">
                 <input type="hidden" name="pegawai_id" x-model="form.pegawai_id">
@@ -34,7 +34,7 @@
                 </template>
 
                 {{-- Photo Upload --}}
-                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3.5 sm:p-4">
+                <div class="rounded-2xl border @error('foto_profile') border-red-300 bg-red-50/20 @else border-slate-200 bg-slate-50 @enderror p-3.5 sm:p-4">
                     <label for="photoInput" class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl bg-white p-3 text-center border border-dashed border-slate-300 hover:bg-slate-50 transition">
                         <div class="flex h-[80px] w-[80px] sm:h-[90px] sm:w-[90px] items-center justify-center rounded-2xl bg-slate-100 text-slate-400 overflow-hidden shadow-inner">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,32 +53,52 @@
                             <img :src="form.photoPreview" alt="Preview foto baru" class="h-20 w-20 rounded-full object-cover shadow-md border-2 border-white" />
                         </div>
                     </template>
-                    @error('foto_profile')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('foto_profile')
+                        <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                            <span>{{ $message }}</span>
+                        </p>
+                    @enderror
                 </div>
 
                 <div class="space-y-3.5">
                     {{-- Nama Lengkap --}}
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Nama Lengkap</label>
-                        <input type="text" name="nama_pegawai" x-model="form.nama_pegawai" required placeholder="Masukkan Nama Lengkap Pegawai"
-                            class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                        @error('nama_pegawai')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_pegawai" x-model="form.nama_pegawai" placeholder="Masukkan Nama Lengkap Pegawai"
+                            class="w-full rounded-2xl border @error('nama_pegawai') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition" />
+                        @error('nama_pegawai')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                <span>{{ $message }}</span>
+                            </p>
+                        @enderror
                     </div>
 
                     {{-- NIP & NFC --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">NIP</label>
-                            <input type="text" name="nip" x-model="form.nip" required placeholder="Contoh : 12345678"
-                                class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                            @error('nip')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">NIP <span class="text-red-500">*</span></label>
+                            <input type="text" name="nip" x-model="form.nip" placeholder="Contoh : 12345678"
+                                class="w-full rounded-2xl border @error('nip') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition" />
+                            @error('nip')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Kartu NFC (opsional)</label>
                             <input type="text" name="nfc_id" x-model="form.nfc_id" placeholder="UID NFC Pegawai"
                                 class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                            @error('nfc_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            @error('nfc_id')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
                     </div>
 
@@ -100,7 +120,12 @@
                         <template x-if="divisionSuccess">
                             <p class="mt-1 text-xs text-green-600" x-text="divisionSuccess"></p>
                         </template>
-                        @error('divisi_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        @error('divisi_id')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                <span>{{ $message }}</span>
+                            </p>
+                        @enderror
                     </div>
 
                     {{-- Role / Jabatan --}}
@@ -121,7 +146,12 @@
                         <template x-if="roleSuccess">
                             <p class="mt-1 text-xs text-green-600" x-text="roleSuccess"></p>
                         </template>
-                        @error('jabatan_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        @error('jabatan_id')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                <span>{{ $message }}</span>
+                            </p>
+                        @enderror
                     </div>
 
                     {{-- Email & Username --}}
@@ -129,15 +159,25 @@
                         <div>
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Email</label>
                             <input type="email" name="email" x-model="form.email" placeholder="admin@spi.co.id"
-                                class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                            @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                                class="w-full rounded-2xl border @error('email') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition" />
+                            @error('email')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Username (opsional)</label>
                             <input type="text" name="username" x-model="form.username" placeholder="jdoe"
-                                class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                            @error('username')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                                class="w-full rounded-2xl border @error('username') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition" />
+                            @error('username')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
                     </div>
 
@@ -146,8 +186,13 @@
                         <div>
                             <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">No. Telepon</label>
                             <input type="text" name="no_handphone" x-model="form.no_handphone" placeholder="08123456789"
-                                class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
-                            @error('no_handphone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                                class="w-full rounded-2xl border @error('no_handphone') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition" />
+                            @error('no_handphone')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
 
                         <div>
@@ -157,29 +202,39 @@
                                 <option value="Aktif">Aktif</option>
                                 <option value="Tidak Aktif">Tidak Aktif</option>
                             </select>
-                            @error('status')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            @error('status')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
                     </div>
 
                     {{-- Password & Konfirmasi Password --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div x-data="{ showPass: false }">
-                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Password</label>
+                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Password <span class="text-red-500" x-show="!isEdit">*</span></label>
                             <div class="relative">
                                 <input :type="showPass ? 'text' : 'password'" name="password" x-model="form.password"
                                     placeholder="Minimal 6 karakter"
-                                    class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 pr-10 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary" />
+                                    class="w-full rounded-2xl border @error('password') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 pr-10 text-xs sm:text-sm text-slate-900 outline-none transition" />
                                 <button type="button" @click="showPass = !showPass"
                                     class="absolute inset-y-0 right-3 inline-flex items-center text-slate-400 transition hover:text-slate-600 focus:outline-none"
                                     aria-label="Toggle password visibility">
                                     <i :class="showPass ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-sm"></i>
                                 </button>
                             </div>
-                            @error('password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            @error('password')
+                                <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                    <span>{{ $message }}</span>
+                                </p>
+                            @enderror
                         </div>
 
                         <div x-data="{ showPassConfirm: false }">
-                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Konfirmasi Password</label>
+                            <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Konfirmasi Password <span class="text-red-500" x-show="!isEdit">*</span></label>
                             <div class="relative">
                                 <input :type="showPassConfirm ? 'text' : 'password'" name="password_confirmation" x-model="form.password_confirmation"
                                     placeholder="Ketik ulang password"
