@@ -3,34 +3,22 @@
     {{-- HEADER --}}
     {{-- ========================= --}}
     <div class="px-5 pt-5">
-
-        <div class="flex items-start gap-3">
-
+        <div class="flex items-center gap-3">
             {{-- Logo --}}
-            <div class>
-
-                <img
-                    src="{{ asset('images/logo-sip.png') }}"
-                    alt="Logo SIP"
-                    class="h-10 w-10 object-contain">
-
+            <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-white flex items-center justify-center p-1 border border-slate-100 shadow-sm">
+                <img src="{{ asset(\App\Models\Setting::get('company_logo', 'assets/logo.png')) }}" alt="SIP Logo" class="h-full w-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150/000000/FFFFFF?text=SIP';">
             </div>
 
             {{-- Company --}}
-            <div class="pt-1">
-
-                <h2 class="text-[16px] font-semibold text-slate-900">
+            <div class="flex flex-col">
+                <h2 class="text-[16px] font-semibold text-slate-900 leading-tight">
                     PT Selada Indonesia Produktif
                 </h2>
-
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="text-[12px] text-slate-500 font-medium">
                     Admin
                 </p>
-
             </div>
-
         </div>
-
     </div>
 
 
@@ -51,7 +39,7 @@
 
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
-                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} px-4 py-3 transition">
+                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} px-4 py-3 transition">
 
                 <i class="fa-solid fa-house fa-fw text-lg"></i>
 
@@ -61,7 +49,7 @@
 
                 @if(request()->routeIs('admin.dashboard', 'admin.dashboard.index'))
                 <span
-                    class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]">
+                    class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary">
                 </span>
                 @endif
 
@@ -69,7 +57,7 @@
 
             {{-- Laporan Kehadiran --}}
             <a href="{{ route('admin.laporan-kehadiran') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
                 <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
 
@@ -85,7 +73,7 @@
 
             {{-- Manajemen Akun --}}
             <a href="{{ route('admin.manajemen-akun') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
                 <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
 
@@ -101,7 +89,7 @@
 
             {{-- Persetujuan --}}
             <a href="{{ route('admin.persetujuan') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
                 <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
 
@@ -117,7 +105,7 @@
 
             {{-- Log Aktivitas --}}
             <a href="{{ route('admin.log-aktivitas') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
                 <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
 
@@ -131,53 +119,24 @@
 
             </a>
 
-            {{-- Tampilan & Branding --}}
+
+            {{-- Settings --}}
             <a href="{{ route('admin.tampilan-branding') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
-
-                <i class="fa-solid fa-palette fa-fw text-lg"></i>
-
-                <span class="text-sm font-semibold">
-                    Tampilan & Branding
-                </span>
-
-                @if(request()->routeIs('admin.tampilan-branding'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
-
-            {{-- Pengaturan --}}
-            <a href="{{ route('admin.pengaturan') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.pengaturan') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
+                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
                 <i class="fa-solid fa-gear fa-fw text-lg"></i>
 
                 <span class="text-sm font-semibold">
-                    Pengaturan
+                    Settings
                 </span>
 
-                @if(request()->routeIs('admin.pengaturan'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                @if(request()->routeIs('admin.tampilan-branding'))
+                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary"></span>
                 @endif
 
             </a>
 
-            {{-- Bantuan --}}
-            <a href="{{ route('admin.bantuan') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.bantuan') ? 'bg-blue-50 text-[#123D91]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#123D91]' }} transition">
 
-                <i class="fa-solid fa-circle-question fa-fw text-lg"></i>
-
-                <span class="text-sm font-semibold">
-                    Bantuan
-                </span>
-
-                @if(request()->routeIs('admin.bantuan'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
 
         </div>
 
@@ -202,7 +161,7 @@
         <button
             type="button"
             @click="logoutOpen = true"
-            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#123D91] py-3 text-sm font-medium text-white transition hover:bg-[#0F3277]">
+            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-sm font-medium text-white transition hover:bg-primary-hover">
 
             <i class="fa-solid fa-right-from-bracket fa-fw text-lg"></i>
 
