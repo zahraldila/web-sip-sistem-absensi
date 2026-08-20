@@ -778,10 +778,20 @@ document.addEventListener('DOMContentLoaded', function () {
     openFilterModal.addEventListener('click', openFilter);
     closeFilterModal.addEventListener('click', closeFilter);
 
+    const loadingHtml = `
+        <div class="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <div class="flex flex-col items-center justify-center gap-3">
+                <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
+                <p class="text-sm font-medium text-slate-500">Memuat data pengajuan...</p>
+            </div>
+        </div>
+    `;
+
     resetFilter.addEventListener('click', function () {
         filterForm.reset();
-        loadApprovals('');
         closeFilter();
+        tableContainer.innerHTML = loadingHtml;
+        loadApprovals('');
     });
 
     filterForm.addEventListener('submit', function (event) {
@@ -795,6 +805,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tanggalAwal) url.searchParams.set('tanggal_awal', tanggalAwal);
         if (tanggalAkhir) url.searchParams.set('tanggal_akhir', tanggalAkhir);
         if (jenisPengajuan) url.searchParams.set('jenis_pengajuan', jenisPengajuan);
+
+        closeFilter();
+        tableContainer.innerHTML = loadingHtml;
 
         fetch(url.toString(), {
             headers: {
@@ -816,7 +829,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             window.history.pushState({}, '', url.toString());
-            closeFilter();
         })
         .catch(error => {
             console.error(error);
