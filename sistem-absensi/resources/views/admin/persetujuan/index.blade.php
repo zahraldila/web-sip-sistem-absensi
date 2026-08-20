@@ -22,6 +22,35 @@
     </section>
 
     {{-- ======================================== --}}
+    {{-- INLINE FEEDBACK BANNER --}}
+    {{-- ======================================== --}}
+    <div
+        x-show="showSuccessToast"
+        x-cloak
+        x-transition
+        class="relative rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-xs sm:text-sm text-green-700">
+        <div class="pr-6" x-text="toastMessage"></div>
+        <button type="button" @click="showSuccessToast = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-green-700 hover:text-green-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <div
+        x-show="showErrorToast"
+        x-cloak
+        x-transition
+        class="relative rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700">
+        <div class="pr-6" x-text="errorMessage"></div>
+        <button type="button" @click="showErrorToast = false" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-red-700 hover:text-red-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    {{-- ======================================== --}}
     {{-- SUMMARY CARD (2 Kolom di HP, 4 di Desktop) --}}
     {{-- ======================================== --}}
     <section class="grid grid-cols-2 gap-3.5 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -322,6 +351,57 @@
         </div>
     </div>
 
+    {{-- ======================================== --}}
+    {{-- APPROVE CONFIRMATION MODAL --}}
+    {{-- ======================================== --}}
+    <div x-show="showApproveConfirm" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeApproveConfirm()">
+        <div class="relative w-full max-w-md overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
+            {{-- Header --}}
+            <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-900">Konfirmasi Persetujuan</h2>
+                        <p class="mt-0.5 text-xs sm:text-sm text-slate-500" x-text="'Setujui pengajuan ' + approveData.jenis_pengajuan + ' untuk ' + approveData.nama_pegawai"></p>
+                    </div>
+                    <button type="button" class="rounded-full border border-slate-200 bg-white p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                        @click="closeApproveConfirm()" aria-label="Tutup modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {{-- Body --}}
+            <div class="px-5 sm:px-6 py-5">
+                <div class="flex items-start gap-4">
+                    <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900">Apakah Anda yakin ingin menyetujui pengajuan ini?</p>
+                        <p class="mt-1 text-xs text-slate-500">Pengajuan <span class="font-semibold text-slate-700" x-text="approveData.jenis_pengajuan"></span> dari <span class="font-semibold text-slate-700" x-text="approveData.nama_pegawai"></span> akan disetujui dan statusnya akan berubah menjadi <span class="font-semibold text-green-700">Disetujui</span>.</p>
+                    </div>
+                </div>
+            </div>
+            {{-- Footer --}}
+            <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 grid grid-cols-2 gap-3 sm:flex sm:justify-end">
+                <button type="button" @click="closeApproveConfirm()"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    Batal
+                </button>
+                <button type="button" @click="submitApprove()"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-green-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-green-700 shadow-sm"
+                    :disabled="isProcessing">
+                    <span x-show="!isProcessing">Setujui</span>
+                    <span x-show="isProcessing">Memproses...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 {{-- ======================================== --}}
@@ -514,6 +594,16 @@
         return {
             showDetail: false,
             showRejectModal: false,
+            showApproveConfirm: false,
+            approveData: {
+                approval_id: null,
+                jenis_pengajuan: '',
+                nama_pegawai: ''
+            },
+            showSuccessToast: false,
+            toastMessage: '',
+            showErrorToast: false,
+            errorMessage: '',
             rejectReason: '',
             isProcessing: false,
             counts: {
@@ -563,8 +653,29 @@
                 }
             },
             confirmApprove(approvalId, jenisPengajuan, namaPegawai) {
-                if (confirm('Apakah Anda yakin ingin MENYETUJUI pengajuan ' + jenisPengajuan + ' dari ' + namaPegawai + '?')) {
-                    this.processApproval(approvalId, 'setujui');
+                this.approveData = {
+                    approval_id: approvalId,
+                    jenis_pengajuan: jenisPengajuan,
+                    nama_pegawai: namaPegawai
+                };
+                this.showApproveConfirm = true;
+            },
+            closeApproveConfirm() {
+                this.showApproveConfirm = false;
+            },
+            submitApprove() {
+                this.showApproveConfirm = false;
+                this.processApproval(this.approveData.approval_id, 'setujui');
+            },
+            showToast(message, type) {
+                if (type === 'success') {
+                    this.toastMessage = message;
+                    this.showSuccessToast = true;
+                    setTimeout(() => { this.showSuccessToast = false; }, 4000);
+                } else {
+                    this.errorMessage = message;
+                    this.showErrorToast = true;
+                    setTimeout(() => { this.showErrorToast = false; }, 4000);
                 }
             },
             openRejectModal(approvalId, jenisPengajuan, namaPegawai) {
@@ -624,20 +735,20 @@
                     this.isProcessing = false;
 
                     if (data.status === 'success') {
-                        alert(data.message);
-
                         this.closeRejectModal();
                         this.closeDetail();
 
-                        window.location.reload();
+                        this.showToast(data.message || 'Pengajuan berhasil diproses.', 'success');
+
+                        setTimeout(() => { window.location.reload(); }, 1800);
                     } else {
-                        alert(data.message || 'Terjadi kesalahan saat memproses pengajuan.');
+                        this.showToast(data.message || 'Terjadi kesalahan saat memproses pengajuan.', 'error');
                     }
                 })
                 .catch(err => {
                     this.isProcessing = false;
                     console.error(err);
-                    alert(err.message || 'Gagal menghubungi server.');
+                    this.showToast(err.message || 'Gagal menghubungi server.', 'error');
                 });
             }
         };
