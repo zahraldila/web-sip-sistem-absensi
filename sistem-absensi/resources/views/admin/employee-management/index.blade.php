@@ -39,6 +39,20 @@
         </div>
     @endif
 
+    {{-- Export Success Notification (dynamic) --}}
+    <template x-if="exportSuccessMessage">
+        <div x-data x-cloak x-init="setTimeout(() => $dispatch('clear-export-success'), 4000)"
+            @clear-export-success.window="exportSuccessMessage = ''"
+            class="mb-4 relative rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-xs sm:text-sm text-green-700">
+            <div class="pr-6" x-text="exportSuccessMessage"></div>
+            <button type="button" @click="exportSuccessMessage = ''" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-green-700 hover:text-green-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </template>
+
     {{-- Search & Export Card --}}
     <div class="mb-5 sm:mb-6 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
         <form method="GET" action="{{ route('admin.employee-management.index') }}">
@@ -523,6 +537,8 @@
                 roleSuccess: '',
                 isSavingDivision: false,
                 isSavingRole: false,
+                exportSuccessMessage: '',
+                exportErrorMessage: '',
                 detailModalOpen: false,
                 detailData: {
                     pegawai_id: '',
@@ -827,23 +843,61 @@
                 exportIsLoading: false,
                 openExport() {
                     this.exportIsLoading = false;
+                    this.exportErrorMessage = '';
                     this.exportModalOpen = true;
                 },
                 closeExport() {
                     this.exportIsLoading = false;
+                    this.exportErrorMessage = '';
                     this.exportModalOpen = false;
                     this.$refs.exportForm.reset();
                 },
-                submitExport(event) {
+                async submitExport(event) {
                     if (this.exportIsLoading) {
                         return;
                     }
 
                     this.exportIsLoading = true;
-                    event.target.submit();
-                    setTimeout(() => {
+
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        });
+
+                        const contentType = response.headers.get('Content-Type') || '';
+
+                        // Jika server mengembalikan file (bukan HTML redirect/error)
+                        if (response.ok && !contentType.includes('text/html')) {
+                            const blob = await response.blob();
+                            const disposition = response.headers.get('Content-Disposition') || '';
+                            const fileMatch = disposition.match(/filename[^;=\n]*=(['"]?)([^'"\n;]*)\1/);
+                            const filename = fileMatch ? fileMatch[2].trim() : 'export';
+
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            URL.revokeObjectURL(url);
+
+                            this.closeExport();
+                            this.exportSuccessMessage = 'Data berhasil diekspor.';
+                        } else {
+                            // Gagal/tidak ada data: tampilkan pesan, modal tetap terbuka
+                            this.exportErrorMessage = 'Tidak ada data yang dapat diekspor.';
+                            this.exportIsLoading = false;
+                        }
+                    } catch (e) {
+                        // Network error atau error tak terduga
                         this.exportIsLoading = false;
-                    }, 1500);
+                    }
                 },
                 async saveDivision() {
                     this.divisionError = '';
