@@ -562,8 +562,38 @@
                                 this.previewObjectUrl = null;
                             }
                             this.form.photoPreview = '';
+                            this.clearErrors();
                         }
                     });
+                },
+                clearErrors() {
+                    const form = document.getElementById('employeeForm');
+                    if (form) {
+                        // Hapus semua pesan error (client-side dan server-side)
+                        form.querySelectorAll('.client-error, p.text-red-600').forEach(el => el.remove());
+
+                        // Reset styling error pada input / container
+                        form.querySelectorAll('.border-red-400, .border-red-300, .bg-red-50\\/20, .ring-red-300, .border-client-error').forEach(el => {
+                            el.classList.remove('border-red-400', 'border-red-300', 'bg-red-50/20', 'ring-1', 'ring-red-300', 'border-client-error');
+                            if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
+                                el.classList.add('border-slate-300', 'bg-white');
+                            } else {
+                                el.classList.add('border-slate-200', 'bg-slate-50');
+                            }
+                        });
+
+                        // Reset file input
+                        const photoInput = document.getElementById('photoInput');
+                        if (photoInput) {
+                            photoInput.value = '';
+                        }
+                    }
+
+                    // Reset pesan alert/status divisi & jabatan
+                    this.divisionError = '';
+                    this.divisionSuccess = '';
+                    this.roleError = '';
+                    this.roleSuccess = '';
                 },
                 openCreate() {
                     this.isEdit = false;
@@ -590,6 +620,7 @@
                         this.previewObjectUrl = null;
                     }
 
+                    this.clearErrors();
                     this.modalOpen = true;
                 },
                 openEdit(event) {
@@ -620,9 +651,11 @@
                         this.previewObjectUrl = null;
                     }
 
+                    this.clearErrors();
                     this.modalOpen = true;
                 },
                 closeModal() {
+                    this.clearErrors();
                     this.modalOpen = false;
                 },
                 /**
@@ -680,6 +713,14 @@
                         if (!emailVal && !usernameVal) {
                             showError(emailInput,    'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
                             showError(usernameInput, 'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
+                        }
+                    }
+
+                    // No. Telepon — format angka jika diisi
+                    const phoneInput = form.querySelector('input[name="no_handphone"]');
+                    if (phoneInput && phoneInput.value.trim()) {
+                        if (!/^[0-9]+$/.test(phoneInput.value.trim())) {
+                            showError(phoneInput, 'Format nomor handphone tidak valid.');
                         }
                     }
 
@@ -791,6 +832,7 @@
                 closeExport() {
                     this.exportIsLoading = false;
                     this.exportModalOpen = false;
+                    this.$refs.exportForm.reset();
                 },
                 submitExport(event) {
                     if (this.exportIsLoading) {

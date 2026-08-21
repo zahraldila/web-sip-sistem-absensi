@@ -48,10 +48,16 @@ class EmployeeManagementController extends Controller
             'status' => 'nullable|string|max:50',
         ], [
             'nama_pegawai.required' => 'Nama lengkap wajib diisi.',
+            'nama_pegawai.max' => 'Nama lengkap tidak boleh lebih dari 255 karakter.',
             'nip.required' => 'NIP wajib diisi.',
             'nip.unique' => 'NIP sudah terdaftar.',
+            'nip.max' => 'NIP tidak boleh lebih dari 50 karakter.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan oleh pegawai lain.',
+            'no_handphone.regex' => 'Format nomor handphone tidak valid.',
+            'no_handphone.max' => 'Nomor handphone tidak boleh lebih dari 20 karakter.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.max' => 'Username tidak boleh lebih dari 100 karakter.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -117,6 +123,21 @@ class EmployeeManagementController extends Controller
             ],
             'password' => 'nullable|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
+        ], [
+            'nama_pegawai.required' => 'Nama lengkap wajib diisi.',
+            'nama_pegawai.max' => 'Nama lengkap tidak boleh lebih dari 255 karakter.',
+            'nip.unique' => 'NIP sudah terdaftar.',
+            'nip.max' => 'NIP tidak boleh lebih dari 50 karakter.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh pegawai lain.',
+            'no_handphone.regex' => 'Format nomor handphone tidak valid.',
+            'no_handphone.max' => 'Nomor handphone tidak boleh lebih dari 20 karakter.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.max' => 'Username tidak boleh lebih dari 100 karakter.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'foto_profile.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
+            'foto_profile.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         $data['foto_profile_file'] = $request->file('foto_profile');
@@ -143,6 +164,10 @@ class EmployeeManagementController extends Controller
     {
         $data = $request->validate([
             'nama_divisi' => 'required|string|max:255|unique:master_divisi,nama_divisi',
+        ], [
+            'nama_divisi.required' => 'Nama divisi wajib diisi.',
+            'nama_divisi.unique' => 'Nama divisi sudah ada.',
+            'nama_divisi.max' => 'Nama divisi tidak boleh lebih dari 255 karakter.',
         ]);
 
         // Simpan divisi
@@ -168,6 +193,10 @@ class EmployeeManagementController extends Controller
     {
         $data = $request->validate([
             'nama_jabatan' => 'required|string|max:255|unique:master_jabatan,nama_jabatan',
+        ], [
+            'nama_jabatan.required' => 'Nama jabatan wajib diisi.',
+            'nama_jabatan.unique' => 'Nama jabatan sudah ada.',
+            'nama_jabatan.max' => 'Nama jabatan tidak boleh lebih dari 255 karakter.',
         ]);
 
         // Simpan jabatan
