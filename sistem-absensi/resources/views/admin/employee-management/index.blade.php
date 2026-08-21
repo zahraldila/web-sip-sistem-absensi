@@ -832,6 +832,7 @@
                 closeExport() {
                     this.exportIsLoading = false;
                     this.exportModalOpen = false;
+                    this.$refs.exportForm.reset();
                 },
                 submitExport(event) {
                     if (this.exportIsLoading) {

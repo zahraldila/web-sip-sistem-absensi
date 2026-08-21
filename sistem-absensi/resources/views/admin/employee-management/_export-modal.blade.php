@@ -3,7 +3,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
     @click.self="closeExport()">
     <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl" @click.stop>
-        <form method="POST" action="{{ route('admin.employee-management.export') }}" @submit.prevent="submitExport($event)">
+        <form x-ref="exportForm" method="POST" action="{{ route('admin.employee-management.export') }}" @submit.prevent="submitExport($event)">
             @csrf
             <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
                 <div>
