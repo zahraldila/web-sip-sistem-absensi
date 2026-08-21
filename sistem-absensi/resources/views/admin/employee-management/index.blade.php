@@ -65,7 +65,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 12.65z" />
                             </svg>
                         </span>
-                        <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Cari nama, department, atau role..." class="w-full rounded-2xl border border-gray-300 bg-white py-2.5 sm:py-3 pl-10 pr-4 text-xs sm:text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <input
+                            x-data="{ _t: null }"
+                            @input="clearTimeout(_t); _t = setTimeout(() => $el.closest('form').submit(), 400)"
+                            type="text" name="search" value="{{ $search ?? '' }}" placeholder="Cari nama, department, atau role..." class="w-full rounded-2xl border border-gray-300 bg-white py-2.5 sm:py-3 pl-10 pr-4 text-xs sm:text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                 </div>
 
