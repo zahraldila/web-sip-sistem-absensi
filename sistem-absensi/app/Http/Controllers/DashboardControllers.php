@@ -17,7 +17,9 @@ class DashboardControllers extends Controller
     {
         $today = now()->toDateString();
 
-        $totalPegawai = Pegawai::count();
+        $totalPegawai = Pegawai::whereDoesntHave('akun', function ($query) {
+            $query->whereRaw('LOWER(role) = ?', ['admin']);
+        })->count();
 
         $hadirHariIni = Attendance::whereDate('tanggal_absensi', $today)
             ->distinct('pegawai_id')
