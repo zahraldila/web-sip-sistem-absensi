@@ -441,9 +441,6 @@
             x-transition:leave-end="opacity-0 scale-95"
             class="relative w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-2xl">
 
-            {{-- Label breadcrumb --}}
-            <p class="mb-4 sm:mb-6 text-xs text-slate-400">edit-jam-masuk</p>
-
             {{-- Title --}}
             <h2 class="text-xl sm:text-2xl font-bold text-slate-900">
                 Edit Jam Masuk
