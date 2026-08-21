@@ -473,6 +473,14 @@ document.addEventListener('alpine:init', () => {
         onLogoChange(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            // Validasi ukuran maksimal 2MB
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran file logo melebihi batas maksimal 2 MB. Silakan pilih file yang lebih kecil.');
+                event.target.value = '';
+                return;
+            }
+
             this.logoFile       = file;
             this.logoFileName   = file.name;
             this.logoPreviewUrl = URL.createObjectURL(file);
