@@ -28,6 +28,9 @@
 
 <body class="bg-[#F5F7FB] text-gray-800 min-h-full flex flex-col antialiased">
 
+    {{-- Offline connectivity warning banner --}}
+    @include('components.layout.offline-banner')
+
     <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-1 w-full relative">
 
         {{-- ===================== --}}

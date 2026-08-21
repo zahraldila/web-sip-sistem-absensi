@@ -7,6 +7,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
+    {{-- Offline connectivity warning banner --}}
+    @include('components.layout.offline-banner')
     <main class="min-h-screen flex flex-col justify-center px-4 py-6 sm:px-6">
         @yield('content')
     </main>
