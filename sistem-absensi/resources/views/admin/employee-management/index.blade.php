@@ -281,7 +281,7 @@
             <nav class="inline-flex overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm flex-shrink-0" aria-label="Pagination">
                 {{-- Previous Page Link --}}
                 <a
-                    class="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center border-r border-slate-200 text-xs sm:text-sm font-medium text-slate-700 transition hover:bg-slate-50 {{ $employees->onFirstPage() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                    class="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center border-r border-slate-200 text-xs sm:text-sm font-medium transition {{ $employees->onFirstPage() ? 'cursor-not-allowed pointer-events-none bg-slate-100 text-slate-300' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200' }}"
                     href="{{ $employees->onFirstPage() ? '#' : $employees->previousPageUrl() }}"
                     aria-disabled="{{ $employees->onFirstPage() ? 'true' : 'false' }}"
                 >
@@ -327,7 +327,7 @@
                         </span>
                     @else
                         <a
-                            class="inline-flex h-9 sm:h-11 min-w-[32px] sm:min-w-[44px] items-center justify-center border-r border-slate-200 px-2 sm:px-3.5 text-xs sm:text-sm font-medium transition hover:bg-slate-50 {{ $element === $currentPage ? 'bg-primary text-white font-semibold' : 'bg-white text-slate-700' }}"
+                            class="inline-flex h-9 sm:h-11 min-w-[32px] sm:min-w-[44px] items-center justify-center border-r border-slate-200 px-2 sm:px-3.5 text-xs sm:text-sm font-semibold transition {{ $element === $currentPage ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200' }}"
                             href="{{ $employees->url($element) }}"
                         >
                             {{ $element }}
@@ -337,7 +337,7 @@
 
                 {{-- Next Page Link --}}
                 <a
-                    class="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center text-xs sm:text-sm font-medium text-slate-700 transition hover:bg-slate-50 {{ ! $employees->hasMorePages() ? 'cursor-not-allowed bg-slate-100 text-slate-400' : '' }}"
+                    class="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center text-xs sm:text-sm font-medium transition {{ ! $employees->hasMorePages() ? 'cursor-not-allowed pointer-events-none bg-slate-100 text-slate-300' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200' }}"
                     href="{{ $employees->hasMorePages() ? $employees->nextPageUrl() : '#' }}"
                     aria-disabled="{{ ! $employees->hasMorePages() ? 'true' : 'false' }}"
                 >
