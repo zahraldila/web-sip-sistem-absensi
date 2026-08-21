@@ -459,7 +459,7 @@
     aria-labelledby="export-modal-title">
 
     <div class="flex min-h-full items-center justify-center">
-        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-visible rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
                 <div>
                     <h2 id="export-modal-title" class="text-base sm:text-lg font-bold text-slate-900">
@@ -544,13 +544,12 @@
                     </div>
 
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Pegawai</label>
-                        <select name="pegawai_id" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                            <option value="">Semua</option>
-                            @foreach($pegawai as $p)
-                                <option value="{{ $p->pegawai_id }}">{{ $p->nama_pegawai }}</option>
-                            @endforeach
-                        </select>
+                        @php
+                            $pegawaiOptions = $pegawai->map(function($p) {
+                                return ['value' => $p->pegawai_id, 'text' => $p->nama_pegawai];
+                            })->toArray();
+                        @endphp
+                        <x-forms.searchable-select name="pegawai_id" label="Pegawai" :options="$pegawaiOptions" />
                     </div>
                 </div>
 

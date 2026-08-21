@@ -352,7 +352,7 @@
     <div x-show="exportModalOpen"
         x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-visible rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
                 <div>
                     <h2 class="text-base sm:text-lg font-bold text-slate-900">Export Laporan</h2>
@@ -425,12 +425,14 @@
                         @endforeach
                     </x-forms.select>
 
-                    <x-forms.select name="pegawai_id" label="Pegawai">
-                        <option value="Semua" {{ request('pegawai_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                        @foreach($pegawaiList as $pegawai)
-                            <option value="{{ $pegawai->pegawai_id }}" {{ (string) request('pegawai_id') === (string) $pegawai->pegawai_id ? 'selected' : '' }}>{{ $pegawai->nama_pegawai }}</option>
-                        @endforeach
-                    </x-forms.select>
+                    @php
+                        $pegawaiOptions = $pegawaiList->map(function($p) {
+                            return ['value' => $p->pegawai_id, 'text' => $p->nama_pegawai];
+                        })->toArray();
+                    @endphp
+                    <x-forms.searchable-select name="pegawai_id" label="Pegawai" :options="$pegawaiOptions" 
+                        class="w-full rounded-3xl border border-slate-200 bg-white pl-4 pr-4 py-3 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200" 
+                        selected="{{ request('pegawai_id', '') }}" />
                 </div>
 
                 <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
