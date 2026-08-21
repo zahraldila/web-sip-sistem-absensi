@@ -148,6 +148,10 @@
     });
 
     window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+            return;
+        }
         var form = document.querySelector('form');
         if (form && form._x_dataStack && form._x_dataStack[0]) {
             form._x_dataStack[0].isSubmitting = false;
