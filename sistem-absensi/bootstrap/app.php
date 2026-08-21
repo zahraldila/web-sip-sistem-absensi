@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,5 +22,45 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+
+        // ── Database connection errors ─────────────────────────────────
+        // Catches: DNS failure, host unreachable, connection refused,
+        // SSL handshake errors, etc. — anything that prevents reaching DB.
+        // Shows a friendly message instead of the Laravel error page.
+        $dbConnectionCodes = ['08000', '08003', '08006', '08001', '08004', 'HY000'];
+
+        $exceptions->render(function (QueryException $e, Request $request) use ($dbConnectionCodes) {
+            $sqlState = $e->getSqlState() ?? '';
+            $message  = strtolower($e->getMessage());
+
+            // Detect connection-level failures (not query logic errors)
+            $isConnectionError =
+                in_array($sqlState, $dbConnectionCodes) ||
+                str_contains($message, 'could not translate host name') ||
+                str_contains($message, 'unknown host') ||
+                str_contains($message, 'connection refused') ||
+                str_contains($message, 'connection timed out') ||
+                str_contains($message, 'no route to host') ||
+                str_contains($message, 'could not connect to server') ||
+                str_contains($message, 'network is unreachable') ||
+                str_contains($message, 'ssl') ;
+
+            if (! $isConnectionError) {
+                return null; // let Laravel handle other DB errors normally
+            }
+
+            $friendlyMessage = 'Tidak dapat terhubung ke database. '
+                . 'Periksa koneksi internet Anda dan coba lagi.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $friendlyMessage,
+                    'error'   => 'database_connection_failed',
+                ], 503);
+            }
+
+            return redirect('/login')
+                ->with('error', $friendlyMessage);
+        });
+
     })->create();

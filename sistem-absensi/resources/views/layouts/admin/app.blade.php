@@ -106,5 +106,8 @@
 
     @stack('scripts')
 
+    {{-- Auto-redirect to login when session expires --}}
+    @include('components.layout.session-timeout')
+
 </body>
 </html>
