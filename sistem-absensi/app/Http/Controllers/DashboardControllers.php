@@ -92,6 +92,10 @@ class DashboardControllers extends Controller
             ]]);
         }
 
+        $jadwal = DB::table('jadwal_kerja')->orderByDesc('jadwal_id')->first();
+        $jamMasuk = $jadwal ? Carbon::parse($jadwal->jam_masuk)->format('H:i') : '08:00';
+        $jamPulang = $jadwal ? Carbon::parse($jadwal->jam_pulang)->format('H:i') : '17:00';
+
         return view('admin.index', compact(
             'totalPegawai',
             'hadirHariIni',
@@ -99,7 +103,9 @@ class DashboardControllers extends Controller
             'wfhWfcCount',
             'liveCheckIns',
             'pendingApprovals',
-            'activities'
+            'activities',
+            'jamMasuk',
+            'jamPulang'
         ));
     }
 
@@ -243,19 +249,26 @@ class DashboardControllers extends Controller
             'jam_pulang.after'         => 'Jam pulang harus setelah jam masuk.',
         ]);
     
-        // Simpan pengaturan jam kerja
-        // Sesuaikan dengan struktur tabel pengaturan jika sudah tersedia.
-        //
-        // DB::table('pengaturan')->updateOrInsert(
-        //     ['kunci' => 'jam_masuk'],
-        //     ['nilai' => $request->jam_masuk]
-        // );
-        //
-        // DB::table('pengaturan')->updateOrInsert(
-        //     ['kunci' => 'jam_pulang'],
-        //     ['nilai' => $request->jam_pulang]
-        // );
-    
+        // Update atau buat jadwal_kerja baru
+        // Kita asumsikan update jadwal_id = 1 (atau jadwal yang paling terakhir aktif)
+        $jadwalAktif = DB::table('jadwal_kerja')->orderByDesc('jadwal_id')->first();
+        
+        if ($jadwalAktif) {
+            DB::table('jadwal_kerja')
+                ->where('jadwal_id', $jadwalAktif->jadwal_id)
+                ->update([
+                    'jam_masuk'  => $request->jam_masuk,
+                    'jam_pulang' => $request->jam_pulang,
+                    'tanggal_berlaku' => now()->toDateString(),
+                ]);
+        } else {
+            DB::table('jadwal_kerja')->insert([
+                'jam_masuk'  => $request->jam_masuk,
+                'jam_pulang' => $request->jam_pulang,
+                'tanggal_berlaku' => now()->toDateString(),
+            ]);
+        }
+
         // Catat aktivitas admin
         $user = \Illuminate\Support\Facades\Auth::user();
     
