@@ -25,6 +25,8 @@
                             </svg>
                         </span>
                         <input
+                            x-data="{ _t: null }"
+                            @input="clearTimeout(_t); _t = setTimeout(() => $el.closest('form').submit(), 400)"
                             id="search"
                             name="search"
                             type="text"

@@ -81,6 +81,10 @@
                     </div>
                 </div>
 
+                <template x-if="exportErrorMessage">
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700" x-text="exportErrorMessage"></div>
+                </template>
+
                 <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
                     <button type="button" @click="closeExport()" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</button>
                     <button type="submit" x-bind:disabled="exportIsLoading" class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm" x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'"></button>
