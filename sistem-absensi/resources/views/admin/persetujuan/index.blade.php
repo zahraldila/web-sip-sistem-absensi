@@ -304,8 +304,11 @@
                     Masukkan Alasan Penolakan <span class="text-red-500">*</span>
                 </label>
                 <textarea id="alasan_penolakan" x-model="rejectReason" rows="3"
-                    class="w-full rounded-2xl border border-slate-300 p-3 text-xs sm:text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+                    @input="rejectError = false"
+                    :class="{'border-red-500 focus:border-red-500 focus:ring-red-500': rejectError, 'border-slate-300 focus:border-red-500 focus:ring-red-500': !rejectError}"
+                    class="w-full rounded-2xl border p-3 text-xs sm:text-sm outline-none transition"
                     placeholder="Contoh: Kuota izin bulan ini sudah habis..."></textarea>
+                <p x-show="rejectError" x-cloak class="mt-1.5 text-xs text-red-500 font-medium">Mohon isi alasan penolakan terlebih dahulu.</p>
             </div>
             <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 grid grid-cols-2 gap-3 sm:flex sm:justify-end">
                 <button type="button" @click="closeRejectModal()"
@@ -575,6 +578,7 @@
             showErrorToast: false,
             errorMessage: '',
             rejectReason: '',
+            rejectError: false,
             isProcessing: false,
             counts: {
                 pending: {{ $pending ?? 0 }},
@@ -657,10 +661,11 @@
             closeRejectModal() {
                 this.showRejectModal = false;
                 this.rejectReason = '';
+                this.rejectError = false;
             },
             submitReject() {
                 if (!this.rejectReason.trim()) {
-                    alert('Mohon isi alasan penolakan.');
+                    this.rejectError = true;
                     return;
                 }
                 this.processApproval(this.rejectData.approval_id, 'tolak', this.rejectReason);
