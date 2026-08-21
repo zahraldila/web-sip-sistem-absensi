@@ -716,6 +716,14 @@
                         }
                     }
 
+                    // No. Telepon — format angka jika diisi
+                    const phoneInput = form.querySelector('input[name="no_handphone"]');
+                    if (phoneInput && phoneInput.value.trim()) {
+                        if (!/^[0-9]+$/.test(phoneInput.value.trim())) {
+                            showError(phoneInput, 'Format nomor handphone tidak valid.');
+                        }
+                    }
+
                     // Password — wajib untuk tambah baru, opsional untuk edit
                     if (!this.isEdit) {
                         const passInput = form.querySelector('input[name="password"]');
