@@ -17,7 +17,6 @@
         .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; }
         .badge-disetujui { background: #dcfce7; color: #166534; }
         .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-diproses { background: #dbeafe; color: #1e40af; }
         .badge-ditolak { background: #fee2e2; color: #991b1b; }
         .badge-default { background: #f8fafc; color: #475569; }
     </style>
@@ -68,7 +67,6 @@
                 $badgeClass = match($statusLower) {
                     'disetujui' => 'badge-disetujui',
                     'pending' => 'badge-pending',
-                    'diproses' => 'badge-diproses',
                     'ditolak' => 'badge-ditolak',
                     default => 'badge-default',
                 };
