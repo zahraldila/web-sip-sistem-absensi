@@ -51,7 +51,7 @@ class AuditLogControllers extends Controller
                 'pegawai.nama_pegawai'
             )
             ->orderBy('audit_log.waktu_log', 'desc')
-            ->get();
+            ->paginate(15);
 
         $totalPegawai = Employee::count(); 
         

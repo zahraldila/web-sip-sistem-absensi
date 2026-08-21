@@ -24,5 +24,7 @@ class AppServiceProvider extends ServiceProvider
         if (file_exists($helpers)) {
             require_once $helpers;
         }
+
+        \Illuminate\Pagination\Paginator::useTailwind();
     }
 }

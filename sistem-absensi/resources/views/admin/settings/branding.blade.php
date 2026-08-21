@@ -5,8 +5,8 @@
 @section('content')
 
 @php
-    $savedColor = \App\Models\Setting::get('primary_color', '#123D91');
-    $savedLogo  = company_logo_url();
+    $savedColor = $savedColor ?? '#123D91';
+    $savedLogo  = $savedLogo ?? asset('images/logo-sip.png');
 @endphp
 
 <div class="space-y-8" x-data="brandingApp('{{ $savedColor }}', '{{ $savedLogo }}')">

@@ -34,7 +34,13 @@ class AdminPlaceholderController extends Controller
 
     public function tampilanBranding()
     {
-        return view('admin.settings.branding');
+        try {
+            $savedColor = \App\Models\Setting::get('primary_color', '#123D91');
+            $savedLogo  = company_logo_url();
+            return view('admin.settings.branding', compact('savedColor', 'savedLogo'));
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings. Terjadi masalah koneksi ke database.');
+        }
     }
 
     public function simpanBranding(Request $request)
