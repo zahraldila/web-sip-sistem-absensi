@@ -196,6 +196,7 @@
     </div>
 
     {{-- DETAIL MODAL --}}
+    <template x-teleport="body">
     <div x-show="showDetail" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeDetail()">
         <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[28px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
             <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
@@ -281,10 +282,12 @@
             </div>
         </div>
     </div>
+    </template>
 
     {{-- REJECT REASON MODAL --}}
-    <div x-show="showRejectModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeRejectModal()">
-        <div class="relative w-full max-w-md overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
+    <template x-teleport="body">
+        <div x-show="showRejectModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeRejectModal()">
+            <div class="relative w-full max-w-md overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
             <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
@@ -323,13 +326,15 @@
                 </button>
             </div>
         </div>
-    </div>
+        </div>
+    </template>
 
     {{-- ======================================== --}}
     {{-- APPROVE CONFIRMATION MODAL --}}
     {{-- ======================================== --}}
-    <div x-show="showApproveConfirm" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeApproveConfirm()">
-        <div class="relative w-full max-w-md overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
+    <template x-teleport="body">
+        <div x-show="showApproveConfirm" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" @click.self="closeApproveConfirm()">
+            <div class="relative w-full max-w-md overflow-hidden rounded-3xl sm:rounded-[24px] bg-white shadow-2xl ring-1 ring-slate-200" @click.stop>
             {{-- Header --}}
             <div class="border-b border-slate-200 px-5 sm:px-6 py-4">
                 <div class="flex items-start justify-between gap-4">
@@ -374,6 +379,7 @@
             </div>
         </div>
     </div>
+    </template>
 
 
 </div>
