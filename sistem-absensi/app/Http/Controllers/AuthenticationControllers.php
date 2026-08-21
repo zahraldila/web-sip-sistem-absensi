@@ -24,75 +24,83 @@ class AuthenticationControllers extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $loginInput = $request->input('email');
-        $password = $request->input('password');
+        try {
+            $loginInput = $request->input('email');
+            $password = $request->input('password');
 
-        // Mencari akun berdasarkan username atau email pegawai
-        $akun = Akun::where('username', $loginInput)
-            ->orWhereHas('pegawai', function ($query) use ($loginInput) {
-                $query->where('email', $loginInput);
-            })
-            ->first();
+            // Mencari akun berdasarkan username atau email pegawai
+            $akun = Akun::where('username', $loginInput)
+                ->orWhereHas('pegawai', function ($query) use ($loginInput) {
+                    $query->where('email', $loginInput);
+                })
+                ->first();
 
-        $validPassword = false;
-        if ($akun) {
-            $storedPassword = (string) $akun->password;
+            $validPassword = false;
+            if ($akun) {
+                $storedPassword = (string) $akun->password;
 
-            // Preferensi: selalu coba Hash::check terlebih dahulu (untuk hashed passwords)
-            if (Hash::check($password, $storedPassword)) {
-                $validPassword = true;
-            } else {
-                // Fallback untuk akun legacy yang menyimpan password plaintext.
-                // Jika cocok, migrasikan ke hash secara aman.
-                if (hash_equals($storedPassword, (string) $password)) {
+                // Preferensi: selalu coba Hash::check terlebih dahulu (untuk hashed passwords)
+                if (Hash::check($password, $storedPassword)) {
                     $validPassword = true;
-                    $akun->password = Hash::make($password);
-                    $akun->save();
+                } else {
+                    // Fallback untuk akun legacy yang menyimpan password plaintext.
+                    // Jika cocok, migrasikan ke hash secara aman.
+                    if (hash_equals($storedPassword, (string) $password)) {
+                        $validPassword = true;
+                        $akun->password = Hash::make($password);
+                        $akun->save();
+                    }
                 }
             }
-        }
 
-        if (! $akun || ! $validPassword) {
+            if (! $akun || ! $validPassword) {
+                return back()
+                    ->withErrors(['email' => 'Username/Email atau password yang Anda masukkan salah.'])
+                    ->onlyInput('email');
+            }
+
+            $remember = $request->boolean('remember');
+
+            // Login user tanpa remember-token DB (kolom remember_token tidak ada di tabel akun).
+            // Fitur "Ingat Saya" ditangani via session: jika dicentang, lastActivityTime tidak
+            // disimpan sehingga SessionTimeout middleware tidak akan men-expire sesi tersebut.
+            Auth::login($akun, false);
+
+            // Regenerate session untuk keamanan
+            $request->session()->regenerate();
+
+            // Jika "Ingat Saya" TIDAK dicentang, set lastActivityTime agar SessionTimeout aktif.
+            // Jika "Ingat Saya" dicentang, lastActivityTime tidak di-set sehingga sesi tidak expire.
+            if (! $remember) {
+                $request->session()->put('lastActivityTime', time());
+            }
+
+            // Menyimpan informasi user/pegawai ke dalam session Laravel
+            $pegawai = $akun->pegawai;
+            session([
+                'akun_id' => $akun->akun_id,
+                'pegawai_id' => $akun->pegawai_id,
+                'role' => $akun->role,
+                'nama_pegawai' => $pegawai ? $pegawai->nama_pegawai : null,
+                'email_pegawai' => $pegawai ? $pegawai->email : null,
+                'remember_me' => $remember,
+            ]);
+
+            // ---------------------------------------------------------
+            // INJEKSI LOG ACTIVITY: Mencatat bahwa user berhasil login
+            // ---------------------------------------------------------
+            $roleName = ucfirst($akun->role); // Membuat huruf pertama kapital (misal: 'Admin' atau 'Pegawai')
+            logHelpers::record($akun->akun_id, "{$roleName} berhasil login ke dalam sistem");
+            // ---------------------------------------------------------
+
+            return redirect()->intended(route('admin.dashboard'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Login failed due to server/connection error: ' . $e->getMessage());
+
             return back()
-                ->withErrors(['email' => 'Username/Email atau password yang Anda masukkan salah.'])
+                ->with('error', 'Gagal terhubung ke server. Silakan periksa koneksi internet Anda dan coba lagi.')
                 ->onlyInput('email');
         }
-
-        $remember = $request->boolean('remember');
-
-        // Login user tanpa remember-token DB (kolom remember_token tidak ada di tabel akun).
-        // Fitur "Ingat Saya" ditangani via session: jika dicentang, lastActivityTime tidak
-        // disimpan sehingga SessionTimeout middleware tidak akan men-expire sesi tersebut.
-        Auth::login($akun, false);
-
-        // Regenerate session untuk keamanan
-        $request->session()->regenerate();
-
-        // Jika "Ingat Saya" TIDAK dicentang, set lastActivityTime agar SessionTimeout aktif.
-        // Jika "Ingat Saya" dicentang, lastActivityTime tidak di-set sehingga sesi tidak expire.
-        if (! $remember) {
-            $request->session()->put('lastActivityTime', time());
-        }
-
-        // Menyimpan informasi user/pegawai ke dalam session Laravel
-        $pegawai = $akun->pegawai;
-        session([
-            'akun_id' => $akun->akun_id,
-            'pegawai_id' => $akun->pegawai_id,
-            'role' => $akun->role,
-            'nama_pegawai' => $pegawai ? $pegawai->nama_pegawai : null,
-            'email_pegawai' => $pegawai ? $pegawai->email : null,
-            'remember_me' => $remember,
-        ]);
-
-        // ---------------------------------------------------------
-        // INJEKSI LOG ACTIVITY: Mencatat bahwa user berhasil login
-        // ---------------------------------------------------------
-        $roleName = ucfirst($akun->role); // Membuat huruf pertama kapital (misal: 'Admin' atau 'Pegawai')
-        logHelpers::record($akun->akun_id, "{$roleName} berhasil login ke dalam sistem");
-        // ---------------------------------------------------------
-
-        return redirect()->intended(route('admin.dashboard'));
     }
 
     /**

@@ -37,13 +37,11 @@
         </div>
     @endif
 
-    {{-- Error Banner (General login error) --}}
-    @if (session('error') || $errors->has('message'))
-        <div class="mt-4 sm:mt-5 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700">
-            <i class="fa-solid fa-circle-exclamation text-red-500"></i>
-            <span>{{ session('error') ?? $errors->first('message') }}</span>
-        </div>
-    @endif
+    {{-- Error Banner (General login error / Offline error) --}}
+    <div id="login-error-banner" @if (!session('error') && !$errors->has('message')) style="display: none;" @endif class="mt-4 sm:mt-5 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700">
+        <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+        <span id="login-error-message">{{ session('error') ?? $errors->first('message') }}</span>
+    </div>
 
     <form method="POST" action="{{ url('/login') }}" novalidate class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false }">
         @csrf
@@ -121,4 +119,23 @@
         </p>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (!navigator.onLine) {
+                    e.preventDefault();
+                    var banner = document.getElementById('login-error-banner');
+                    var msg = document.getElementById('login-error-message');
+                    if (banner && msg) {
+                        msg.textContent = 'Gagal terhubung ke server. Silakan periksa koneksi internet Anda dan coba lagi.';
+                        banner.style.display = 'flex';
+                    }
+                }
+            });
+        }
+    });
+</script>
 @endsection
