@@ -38,10 +38,10 @@
     @endif
 
     {{-- Error Banner (General login error) --}}
-    @if (session('error'))
+    @if (session('error') || $errors->has('message'))
         <div class="mt-4 sm:mt-5 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700">
             <i class="fa-solid fa-circle-exclamation text-red-500"></i>
-            <span>{{ session('error') }}</span>
+            <span>{{ session('error') ?? $errors->first('message') }}</span>
         </div>
     @endif
 
