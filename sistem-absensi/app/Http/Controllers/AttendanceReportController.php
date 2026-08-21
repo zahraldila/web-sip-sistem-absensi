@@ -17,7 +17,13 @@ class AttendanceReportController extends Controller
 {
     private function attendanceQuery(Request $request)
     {
-        $query = Attendance::with('pegawai.masterDivisi');
+        $query = Attendance::with('pegawai.masterDivisi')
+            ->whereHas('pegawai', function ($q) {
+                $q->where('status', 'Aktif')
+                  ->whereDoesntHave('akun', function ($q2) {
+                      $q2->where('role', 'admin');
+                  });
+            });
 
         if ($search = trim((string) $request->query('search', ''))) {
             $searchTerm = "%{$search}%";
@@ -327,7 +333,12 @@ class AttendanceReportController extends Controller
             });
         }
 
-        $pegawaiList = Pegawai::orderBy('nama_pegawai')->get(['pegawai_id', 'nama_pegawai']);
+        $pegawaiList = Pegawai::where('status', 'Aktif')
+            ->whereDoesntHave('akun', function ($q) {
+                $q->where('role', 'admin');
+            })
+            ->orderBy('nama_pegawai')
+            ->get(['pegawai_id', 'nama_pegawai']);
         $statusOptions = ['Semua', 'Hadir', 'Tepat Waktu', 'Terlambat', 'Tidak Hadir'];
         $divisions = \App\Models\MasterDivisi::orderBy('nama_divisi')->get(['divisi_id', 'nama_divisi']);
 

@@ -453,6 +453,8 @@
                             $refs.exportForm.submit();
                             setTimeout(() => {
                                 exportIsLoading = false;
+                                exportModalOpen = false;
+                                alert('Data berhasil diekspor.');
                             }, 1500);
                         "
                         class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm"

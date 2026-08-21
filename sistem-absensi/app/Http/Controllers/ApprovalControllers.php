@@ -91,6 +91,10 @@ class ApprovalControllers extends Controller
             ->pluck('jenis_pengajuan');
         
         $pegawai = Pegawai::query()
+            ->where('status', 'Aktif')
+            ->whereDoesntHave('akun', function ($q) {
+                $q->where('role', 'admin');
+            })
             ->orderBy('nama_pegawai')
             ->get([
                 'pegawai_id',
