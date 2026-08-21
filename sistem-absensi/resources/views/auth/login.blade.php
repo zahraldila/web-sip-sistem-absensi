@@ -4,6 +4,7 @@
 
 @section('content')
 <style>
+    [x-cloak] { display: none !important; }
     /* Override browser autofill background & text colors */
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
@@ -43,7 +44,7 @@
         <span id="login-error-message">{{ session('error') ?? $errors->first('message') }}</span>
     </div>
 
-    <form method="POST" action="{{ url('/login') }}" novalidate class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false }">
+    <form method="POST" action="{{ url('/login') }}" novalidate class="mt-6 sm:mt-8 space-y-4 sm:space-y-5" x-data="{ showPassword: false, isSubmitting: false }" @submit="if (!navigator.onLine) { $event.preventDefault(); isSubmitting = false; return false; } if (isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true;">
         @csrf
 
         {{-- Username / Email --}}
@@ -108,8 +109,14 @@
         {{-- Submit --}}
         <button
             type="submit"
-            class="w-full rounded-2xl bg-primary py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white shadow-lg transition hover:bg-primary-hover active:scale-95">
-            Masuk
+            :disabled="isSubmitting"
+            :class="isSubmitting ? 'opacity-75 cursor-not-allowed' : 'hover:bg-primary-hover active:scale-95'"
+            class="w-full flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white shadow-lg transition">
+            <svg x-show="isSubmitting" x-cloak class="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span x-text="isSubmitting ? 'Memproses...' : 'Masuk'">Masuk</span>
         </button>
 
         {{-- Help --}}
@@ -133,8 +140,18 @@
                         msg.textContent = 'Gagal terhubung ke server. Silakan periksa koneksi internet Anda dan coba lagi.';
                         banner.style.display = 'flex';
                     }
+                    if (form._x_dataStack && form._x_dataStack[0]) {
+                        form._x_dataStack[0].isSubmitting = false;
+                    }
                 }
             });
+        }
+    });
+
+    window.addEventListener('pageshow', function (event) {
+        var form = document.querySelector('form');
+        if (form && form._x_dataStack && form._x_dataStack[0]) {
+            form._x_dataStack[0].isSubmitting = false;
         }
     });
 </script>
