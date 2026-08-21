@@ -886,6 +886,17 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = url.toString();
         setTimeout(() => {
             setExportLoading(false);
+            closeExport();
+            
+            // Tampilkan toast success via Alpine
+            const alpineComponent = document.querySelector('[x-data="approvalModal()"]');
+            if (alpineComponent && alpineComponent._x_dataStack && alpineComponent._x_dataStack[0]) {
+                alpineComponent._x_dataStack[0].showSuccessToast = true;
+                alpineComponent._x_dataStack[0].toastMessage = 'Data berhasil diekspor.';
+                setTimeout(() => {
+                    alpineComponent._x_dataStack[0].showSuccessToast = false;
+                }, 3000);
+            }
         }, 1500);
     });
 

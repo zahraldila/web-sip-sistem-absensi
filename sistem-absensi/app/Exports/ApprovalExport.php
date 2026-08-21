@@ -21,7 +21,13 @@ class ApprovalExport implements FromQuery, WithHeadings, WithMapping
     public function query(): Builder
     {
         $query = Approval::query()
-            ->with(['pegawai.masterDivisi', 'pegawai.masterJabatan']);
+            ->with(['pegawai.masterDivisi', 'pegawai.masterJabatan'])
+            ->whereHas('pegawai', function ($q) {
+                $q->where('status', 'Aktif')
+                  ->whereDoesntHave('akun', function ($q2) {
+                      $q2->where('role', 'admin');
+                  });
+            });
 
         if (!empty($this->filters['tanggal_awal'])) {
             $query->whereDate(
