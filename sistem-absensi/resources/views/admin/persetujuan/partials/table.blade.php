@@ -6,7 +6,6 @@
         @php
             $statusClass = match($approval->status_pengajuan) {
                 'Pending' => 'bg-yellow-100 text-yellow-700',
-                'Diproses' => 'bg-blue-100 text-blue-700',
                 'Disetujui' => 'bg-green-100 text-green-700',
                 'Ditolak' => 'bg-red-100 text-red-700',
                 default => 'bg-slate-100 text-slate-700',
@@ -99,7 +98,6 @@
                     @php
                         $statusClass = match($approval->status_pengajuan) {
                             'Pending' => 'bg-yellow-100 text-yellow-700',
-                            'Diproses' => 'bg-blue-100 text-blue-700',
                             'Disetujui' => 'bg-green-100 text-green-700',
                             'Ditolak' => 'bg-red-100 text-red-700',
                             default => 'bg-slate-100 text-slate-700',

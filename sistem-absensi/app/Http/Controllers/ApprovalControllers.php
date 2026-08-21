@@ -18,8 +18,6 @@ class ApprovalControllers extends Controller
     {
         $pending = Approval::where('status_pengajuan', 'Pending')->count();
     
-        $diproses = Approval::where('status_pengajuan', 'Diproses')->count();
-    
         $disetujui = Approval::where('status_pengajuan', 'Disetujui')->count();
     
         $ditolak = Approval::where('status_pengajuan', 'Ditolak')->count();
@@ -34,7 +32,6 @@ class ApprovalControllers extends Controller
     
         $allowedStatuses = [
             'Pending',
-            'Diproses',
             'Disetujui',
             'Ditolak',
         ];
@@ -114,7 +111,6 @@ class ApprovalControllers extends Controller
                 )->render(),
                 'counts' => [
                     'pending' => $pending,
-                    'diproses' => $diproses,
                     'disetujui' => $disetujui,
                     'ditolak' => $ditolak,
                 ],
@@ -130,11 +126,10 @@ class ApprovalControllers extends Controller
         return view(
             'admin.persetujuan.index',
             compact(
+                'approvals',
                 'pending',
-                'diproses',
                 'disetujui',
                 'ditolak',
-                'approvals',
                 'status',
                 'jenisPengajuan',
                 'pegawai'
@@ -366,7 +361,6 @@ class ApprovalControllers extends Controller
             // Ambil data statistik counter terkini
             $counts = [
                 'pending'   => DB::table('pengajuan')->where('status_pengajuan', 'Pending')->count(),
-                'diproses'  => DB::table('pengajuan')->where('status_pengajuan', 'Diproses')->count(),
                 'disetujui' => DB::table('pengajuan')->where('status_pengajuan', 'Disetujui')->count(),
                 'ditolak'   => DB::table('pengajuan')->where('status_pengajuan', 'Ditolak')->count(),
             ];
@@ -478,7 +472,6 @@ class ApprovalControllers extends Controller
             // Ambil data statistik counter terkini
             $counts = [
                 'pending'   => DB::table('pengajuan')->where('status_pengajuan', 'Pending')->count(),
-                'diproses'  => DB::table('pengajuan')->where('status_pengajuan', 'Diproses')->count(),
                 'disetujui' => DB::table('pengajuan')->where('status_pengajuan', 'Disetujui')->count(),
                 'ditolak'   => DB::table('pengajuan')->where('status_pengajuan', 'Ditolak')->count(),
             ];

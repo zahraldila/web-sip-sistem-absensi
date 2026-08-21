@@ -51,9 +51,9 @@
     </div>
 
     {{-- ======================================== --}}
-    {{-- SUMMARY CARD (2 Kolom di HP, 4 di Desktop) --}}
+    {{-- SUMMARY CARD (2 Kolom di HP, 3 di Desktop) --}}
     {{-- ======================================== --}}
-    <section class="grid grid-cols-2 gap-3.5 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <section class="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-3">
 
         {{-- Pending --}}
         <div class="overflow-hidden rounded-2xl sm:rounded-3xl bg-white shadow-sm sm:shadow-card">
@@ -71,28 +71,6 @@
                     <div class="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-2xl sm:rounded-full bg-orange-100 flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-7 sm:w-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Diproses --}}
-        <div class="overflow-hidden rounded-2xl sm:rounded-3xl bg-white shadow-sm sm:shadow-card">
-            <div class="flex">
-                <div class="w-1.5 bg-blue-600 flex-shrink-0"></div>
-                <div class="flex flex-1 items-center justify-between p-3.5 sm:p-6 min-w-0">
-                    <div>
-                        <p class="text-[11px] sm:text-sm font-semibold uppercase tracking-wide text-slate-400 sm:text-slate-500">
-                            Diproses
-                        </p>
-                        <h2 class="mt-1 sm:mt-2 text-2xl sm:text-4xl font-bold text-slate-900" x-text="counts.diproses">
-                            {{ $diproses }}
-                        </h2>
-                    </div>
-                    <div class="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-2xl sm:rounded-full bg-blue-100 flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-7 sm:w-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M20 8A8 8 0 006.34 5.34L4 10m16 4l-2.34 4.66A8 8 0 014 16"/>
                         </svg>
                     </div>
                 </div>
@@ -165,13 +143,6 @@
                     data-status="Pending"
                     class="approval-tab rounded-xl px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold text-slate-600 transition whitespace-nowrap">
                     Menunggu
-                </button>
-
-                <button
-                    type="button"
-                    data-status="Diproses"
-                    class="approval-tab rounded-xl px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold text-slate-600 transition whitespace-nowrap">
-                    Diproses
                 </button>
 
                 <button
@@ -333,8 +304,11 @@
                     Masukkan Alasan Penolakan <span class="text-red-500">*</span>
                 </label>
                 <textarea id="alasan_penolakan" x-model="rejectReason" rows="3"
-                    class="w-full rounded-2xl border border-slate-300 p-3 text-xs sm:text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+                    @input="rejectError = false"
+                    :class="{'border-red-500 focus:border-red-500 focus:ring-red-500': rejectError, 'border-slate-300 focus:border-red-500 focus:ring-red-500': !rejectError}"
+                    class="w-full rounded-2xl border p-3 text-xs sm:text-sm outline-none transition"
                     placeholder="Contoh: Kuota izin bulan ini sudah habis..."></textarea>
+                <p x-show="rejectError" x-cloak class="mt-1.5 text-xs text-red-500 font-medium">Mohon isi alasan penolakan terlebih dahulu.</p>
             </div>
             <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 grid grid-cols-2 gap-3 sm:flex sm:justify-end">
                 <button type="button" @click="closeRejectModal()"
@@ -548,7 +522,6 @@
                         <select name="status" class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                             <option value="">Semua</option>
                             <option value="Pending">Pending</option>
-                            <option value="Diproses">Diproses</option>
                             <option value="Disetujui">Disetujui</option>
                             <option value="Ditolak">Ditolak</option>
                         </select>
@@ -605,12 +578,12 @@
             showErrorToast: false,
             errorMessage: '',
             rejectReason: '',
+            rejectError: false,
             isProcessing: false,
             counts: {
-                pending: {{ $pending }},
-                diproses: {{ $diproses }},
-                disetujui: {{ $disetujui }},
-                ditolak: {{ $ditolak }}
+                pending: {{ $pending ?? 0 }},
+                disetujui: {{ $disetujui ?? 0 }},
+                ditolak: {{ $ditolak ?? 0 }}
             },
             detailData: {
                 approval_id: null,
@@ -646,7 +619,6 @@
             statusClass(status) {
                 switch(status) {
                     case 'Pending': return 'bg-yellow-100 text-yellow-700';
-                    case 'Diproses': return 'bg-blue-100 text-blue-700';
                     case 'Disetujui': return 'bg-green-100 text-green-700';
                     case 'Ditolak': return 'bg-red-100 text-red-700';
                     default: return 'bg-slate-100 text-slate-700';
@@ -664,7 +636,6 @@
                 this.showApproveConfirm = false;
             },
             submitApprove() {
-                this.showApproveConfirm = false;
                 this.processApproval(this.approveData.approval_id, 'setujui');
             },
             showToast(message, type) {
@@ -690,10 +661,11 @@
             closeRejectModal() {
                 this.showRejectModal = false;
                 this.rejectReason = '';
+                this.rejectError = false;
             },
             submitReject() {
                 if (!this.rejectReason.trim()) {
-                    alert('Mohon isi alasan penolakan.');
+                    this.rejectError = true;
                     return;
                 }
                 this.processApproval(this.rejectData.approval_id, 'tolak', this.rejectReason);
@@ -736,6 +708,7 @@
 
                     if (data.status === 'success') {
                         this.closeRejectModal();
+                        this.closeApproveConfirm();
                         this.closeDetail();
 
                         this.showToast(data.message || 'Pengajuan berhasil diproses.', 'success');
