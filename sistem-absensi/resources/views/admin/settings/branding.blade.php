@@ -345,122 +345,159 @@
     @endif
 
     {{-- ======================================================== --}}
-    {{-- MODAL TAMBAH / EDIT KANTOR CABANG --}}
+    {{-- TELEPORTED MODALS (100% FULL SCREEN VIEWPORT OVERLAY) --}}
     {{-- ======================================================== --}}
-    <div x-show="showLokasiModal"
-         x-transition.opacity.duration.300ms
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-         style="display: none;">
-        <div @click.away="showLokasiModal = false"
-             class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-7 relative border border-slate-100">
-            
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-building"></i>
+
+    {{-- 1. MODAL TAMBAH / EDIT KANTOR CABANG --}}
+    <template x-teleport="body">
+        <div x-show="showLokasiModal"
+             x-transition.opacity.duration.300ms
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"
+             x-cloak
+             style="display: none;">
+            <div @click.away="showLokasiModal = false"
+                 class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-7 relative border border-slate-100 my-auto">
+                
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900" x-text="isEdit ? 'Edit Kantor Cabang' : 'Tambah Kantor Cabang Baru'"></h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Konfigurasi koordinat GPS dan jaringan Wi-Fi</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-900" x-text="isEdit ? 'Edit Kantor Cabang' : 'Tambah Kantor Cabang Baru'"></h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Konfigurasi koordinat GPS dan jaringan Wi-Fi</p>
-                    </div>
+                    <button @click="showLokasiModal = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-50">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
                 </div>
-                <button @click="showLokasiModal = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-50">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+
+                <form action="{{ route('admin.settings.lokasi.simpan') }}" method="POST" class="mt-5 space-y-4">
+                    @csrf
+                    <input type="hidden" name="lokasi_id" x-model="formLokasi.lokasi_id">
+
+                    {{-- Nama Kantor --}}
+                    <div>
+                        <label class="text-xs font-bold text-slate-700">Nama Kantor Cabang <span class="text-rose-500">*</span></label>
+                        <input type="text" name="nama_kantor" x-model="formLokasi.nama_kantor" required
+                               placeholder="Contoh: Kantor Cabang Jakarta"
+                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    {{-- Latitude & Longitude --}}
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-700">Latitude <span class="text-rose-500">*</span></label>
+                            <input type="text" name="latitude" x-model="formLokasi.latitude" required
+                                   placeholder="Contoh: -6.910194"
+                                   class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-700">Longitude <span class="text-rose-500">*</span></label>
+                            <input type="text" name="longitude" x-model="formLokasi.longitude" required
+                                   placeholder="Contoh: 107.650728"
+                                   class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                        </div>
+                    </div>
+
+                    {{-- Radius Meter --}}
+                    <div>
+                        <label class="text-xs font-bold text-slate-700">Radius Presensi (Meter) <span class="text-rose-500">*</span></label>
+                        <input type="number" name="radius_meter" x-model="formLokasi.radius_meter" required min="1"
+                               placeholder="Contoh: 100"
+                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    {{-- Wi-Fi SSIDs --}}
+                    <div>
+                        <label class="text-xs font-bold text-slate-700">Nama SSID Wi-Fi Kantor <span class="text-xs text-slate-400 font-normal">(Pisahkan dengan koma jika lebih dari satu)</span></label>
+                        <input type="text" name="wifi_ssids" x-model="formLokasi.wifi_ssids"
+                               placeholder="Contoh: SIP, SIP-5G"
+                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    {{-- Submit Buttons --}}
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                        <button type="button" @click="showLokasiModal = false" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-md hover:bg-primary/90 transition">
+                            Simpan Kantor Cabang
+                        </button>
+                    </div>
+                </form>
+
             </div>
+        </div>
+    </template>
 
-            <form action="{{ route('admin.settings.lokasi.simpan') }}" method="POST" class="mt-5 space-y-4">
-                @csrf
-                <input type="hidden" name="lokasi_id" x-model="formLokasi.lokasi_id">
-
-                {{-- Nama Kantor --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-700">Nama Kantor Cabang <span class="text-rose-500">*</span></label>
-                    <input type="text" name="nama_kantor" x-model="formLokasi.nama_kantor" required
-                           placeholder="Contoh: Kantor Cabang Jakarta"
-                           class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+    {{-- 2. MODAL CUSTOM CONFIRM DELETE KANTOR CABANG --}}
+    <template x-teleport="body">
+        <div x-show="showDeleteLokasiModal"
+             x-transition.opacity.duration.300ms
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+             x-cloak
+             style="display: none;">
+            <div @click.away="showDeleteLokasiModal = false"
+                 class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 relative border border-slate-100 text-center">
+                
+                {{-- Danger Warning Icon --}}
+                <div class="h-16 w-16 mx-auto rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-2xl mb-4">
+                    <i class="fa-solid fa-trash-can"></i>
                 </div>
 
-                {{-- Latitude & Longitude --}}
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs font-bold text-slate-700">Latitude <span class="text-rose-500">*</span></label>
-                        <input type="text" name="latitude" x-model="formLokasi.latitude" required
-                               placeholder="Contoh: -6.910194"
-                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-700">Longitude <span class="text-rose-500">*</span></label>
-                        <input type="text" name="longitude" x-model="formLokasi.longitude" required
-                               placeholder="Contoh: 107.650728"
-                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                    </div>
-                </div>
+                <h3 class="text-lg font-extrabold text-slate-900">Hapus Kantor Cabang?</h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus kantor cabang <strong class="text-slate-800 font-bold" x-text="deleteLokasiData.nama"></strong>? Seluruh tautan Wi-Fi terkait akan dilepaskan dan tindakan ini tidak dapat dibatalkan.
+                </p>
 
-                {{-- Radius Meter --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-700">Radius Presensi (Meter) <span class="text-rose-500">*</span></label>
-                    <input type="number" name="radius_meter" x-model="formLokasi.radius_meter" required min="1"
-                           placeholder="Contoh: 100"
-                           class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                </div>
-
-                {{-- Wi-Fi SSIDs --}}
-                <div>
-                    <label class="text-xs font-bold text-slate-700">Nama SSID Wi-Fi Kantor <span class="text-xs text-slate-400 font-normal">(Pisahkan dengan koma jika lebih dari satu)</span></label>
-                    <input type="text" name="wifi_ssids" x-model="formLokasi.wifi_ssids"
-                           placeholder="Contoh: SIP, SIP-5G"
-                           class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                </div>
-
-                {{-- Submit Buttons --}}
-                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                    <button type="button" @click="showLokasiModal = false" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                <form :action="'/admin/settings/lokasi/' + deleteLokasiData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" @click="showDeleteLokasiModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
                         Batal
                     </button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-md hover:bg-primary/90 transition">
-                        Simpan Kantor Cabang
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                        <span>Ya, Hapus Cabang</span>
                     </button>
-                </div>
-            </form>
+                </form>
 
-        </div>
-    </div>
-
-    {{-- ======================================================== --}}
-    {{-- MODAL CUSTOM CONFIRM DELETE KANTOR CABANG (MODERN UI) --}}
-    {{-- ======================================================== --}}
-    <div x-show="showDeleteLokasiModal"
-         x-transition.opacity.duration.300ms
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-         style="display: none;">
-        <div @click.away="showDeleteLokasiModal = false"
-             class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 relative border border-slate-100 text-center">
-            
-            {{-- Danger Warning Icon --}}
-            <div class="h-16 w-16 mx-auto rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-2xl mb-4">
-                <i class="fa-solid fa-trash-can"></i>
             </div>
-
-            <h3 class="text-lg font-extrabold text-slate-900">Hapus Kantor Cabang?</h3>
-            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-                Apakah Anda yakin ingin menghapus kantor cabang <strong class="text-slate-800 font-bold" x-text="deleteLokasiData.nama"></strong>? Seluruh tautan Wi-Fi terkait akan dilepaskan dan tindakan ini tidak dapat dibatalkan.
-            </p>
-
-            <form :action="'/admin/settings/lokasi/' + deleteLokasiData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
-                @csrf
-                @method('DELETE')
-                <button type="button" @click="showDeleteLokasiModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
-                    Batal
-                </button>
-                <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-trash text-xs"></i>
-                    <span>Ya, Hapus Cabang</span>
-                </button>
-            </form>
-
         </div>
-    </div>
+    </template>
+
+    {{-- 3. MODAL RESET BRANDING --}}
+    <template x-teleport="body">
+        <div x-show="showResetModal"
+             x-transition.opacity.duration.300ms
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+             x-cloak
+             style="display: none;">
+            <div @click.away="showResetModal = false"
+                 class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 relative border border-slate-100 text-center">
+                <div class="h-16 w-16 mx-auto rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center text-2xl mb-4">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <h3 class="text-lg font-extrabold text-slate-900">Reset Pengaturan Branding?</h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Logo dan warna tema akan dikembalikan ke pengaturan awal sistem.
+                </p>
+                <div class="mt-6 flex items-center justify-center gap-3">
+                    <button type="button" @click="showResetModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <form action="{{ route('admin.tampilan-branding.reset') }}" method="POST" class="w-1/2">
+                        @csrf
+                        <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition">
+                            Ya, Reset
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
 
 </div>
 
