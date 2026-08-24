@@ -9,57 +9,33 @@ use Carbon\Carbon;
 
 class TvDashboardController extends Controller
 {
-    /**
-     * Display the TV Dashboard landing page.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View
-     */
     public function index(Request $request)
     {
         $date = $request->query('date', now()->toDateString());
-        $cabang = strtolower($request->query('cabang', 'all'));
-        
-        $data = $this->fetchStats($date, $cabang);
+        $data = $this->fetchStats($date);
         
         return view('dashboard-tv.index', array_merge($data, [
             'selectedDate' => $date,
-            'selectedCabang' => $cabang,
             'isDemo' => $request->has('date')
         ]));
     }
 
-    /**
-     * API endpoint to get real-time stats (used for Alpine.js polling).
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getStats(Request $request)
     {
         $date = $request->query('date', now()->toDateString());
-        $cabang = strtolower($request->query('cabang', 'all'));
-        
-        $data = $this->fetchStats($date, $cabang);
+        $data = $this->fetchStats($date);
         
         return response()->json($data);
     }
 
-    /**
-     * Helper method to query stats and live check-ins for a specific date and branch dynamically.
-     *
-     * @param  string  $date
-     * @param  string  $cabang
-     * @return array
-     */
-    private function fetchStats($date, $cabang = 'all')
+    private function fetchStats($date)
     {
         // 1. Fetch dynamic list of branches from database ordered by ID
         $branches = DB::table('lokasi_kantor')
             ->orderBy('lokasi_id', 'asc')
             ->get(['lokasi_id', 'nama_kantor', 'latitude', 'longitude', 'radius_meter']);
 
-        // Fetch registered office Wi-Fis linked to locations (sorted by SSID length desc for exact match)
+        // Fetch registered office Wi-Fis linked to locations (sorted by SSID length desc)
         $officeWifis = DB::table('wifi_kantor')
             ->whereNotNull('lokasi_id')
             ->where('aktif', true)
@@ -247,27 +223,12 @@ class TvDashboardController extends Controller
             ];
         });
 
-        // Filter list based on selected cabang ('all', or numeric ID, or slug)
-        $filteredList = $mappedAttendances;
-        if ($cabang !== 'all') {
-            $filteredList = $mappedAttendances->filter(function ($i) use ($cabang, $branches) {
-                if ((string)$i['cabang_id'] === (string)$cabang) {
-                    return true;
-                }
-                $found = $branches->firstWhere('lokasi_id', (int)$i['cabang_id']);
-                if ($found && str_contains(strtolower($found->nama_kantor), strtolower($cabang))) {
-                    return true;
-                }
-                return false;
-            })->values();
-        }
-
-        // Summary counts
-        $totalHadir = $filteredList->pluck('pegawai_id')->unique()->count();
-        $sedangBekerja = $filteredList->where('has_checkout', false)->pluck('pegawai_id')->unique()->count();
-        $sudahCheckOut = $filteredList->where('has_checkout', true)->pluck('pegawai_id')->unique()->count();
-        $wfoCount = $filteredList->where('skema', 'WFO')->pluck('pegawai_id')->unique()->count();
-        $wfhCount = $filteredList->whereIn('skema', ['WFH', 'WFC'])->pluck('pegawai_id')->unique()->count();
+        // Global Summary counts
+        $totalHadir = $mappedAttendances->pluck('pegawai_id')->unique()->count();
+        $sedangBekerja = $mappedAttendances->where('has_checkout', false)->pluck('pegawai_id')->unique()->count();
+        $sudahCheckOut = $mappedAttendances->where('has_checkout', true)->pluck('pegawai_id')->unique()->count();
+        $wfoCount = $mappedAttendances->where('skema', 'WFO')->pluck('pegawai_id')->unique()->count();
+        $wfhCount = $mappedAttendances->whereIn('skema', ['WFH', 'WFC'])->pluck('pegawai_id')->unique()->count();
 
         // Sakit & Izin
         $sakitCount = DB::table('pengajuan')
@@ -284,12 +245,22 @@ class TvDashboardController extends Controller
             ->distinct('pegawai_id')
             ->count('pegawai_id');
 
-        // Belum Hadir
-        if ($cabang === 'all') {
-            $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
-        } else {
-            $belumHadir = max(0, $totalPegawai - $totalHadir);
-        }
+        $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
+
+        // Group attendance by primary locations (Sulaksana vs Cikawao)
+        $sulaksanaLocation = $branches->firstWhere('nama_kantor', 'Kantor Sulaksana') ?? $branches->firstWhere('lokasi_id', 1);
+        $cikawaoLocation = $branches->firstWhere('nama_kantor', 'Kantor Cikawao') ?? $branches->firstWhere('lokasi_id', 2);
+
+        $sulaksanaId = $sulaksanaLocation ? (string)$sulaksanaLocation->lokasi_id : '1';
+        $cikawaoId = $cikawaoLocation ? (string)$cikawaoLocation->lokasi_id : '2';
+
+        $sulaksanaList = $mappedAttendances->filter(function ($i) use ($sulaksanaId) {
+            return (string)$i['cabang_id'] === $sulaksanaId || str_contains(strtolower($i['cabang_label']), 'sulaksana');
+        })->values();
+
+        $cikawaoList = $mappedAttendances->filter(function ($i) use ($cikawaoId) {
+            return (string)$i['cabang_id'] === $cikawaoId || str_contains(strtolower($i['cabang_label']), 'cikawao');
+        })->values();
 
         return [
             'branches' => $branches,
@@ -300,9 +271,11 @@ class TvDashboardController extends Controller
             'wfoCount' => $wfoCount,
             'wfhCount' => $wfhCount,
             'sakitCount' => $sakitCount,
+            'izinCount' => $izinCount,
             'belumHadir' => $belumHadir,
-            'liveCheckIns' => $filteredList,
-            'activeCabang' => $cabang,
+            'liveCheckIns' => $mappedAttendances,
+            'sulaksanaList' => $sulaksanaList,
+            'cikawaoList' => $cikawaoList,
         ];
     }
 }
