@@ -310,7 +310,7 @@
                     </div>
                 </div>
 
-                {{-- Action Buttons (Edit / Delete) --}}
+                {{-- Action Buttons (Edit / Custom Delete Modal) --}}
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                     <button type="button"
                             @click="openModalEdit({{ json_encode($lokasi) }})"
@@ -319,14 +319,12 @@
                         <span>Edit</span>
                     </button>
 
-                    <form action="{{ route('admin.settings.lokasi.hapus', $lokasi->lokasi_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kantor cabang {{ $lokasi->nama_kantor }}?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-trash"></i>
-                            <span>Hapus</span>
-                        </button>
-                    </form>
+                    <button type="button"
+                            @click="confirmDeleteLokasi({{ $lokasi->lokasi_id }}, '{{ addslashes($lokasi->nama_kantor) }}')"
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Hapus</span>
+                    </button>
                 </div>
             </div>
             @empty
@@ -429,6 +427,41 @@
         </div>
     </div>
 
+    {{-- ======================================================== --}}
+    {{-- MODAL CUSTOM CONFIRM DELETE KANTOR CABANG (MODERN UI) --}}
+    {{-- ======================================================== --}}
+    <div x-show="showDeleteLokasiModal"
+         x-transition.opacity.duration.300ms
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+         style="display: none;">
+        <div @click.away="showDeleteLokasiModal = false"
+             class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 relative border border-slate-100 text-center">
+            
+            {{-- Danger Warning Icon --}}
+            <div class="h-16 w-16 mx-auto rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+
+            <h3 class="text-lg font-extrabold text-slate-900">Hapus Kantor Cabang?</h3>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                Apakah Anda yakin ingin menghapus kantor cabang <strong class="text-slate-800 font-bold" x-text="deleteLokasiData.nama"></strong>? Seluruh tautan Wi-Fi terkait akan dilepaskan dan tindakan ini tidak dapat dibatalkan.
+            </p>
+
+            <form :action="'/admin/settings/lokasi/' + deleteLokasiData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
+                @csrf
+                @method('DELETE')
+                <button type="button" @click="showDeleteLokasiModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                    <span>Ya, Hapus Cabang</span>
+                </button>
+            </form>
+
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -454,6 +487,10 @@
                 radius_meter: 100,
                 wifi_ssids: '',
             },
+
+            // Delete location modal states
+            showDeleteLokasiModal: false,
+            deleteLokasiData: { id: '', nama: '' },
 
             presets: [
                 '#123D91', '#0F766E', '#4338CA', '#1D4ED8',
@@ -507,6 +544,11 @@
                     wifi_ssids: ssids,
                 };
                 this.showLokasiModal = true;
+            },
+
+            confirmDeleteLokasi(id, nama) {
+                this.deleteLokasiData = { id: id, nama: nama };
+                this.showDeleteLokasiModal = true;
             }
         }));
     });
