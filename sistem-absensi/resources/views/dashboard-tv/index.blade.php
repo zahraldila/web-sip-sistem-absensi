@@ -347,11 +347,11 @@
             x-transition:leave="transition ease-in duration-200 transform"
             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-            @click.away="showModal = false"
+            @click.away="closeModalAndProceed()"
             class="bg-white rounded-[2.5rem] shadow-[0_25px_60px_-12px_rgba(0,0,0,0.3)] max-w-4xl w-full mx-4 p-8 sm:p-10 flex flex-col md:flex-row gap-8 sm:gap-10 relative overflow-hidden border border-slate-100"
         >
             <!-- Close Button -->
-            <button @click="showModal = false" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-50" aria-label="Tutup alert">
+            <button @click="closeModalAndProceed()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-50" aria-label="Tutup alert">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
@@ -487,10 +487,12 @@
                 clockTime: '00:00:00',
                 clockDate: '...',
 
-                // Modal popup states
+                // Modal popup queue states
                 showModal: false,
                 modalData: {},
-                lastActivityKey: null,
+                modalQueue: [],
+                isProcessingQueue: false,
+                knownActivityKeys: new Set(),
                 modalTimer: null,
                 autoScrollTimer: null,
 
@@ -498,10 +500,11 @@
                     this.updateClock();
                     setInterval(() => this.updateClock(), 1000);
 
-                    // Initialize last activity key on load
+                    // Initialize known activity keys on initial load
                     if (this.liveCheckIns && this.liveCheckIns.length > 0) {
-                        const first = this.liveCheckIns[0];
-                        this.lastActivityKey = first.id + '_' + (first.has_checkout ? 'out_' + first.jam_checkout : 'in_' + first.jam_checkin);
+                        this.liveCheckIns.forEach(item => {
+                            this.knownActivityKeys.add(this.getActivityKey(item));
+                        });
                     }
                     
                     // Auto-poll stats every 5 seconds
@@ -509,6 +512,10 @@
 
                     // Start smooth auto-scroll for TV screen
                     this.initAutoScroll();
+                },
+
+                getActivityKey(item) {
+                    return item.id + '_' + (item.has_checkout ? 'out_' + item.jam_checkout : 'in_' + item.jam_checkin);
                 },
 
                 initAutoScroll() {
@@ -575,16 +582,24 @@
                             this.sakitCount = data.sakitCount;
                             this.belumHadir = data.belumHadir;
                             
-                            // Check if a new check-in or check-out has occurred
+                            // Detect all new activities and push to queue
                             if (data.liveCheckIns && data.liveCheckIns.length > 0) {
-                                const latest = data.liveCheckIns[0];
-                                const currentKey = latest.id + '_' + (latest.has_checkout ? 'out_' + latest.jam_checkout : 'in_' + latest.jam_checkin);
-                                
-                                if (this.lastActivityKey === null) {
-                                    this.lastActivityKey = currentKey;
-                                } else if (currentKey !== this.lastActivityKey) {
-                                    this.lastActivityKey = currentKey;
-                                    this.triggerModal(latest);
+                                const newActivities = [];
+
+                                data.liveCheckIns.forEach(item => {
+                                    const key = this.getActivityKey(item);
+                                    if (!this.knownActivityKeys.has(key)) {
+                                        this.knownActivityKeys.add(key);
+                                        newActivities.push(item);
+                                    }
+                                });
+
+                                // Queue new activities (reverse so older events appear first)
+                                if (newActivities.length > 0) {
+                                    newActivities.reverse().forEach(item => {
+                                        this.modalQueue.push(item);
+                                    });
+                                    this.processModalQueue();
                                 }
 
                                 this.liveCheckIns = data.liveCheckIns;
@@ -595,17 +610,41 @@
                     }
                 },
 
-                triggerModal(item) {
-                    this.modalData = item;
+                processModalQueue() {
+                    if (this.isProcessingQueue || this.modalQueue.length === 0) {
+                        return;
+                    }
+
+                    this.isProcessingQueue = true;
+                    const nextItem = this.modalQueue.shift();
+                    this.modalData = nextItem;
                     this.showModal = true;
 
                     if (this.modalTimer) {
                         clearTimeout(this.modalTimer);
                     }
 
+                    // Display modal for 4 seconds, then transition to next
                     this.modalTimer = setTimeout(() => {
-                        this.showModal = false;
-                    }, 6000);
+                        this.closeModalAndProceed();
+                    }, 4000);
+                },
+
+                closeModalAndProceed() {
+                    if (this.modalTimer) {
+                        clearTimeout(this.modalTimer);
+                        this.modalTimer = null;
+                    }
+
+                    this.showModal = false;
+
+                    // Allow 350ms fade-out transition, then process next item in queue
+                    setTimeout(() => {
+                        this.isProcessingQueue = false;
+                        if (this.modalQueue.length > 0) {
+                            this.processModalQueue();
+                        }
+                    }, 350);
                 }
             }));
         });
