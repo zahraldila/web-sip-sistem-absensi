@@ -3,13 +3,27 @@
 @section('title', 'Laporan Kehadiran')
 
 @section('content')
-<div x-data="{ filterOpen: false, exportModalOpen: false, exportFormat: 'xlsx', exportIsLoading: false }">
+<div x-data="attendanceReport()">
 
     {{-- Header --}}
     <div class="mb-5 sm:mb-6">
         <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">Laporan Kehadiran</h1>
         <p class="mt-1 text-xs sm:text-sm text-gray-600">Ringkasan Laporan Kehadiran Karyawan secara menyeluruh.</p>
     </div>
+
+    {{-- Export Success Notification (dynamic) --}}
+    <template x-if="exportSuccessMessage">
+        <div x-data x-cloak x-init="setTimeout(() => $dispatch('clear-export-success'), 4000)"
+            @clear-export-success.window="exportSuccessMessage = ''"
+            class="mb-4 relative rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-xs sm:text-sm text-green-700">
+            <div class="pr-6" x-text="exportSuccessMessage"></div>
+            <button type="button" @click="exportSuccessMessage = ''" aria-label="Tutup notifikasi" class="absolute right-2 top-2 text-green-700 hover:text-green-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </template>
 
     {{-- Search & Filter Card --}}
     <div class="mb-5 sm:mb-6 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
@@ -75,7 +89,7 @@
 
                                 <x-forms.select name="mode_kerja" label="Mode Kerja">
                                     <option value="Semua" {{ request('mode_kerja') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                                    <option value="WFO" {{ request('mode_kerja') === 'WFO' ? 'selected' : '' }}>WFO</option>
+                                    <option value="WFO" {{ request('mode_kerja') === 'WFH' ? 'selected' : '' }}>WFO</option>
                                     <option value="WFH" {{ request('mode_kerja') === 'WFH' ? 'selected' : '' }}>WFH</option>
                                 </x-forms.select>
                             </div>
@@ -100,7 +114,7 @@
                     <div>
                         <button
                             type="button"
-                            @click="exportIsLoading = false; exportModalOpen = true"
+                            @click="openExport()"
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -353,120 +367,219 @@
     {{-- ======================================================== --}}
     <div x-show="exportModalOpen"
         x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-visible rounded-3xl sm:rounded-[28px] bg-white shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
-                <div>
-                    <h2 class="text-base sm:text-lg font-bold text-slate-900">Export Laporan</h2>
-                    <p class="mt-1 text-xs sm:text-sm text-slate-500">Pilih format dan rentang filter untuk unduh laporan.</p>
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
+        @click.self="closeExport()">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-visible rounded-3xl sm:rounded-[28px] bg-white shadow-2xl" @click.stop>
+            <form x-ref="exportForm" @submit.prevent="submitExport($event)">
+                <div class="flex items-center justify-between border-b border-slate-200 px-5 sm:px-8 py-5 sm:py-6">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">Export Laporan</h2>
+                        <p class="mt-1 text-xs sm:text-sm text-slate-500">Pilih format dan rentang filter untuk unduh laporan.</p>
+                    </div>
+                    <button type="button" @click="closeExport()" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" aria-label="Tutup modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <button type="button" @click="exportIsLoading = false; exportModalOpen = false" class="flex items-center justify-center rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
 
-            <form x-ref="exportForm" method="GET" action="{{ route('admin.laporan-kehadiran.export.excel') }}" class="space-y-5 sm:space-y-6 px-5 sm:px-8 py-5 sm:py-6">
-                <input type="hidden" name="search" value="{{ request('search') }}" />
-                <input type="hidden" name="mode_kerja" value="{{ request('mode_kerja') }}" />
+                <div class="space-y-5 sm:space-y-6 px-5 sm:px-8 py-5 sm:py-6">
+                    <input type="hidden" name="search" value="{{ request('search') }}" />
+                    <input type="hidden" name="mode_kerja" value="{{ request('mode_kerja') }}" />
 
-                <div class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
-                    <div class="space-y-3 sm:space-y-4">
-                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Format Export</p>
+                    <div class="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
+                        <div class="space-y-3 sm:space-y-4">
+                            <p class="text-xs sm:text-sm font-semibold text-slate-900">Format Export</p>
 
-                        <div class="space-y-3">
-                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" checked />
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-slate-900">Excel (.xlsx)</p>
-                                    <p class="text-xs text-slate-500">Unduh file Excel dengan data laporan kehadiran.</p>
-                                </div>
-                            </label>
+                            <div class="space-y-3">
+                                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                    <input type="radio" name="format" value="xlsx" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" checked />
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-slate-900">Excel (.xlsx)</p>
+                                        <p class="text-xs text-slate-500">Unduh file Excel dengan data laporan kehadiran.</p>
+                                    </div>
+                                </label>
 
-                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-slate-900">CSV</p>
-                                    <p class="text-xs text-slate-500">Unduh file CSV yang mudah diolah.</p>
-                                </div>
-                            </label>
+                                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                    <input type="radio" name="format" value="csv" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-slate-900">CSV</p>
+                                        <p class="text-xs text-slate-500">Unduh file CSV yang mudah diolah.</p>
+                                    </div>
+                                </label>
 
-                            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
-                                <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-slate-900">PDF</p>
-                                    <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
-                                </div>
-                            </label>
+                                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 transition hover:border-slate-300 hover:bg-slate-50">
+                                    <input type="radio" name="format" value="pdf" class="mt-1 h-4 w-4 text-primary focus:ring-primary" x-model="exportFormat" />
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-slate-900">PDF</p>
+                                        <p class="text-xs text-slate-500">Unduh file PDF yang siap dicetak.</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 sm:space-y-4">
+                            <p class="text-xs sm:text-sm font-semibold text-slate-900">Rentang Tanggal & Filter</p>
+                            <div class="space-y-3">
+                                <x-forms.date-picker name="start_date" label="Tanggal Awal" value="{{ request('start_date') }}" />
+                                <x-forms.date-picker name="end_date" label="Tanggal Akhir" value="{{ request('end_date') }}" />
+                            </div>
                         </div>
                     </div>
 
-                    <div class="space-y-3 sm:space-y-4">
-                        <p class="text-xs sm:text-sm font-semibold text-slate-900">Rentang Tanggal & Filter</p>
-                        <div class="space-y-3">
-                            <x-forms.date-picker name="start_date" label="Tanggal Awal" value="{{ request('start_date') }}" />
-                            <x-forms.date-picker name="end_date" label="Tanggal Akhir" value="{{ request('end_date') }}" />
-                        </div>
+                    <div class="grid gap-3 sm:gap-4 border-t border-slate-200 pt-5 sm:pt-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+                        <x-forms.select name="status" label="Status">
+                            <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
+                            <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
+                            <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
+                            <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
+                            <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
+                        </x-forms.select>
+
+                        <x-forms.select name="divisi_id" label="Divisi">
+                            <option value="Semua" {{ request('divisi_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
+                            @foreach($divisions as $division)
+                                <option value="{{ $division->divisi_id }}" {{ (string) request('divisi_id') === (string) $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
+                            @endforeach
+                        </x-forms.select>
+
+                        @php
+                            $pegawaiOptions = $pegawaiList->map(function($p) {
+                                return ['value' => $p->pegawai_id, 'text' => $p->nama_pegawai];
+                            })->toArray();
+                        @endphp
+                        <x-forms.searchable-select name="pegawai_id" label="Pegawai" :options="$pegawaiOptions" 
+                            class="w-full rounded-3xl border border-slate-200 bg-white pl-4 pr-4 py-3 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200" 
+                            selected="{{ request('pegawai_id', '') }}" />
                     </div>
-                </div>
 
-                <div class="grid gap-3 sm:gap-4 border-t border-slate-200 pt-5 sm:pt-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-                    <x-forms.select name="status" label="Status">
-                        <option value="Semua" {{ request('status') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                        <option value="Hadir" {{ request('status') === 'Hadir' ? 'selected' : '' }}>Hadir (Semua)</option>
-                        <option value="Tepat Waktu" {{ request('status') === 'Tepat Waktu' ? 'selected' : '' }}>Tepat Waktu</option>
-                        <option value="Terlambat" {{ request('status') === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
-                        <option value="Tidak Hadir" {{ request('status') === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
-                    </x-forms.select>
+                    <template x-if="exportErrorMessage">
+                        <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs sm:text-sm text-red-700" x-text="exportErrorMessage"></div>
+                    </template>
 
-                    <x-forms.select name="divisi_id" label="Divisi">
-                        <option value="Semua" {{ request('divisi_id') === 'Semua' ? 'selected' : '' }}>Semua</option>
-                        @foreach($divisions as $division)
-                            <option value="{{ $division->divisi_id }}" {{ (string) request('divisi_id') === (string) $division->divisi_id ? 'selected' : '' }}>{{ $division->nama_divisi }}</option>
-                        @endforeach
-                    </x-forms.select>
-
-                    @php
-                        $pegawaiOptions = $pegawaiList->map(function($p) {
-                            return ['value' => $p->pegawai_id, 'text' => $p->nama_pegawai];
-                        })->toArray();
-                    @endphp
-                    <x-forms.searchable-select name="pegawai_id" label="Pegawai" :options="$pegawaiOptions" 
-                        class="w-full rounded-3xl border border-slate-200 bg-white pl-4 pr-4 py-3 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200" 
-                        selected="{{ request('pegawai_id', '') }}" />
-                </div>
-
-                <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
-                    <button type="button" @click="exportIsLoading = false; exportModalOpen = false" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                        Batal
-                    </button>
-                    <button
-                        type="button"
-                        x-bind:disabled="exportIsLoading"
-                        @click.prevent="
-                            if (exportIsLoading) return;
-                            exportIsLoading = true;
-                            let exportUrl = '{{ route('admin.laporan-kehadiran.export.excel') }}';
-                            if (exportFormat === 'csv') {
-                                exportUrl = '{{ route('admin.laporan-kehadiran.export.csv') }}';
-                            } else if (exportFormat === 'pdf') {
-                                exportUrl = '{{ route('admin.laporan-kehadiran.export.pdf') }}';
-                            }
-                            $refs.exportForm.action = exportUrl;
-                            $refs.exportForm.submit();
-                            setTimeout(() => {
-                                exportIsLoading = false;
-                                exportModalOpen = false;
-                                alert('Data berhasil diekspor.');
-                            }, 1500);
-                        "
-                        class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm"
-                        x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'">
-                    </button>
+                    <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:pt-6 sm:flex-row sm:justify-end">
+                        <button type="button" @click="closeExport()" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-6 py-3 text-xs sm:text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            x-bind:disabled="exportIsLoading"
+                            class="w-full sm:w-auto rounded-2xl bg-primary px-6 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm"
+                            x-text="exportIsLoading ? 'Menyiapkan...' : 'Unduh'">
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <script>
+        function attendanceReport() {
+            return {
+                filterOpen: false,
+                exportModalOpen: false,
+                exportFormat: 'xlsx',
+                exportIsLoading: false,
+                exportSuccessMessage: '',
+                exportErrorMessage: '',
+                openExport() {
+                    this.exportIsLoading = false;
+                    this.resetExport();
+                    this.exportModalOpen = true;
+                },
+                closeExport() {
+                    this.exportIsLoading = false;
+                    this.exportModalOpen = false;
+                    this.resetExport();
+                },
+                resetExport() {
+                    this.exportFormat = 'xlsx';
+                    this.exportErrorMessage = '';
+                    if (this.$refs.exportForm) {
+                        this.$refs.exportForm.reset();
+
+                        const startDateInput = this.$refs.exportForm.querySelector('input[name="start_date"]');
+                        if (startDateInput) startDateInput.value = '{{ request('start_date', '') }}';
+
+                        const endDateInput = this.$refs.exportForm.querySelector('input[name="end_date"]');
+                        if (endDateInput) endDateInput.value = '{{ request('end_date', '') }}';
+
+                        const statusSelect = this.$refs.exportForm.querySelector('select[name="status"]');
+                        if (statusSelect) statusSelect.value = '{{ request('status', 'Semua') }}';
+
+                        const divisiSelect = this.$refs.exportForm.querySelector('select[name="divisi_id"]');
+                        if (divisiSelect) divisiSelect.value = '{{ request('divisi_id', 'Semua') }}';
+
+                        const searchableSelects = this.$refs.exportForm.querySelectorAll('[x-data]');
+                        searchableSelects.forEach(el => {
+                            if (el._x_dataStack && el._x_dataStack[0]) {
+                                el._x_dataStack[0].selected = '{{ request('pegawai_id', '') }}';
+                                el._x_dataStack[0].search = '';
+                                el._x_dataStack[0].open = false;
+                            }
+                        });
+                        const pegawaiInput = this.$refs.exportForm.querySelector('input[name="pegawai_id"]');
+                        if (pegawaiInput) pegawaiInput.value = '{{ request('pegawai_id', '') }}';
+                    }
+                },
+                async submitExport(event) {
+                    if (this.exportIsLoading) {
+                        return;
+                    }
+
+                    this.exportIsLoading = true;
+                    this.exportErrorMessage = '';
+
+                    const form = this.$refs.exportForm;
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData);
+
+                    let exportUrl = '{{ route('admin.laporan-kehadiran.export.excel') }}';
+                    if (this.exportFormat === 'csv') {
+                        exportUrl = '{{ route('admin.laporan-kehadiran.export.csv') }}';
+                    } else if (this.exportFormat === 'pdf') {
+                        exportUrl = '{{ route('admin.laporan-kehadiran.export.pdf') }}';
+                    }
+
+                    try {
+                        const response = await fetch(`${exportUrl}?${params.toString()}`, {
+                            method: 'GET',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        });
+
+                        const contentType = response.headers.get('Content-Type') || '';
+
+                        // Jika server mengembalikan file (bukan HTML redirect/error)
+                        if (response.ok && !contentType.includes('text/html')) {
+                            const blob = await response.blob();
+                            const disposition = response.headers.get('Content-Disposition') || '';
+                            const fileMatch = disposition.match(/filename[^;=\n]*=(['"]?)([^'"\n;]*)\1/);
+                            const filename = fileMatch ? fileMatch[2].trim() : ('laporan-kehadiran.' + this.exportFormat);
+
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            URL.revokeObjectURL(url);
+
+                            this.closeExport();
+                            this.exportSuccessMessage = 'Data berhasil diekspor.';
+                        } else {
+                            // Gagal/tidak ada data: tampilkan pesan, modal tetap terbuka
+                            this.exportErrorMessage = 'Tidak ada data yang dapat diekspor.';
+                            this.exportIsLoading = false;
+                        }
+                    } catch (e) {
+                        // Network error atau error tak terduga
+                        this.exportErrorMessage = 'Terjadi kesalahan saat mengekspor data.';
+                        this.exportIsLoading = false;
+                    }
+                }
+            };
+        }
+    </script>
 </div>
 @endsection
