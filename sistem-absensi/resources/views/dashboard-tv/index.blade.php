@@ -83,7 +83,7 @@
         </div>
     </header>
 
-    <!-- Main Content Area: Dynamic Multi-Branch Responsive Grid -->
+    <!-- Main Content Area: Dynamic Multi-Branch Responsive Grid with Avatar Card Grid -->
     <main class="relative z-10 flex-1 max-w-[1920px] w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
         
         <div 
@@ -148,73 +148,73 @@
                         </div>
                     </div>
 
-                    <!-- List Pegawai Hadir di Cabang (Auto-Scrollable) -->
-                    <div :id="'branch-list-' + branch.lokasi_id" class="flex-1 overflow-y-auto pr-1 custom-scrollbar divide-y divide-slate-100">
+                    <!-- List Pegawai Hadir di Cabang (Avatar Card Grid Layout) -->
+                    <div :id="'branch-list-' + branch.lokasi_id" class="flex-1 overflow-y-auto pr-1 custom-scrollbar">
                         
-                        <!-- Loop Pegawai Hadir di Cabang -->
-                        <template x-for="item in branch.attendances" :key="item.id">
-                            <div class="py-2.5 px-1.5 sm:px-2 flex items-center justify-between gap-2.5 sm:gap-3 transition hover:bg-slate-50/80 rounded-2xl">
-                                
-                                <!-- Left: Foto Profil & Info Pegawai -->
-                                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                                    <div class="relative flex-shrink-0">
+                        <!-- Grid Kartu Karyawan (Fokus Foto + Nama) -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-3 p-1">
+                            <template x-for="item in branch.attendances" :key="item.id">
+                                <div 
+                                    :class="item.has_checkout 
+                                        ? 'bg-slate-50/90 border-slate-200/60 opacity-80' 
+                                        : 'bg-white border-slate-200/90 shadow-xs hover:shadow-sm hover:border-emerald-300'"
+                                    class="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 text-center relative group"
+                                >
+                                    <!-- Avatar with Ring & Dot Status -->
+                                    <div class="relative mb-2 flex-shrink-0">
                                         <template x-if="item.foto_profile">
                                             <img 
                                                 :src="item.foto_profile" 
                                                 :alt="item.nama" 
                                                 x-on:error="item.foto_profile = null"
-                                                :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
-                                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover p-0.5 bg-white transition"
+                                                :class="item.has_checkout 
+                                                    ? 'ring-2 ring-slate-300 grayscale-[25%]' 
+                                                    : 'ring-2 ring-emerald-500 ring-offset-1'"
+                                                class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover p-0.5 bg-white shadow-xs transition"
                                             >
                                         </template>
                                         <template x-if="!item.foto_profile">
                                             <div 
-                                                :class="item.has_checkout ? 'bg-slate-400 ring-2 ring-slate-300 opacity-75' : 'bg-primary ring-2 ring-emerald-500 shadow-xs'"
-                                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center font-bold text-xs sm:text-sm transition" 
+                                                :class="item.has_checkout 
+                                                    ? 'bg-slate-400 ring-2 ring-slate-300' 
+                                                    : 'bg-primary ring-2 ring-emerald-500 ring-offset-1'"
+                                                class="w-12 h-12 sm:w-14 sm:h-14 rounded-full text-white flex items-center justify-center font-black text-sm sm:text-base shadow-xs transition" 
                                                 x-text="item.nama.substring(0, 1).toUpperCase()">
                                             </div>
                                         </template>
 
-                                        <!-- Dot status -->
-                                        <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                                        <!-- Dot status badge -->
+                                        <span class="absolute bottom-0 right-0 flex h-3.5 w-3.5">
                                             <template x-if="!item.has_checkout">
-                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500 border-2 border-white"></span>
+                                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
                                             </template>
                                             <template x-if="item.has_checkout">
-                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-slate-400 border-2 border-white"></span>
+                                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-slate-400 border-2 border-white"></span>
                                             </template>
                                         </span>
                                     </div>
 
-                                    <div class="min-w-0">
-                                        <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-xs sm:text-sm truncate leading-tight" x-text="item.nama"></h4>
-                                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">
-                                            <span x-text="item.divisi"></span>
-                                            <span class="text-slate-300">&bull;</span>
-                                            <span x-text="item.jabatan"></span>
-                                            <span class="text-slate-300">&bull;</span>
-                                            <span class="font-bold text-slate-600" x-text="item.waktu + ' WIB'"></span>
-                                        </div>
+                                    <!-- Nama Pegawai (Fokus Utama) -->
+                                    <h4 
+                                        :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" 
+                                        class="text-xs sm:text-sm leading-tight line-clamp-1 w-full px-1 tracking-tight" 
+                                        x-text="item.nama"
+                                        :title="item.nama"
+                                    ></h4>
+
+                                    <!-- Mini Badge Waktu Check In / Out -->
+                                    <div class="mt-1 flex items-center justify-center">
+                                        <span 
+                                            :class="item.has_checkout 
+                                                ? 'text-slate-500 bg-slate-100' 
+                                                : (item.status_kehadiran === 'Terlambat' ? 'text-[#B42318] bg-[#FFF4F2]' : 'text-[#027A48] bg-[#ECFDF3]')"
+                                            class="text-[10px] font-bold px-1.5 py-0.5 rounded-md leading-none" 
+                                            x-text="item.waktu + ' WIB'"
+                                        ></span>
                                     </div>
                                 </div>
-
-                                <!-- Right: Status Mode & Kehadiran -->
-                                <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                                    <template x-if="!item.has_checkout">
-                                        <span :class="item.status_kehadiran === 'Terlambat' ? 'bg-[#FFF4F2] text-[#B42318] border-[#FECDCA]' : 'bg-[#ECFDF3] text-[#027A48] border-[#A6F4C5]'"
-                                            class="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-xs" x-text="item.status_kehadiran">
-                                        </span>
-                                    </template>
-                                    <template x-if="item.has_checkout">
-                                        <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                            Pulang
-                                        </span>
-                                    </template>
-                                    <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="item.skema"></span>
-                                </div>
-
-                            </div>
-                        </template>
+                            </template>
+                        </div>
 
                         <!-- Empty State -->
                         <div x-show="branch.attendances.length === 0" class="flex flex-col items-center justify-center h-48 text-center px-4 py-8">
