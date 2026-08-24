@@ -17,9 +17,7 @@ class TvDashboardController extends Controller
      */
     public function index(Request $request)
     {
-        // Default to current date, but allow ?date=YYYY-MM-DD for demo/testing
         $date = $request->query('date', now()->toDateString());
-        // Branch filter: 'all', 'sulaksana', 'cikawao'
         $cabang = strtolower($request->query('cabang', 'all'));
         
         $data = $this->fetchStats($date, $cabang);
@@ -48,7 +46,7 @@ class TvDashboardController extends Controller
     }
 
     /**
-     * Helper method to query stats and live check-ins for a specific date and branch.
+     * Helper method to query stats and live check-ins for a specific date and branch dynamically.
      *
      * @param  string  $date
      * @param  string  $cabang
@@ -56,7 +54,13 @@ class TvDashboardController extends Controller
      */
     private function fetchStats($date, $cabang = 'all')
     {
-        // 1. Total Pegawai (Aktif)
+        // 1. Fetch dynamic list of branches from database
+        $branches = DB::table('lokasi_kantor')->get(['lokasi_id', 'nama_kantor', 'latitude', 'longitude', 'radius_meter']);
+
+        // Fetch registered office Wi-Fis linked to locations
+        $officeWifis = DB::table('wifi_kantor')->whereNotNull('lokasi_id')->where('aktif', true)->get();
+
+        // 2. Total Pegawai (Aktif)
         $totalPegawai = DB::table('pegawai')
             ->where(function ($query) {
                 $query->where('status', 'Aktif')
@@ -65,7 +69,7 @@ class TvDashboardController extends Controller
             })
             ->count();
 
-        // 2. Fetch all raw attendance records for the date
+        // 3. Fetch all raw attendance records for the date
         $allAttendances = DB::table('absensi')
             ->join('pegawai', 'absensi.pegawai_id', '=', 'pegawai.pegawai_id')
             ->leftJoin('master_divisi', 'pegawai.divisi_id', '=', 'master_divisi.divisi_id')
@@ -93,41 +97,61 @@ class TvDashboardController extends Controller
             ->orderByRaw('COALESCE(absensi.jam_checkout, absensi.jam_checkin) DESC')
             ->get();
 
-        // 3. Map records with cabang determination (Sulaksana / Cikawao / Remote)
-        $mappedAttendances = $allAttendances->map(function ($item) {
+        // 4. Map records with dynamic branch determination
+        $mappedAttendances = $allAttendances->map(function ($item) use ($branches, $officeWifis) {
             $catatan = strtolower($item->catatan ?? '');
             
-            // Deteksi cabang berdasarkan SSID Wi-Fi kantor
-            $branch = 'sulaksana'; // default
-            $branchLabel = 'Kantor Sulaksana';
-            
-            if (str_contains($catatan, 'ideahub') || str_contains($catatan, 'cikawao')) {
-                $branch = 'cikawao';
-                $branchLabel = 'Kantor Cikawao';
-            } elseif (str_contains($catatan, 'sip') || str_contains($catatan, 'sulaksana')) {
-                $branch = 'sulaksana';
-                $branchLabel = 'Kantor Sulaksana';
-            } else {
-                // Cek koordinat GPS jika ada
-                if ($item->latitude && $item->longitude) {
-                    $lat = (float) $item->latitude;
-                    $long = (float) $item->longitude;
-                    $distCikawao = sqrt(pow($lat - (-6.927558), 2) + pow($long - 107.614570, 2));
-                    $distSulaksana = sqrt(pow($lat - (-6.910194), 2) + pow($long - 107.650728, 2));
-                    if ($distCikawao < $distSulaksana && $distCikawao < 0.01) {
-                        $branch = 'cikawao';
-                        $branchLabel = 'Kantor Cikawao';
-                    } elseif ($distSulaksana < 0.01) {
-                        $branch = 'sulaksana';
-                        $branchLabel = 'Kantor Sulaksana';
-                    } elseif (in_array(strtoupper($item->skema_kerja ?? ''), ['WFH', 'WFC'])) {
-                        $branch = 'remote';
-                        $branchLabel = 'Remote (WFH/WFC)';
-                    }
-                } elseif (in_array(strtoupper($item->skema_kerja ?? ''), ['WFH', 'WFC'])) {
-                    $branch = 'remote';
-                    $branchLabel = 'Remote (WFH/WFC)';
+            $matchedLocationId = null;
+            $matchedLocationName = 'Remote';
+
+            // A. Check Wi-Fi match first
+            foreach ($officeWifis as $wifi) {
+                if (!empty($wifi->ssid) && str_contains($catatan, strtolower($wifi->ssid))) {
+                    $matchedLocationId = $wifi->lokasi_id;
+                    break;
                 }
+            }
+
+            // B. If not matched by Wi-Fi, check Geo-Location coordinates against all branches
+            if (!$matchedLocationId && $item->latitude && $item->longitude) {
+                $lat = (float) $item->latitude;
+                $long = (float) $item->longitude;
+
+                $closestDist = PHP_FLOAT_MAX;
+                $closestBranch = null;
+
+                foreach ($branches as $branch) {
+                    if ($branch->latitude && $branch->longitude) {
+                        $bLat = (float) $branch->latitude;
+                        $bLong = (float) $branch->longitude;
+                        $dist = sqrt(pow($lat - $bLat, 2) + pow($long - $bLong, 2));
+                        if ($dist < $closestDist) {
+                            $closestDist = $dist;
+                            $closestBranch = $branch;
+                        }
+                    }
+                }
+
+                if ($closestBranch && $closestDist < 0.05) {
+                    $matchedLocationId = $closestBranch->lokasi_id;
+                }
+            }
+
+            // C. Fallback for WFO / WFH
+            if (!$matchedLocationId) {
+                if (in_array(strtoupper($item->skema_kerja ?? ''), ['WFH', 'WFC'])) {
+                    $matchedLocationId = 'remote';
+                    $matchedLocationName = 'Remote (WFH/WFC)';
+                } else {
+                    // Default WFO to first branch
+                    $matchedLocationId = $branches->first()?->lokasi_id ?? 1;
+                }
+            }
+
+            // Resolve name
+            if ($matchedLocationId !== 'remote') {
+                $found = $branches->firstWhere('lokasi_id', $matchedLocationId);
+                $matchedLocationName = $found ? $found->nama_kantor : 'Kantor Cabang';
             }
 
             $hasCheckOut = !empty($item->jam_checkout);
@@ -147,7 +171,7 @@ class TvDashboardController extends Controller
             $skema = strtoupper($item->skema_kerja ?? 'WFO');
             if ($skema === 'WFO') {
                 $skemaLabel = 'Work From Office';
-                $lokasi = $branchLabel;
+                $lokasi = $matchedLocationName;
             } elseif ($skema === 'WFH') {
                 $skemaLabel = 'Work From Home';
                 $lokasi = 'Rumah';
@@ -187,8 +211,8 @@ class TvDashboardController extends Controller
                 'has_checkout' => $hasCheckOut,
                 'skema' => $skema,
                 'skema_label' => $skemaLabel,
-                'cabang' => $branch,
-                'cabang_label' => $branchLabel,
+                'cabang_id' => (string)$matchedLocationId,
+                'cabang_label' => $matchedLocationName,
                 'lokasi' => $lokasi,
                 'status_kehadiran' => $statusKehadiran,
                 'status_kerja' => $hasCheckOut ? 'Sudah Pulang' : 'Sedang Bekerja',
@@ -213,15 +237,22 @@ class TvDashboardController extends Controller
             ];
         });
 
-        // Filter list based on selected cabang ('all', 'sulaksana', 'cikawao')
+        // Filter list based on selected cabang ('all', or numeric ID, or slug)
         $filteredList = $mappedAttendances;
-        if ($cabang === 'sulaksana') {
-            $filteredList = $mappedAttendances->filter(fn($i) => $i['cabang'] === 'sulaksana')->values();
-        } elseif ($cabang === 'cikawao') {
-            $filteredList = $mappedAttendances->filter(fn($i) => $i['cabang'] === 'cikawao')->values();
+        if ($cabang !== 'all') {
+            $filteredList = $mappedAttendances->filter(function ($i) use ($cabang, $branches) {
+                if ((string)$i['cabang_id'] === (string)$cabang) {
+                    return true;
+                }
+                $found = $branches->firstWhere('lokasi_id', $i['cabang_id']);
+                if ($found && str_contains(strtolower($found->nama_kantor), strtolower($cabang))) {
+                    return true;
+                }
+                return false;
+            })->values();
         }
 
-        // Summary counts based on filtered branch or total
+        // Summary counts
         $totalHadir = $filteredList->pluck('pegawai_id')->unique()->count();
         $sedangBekerja = $filteredList->where('has_checkout', false)->pluck('pegawai_id')->unique()->count();
         $sudahCheckOut = $filteredList->where('has_checkout', true)->pluck('pegawai_id')->unique()->count();
@@ -247,11 +278,11 @@ class TvDashboardController extends Controller
         if ($cabang === 'all') {
             $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
         } else {
-            // For branch view, show total not yet in this branch
             $belumHadir = max(0, $totalPegawai - $totalHadir);
         }
 
         return [
+            'branches' => $branches,
             'totalPegawai' => $totalPegawai,
             'totalHadir' => $totalHadir,
             'sedangBekerja' => $sedangBekerja,

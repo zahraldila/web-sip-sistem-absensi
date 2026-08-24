@@ -32,15 +32,125 @@ class AdminPlaceholderController extends Controller
         return view('admin.placeholder', ['title' => 'Log Aktivitas']);
     }
 
-    public function tampilanBranding()
+    public function tampilanBranding(Request $request)
     {
         try {
             $savedColor = \App\Models\Setting::get('primary_color', '#123D91');
             $savedLogo  = company_logo_url();
-            return view('admin.settings.branding', compact('savedColor', 'savedLogo'));
+            $activeTab  = $request->query('tab', 'branding');
+
+            $daftarLokasi = \Illuminate\Support\Facades\DB::table('lokasi_kantor')->get();
+            foreach ($daftarLokasi as $lokasi) {
+                $lokasi->wifis = \Illuminate\Support\Facades\DB::table('wifi_kantor')
+                    ->where('lokasi_id', $lokasi->lokasi_id)
+                    ->get();
+            }
+
+            return view('admin.settings.branding', compact('savedColor', 'savedLogo', 'daftarLokasi', 'activeTab'));
         } catch (\Exception $e) {
-            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings. Terjadi masalah koneksi ke database.');
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings. Terjadi masalah koneksi ke database: ' . $e->getMessage());
         }
+    }
+
+    public function simpanLokasi(Request $request)
+    {
+        $request->validate([
+            'lokasi_id'     => 'nullable|integer',
+            'nama_kantor'   => 'required|string|max:100',
+            'latitude'      => 'required|numeric',
+            'longitude'     => 'required|numeric',
+            'radius_meter'  => 'required|numeric|min:1',
+            'wifi_ssids'    => 'nullable|string',
+        ]);
+
+        $lokasiId = $request->input('lokasi_id');
+        $namaKantor = trim($request->input('nama_kantor'));
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        $radiusMeter = $request->input('radius_meter');
+
+        if ($lokasiId) {
+            // Update existing
+            \Illuminate\Support\Facades\DB::table('lokasi_kantor')
+                ->where('lokasi_id', $lokasiId)
+                ->update([
+                    'nama_kantor'  => $namaKantor,
+                    'latitude'     => $latitude,
+                    'longitude'    => $longitude,
+                    'radius_meter' => $radiusMeter,
+                ]);
+            $msg = "Kantor cabang '{$namaKantor}' berhasil diperbarui.";
+            $actionLog = "Memperbarui lokasi kantor cabang '{$namaKantor}'";
+        } else {
+            // Insert new
+            $lokasiId = \Illuminate\Support\Facades\DB::table('lokasi_kantor')
+                ->insertGetId([
+                    'nama_kantor'  => $namaKantor,
+                    'latitude'     => $latitude,
+                    'longitude'    => $longitude,
+                    'radius_meter' => $radiusMeter,
+                ], 'lokasi_id');
+            $msg = "Kantor cabang '{$namaKantor}' berhasil ditambahkan.";
+            $actionLog = "Menambahkan lokasi kantor cabang baru '{$namaKantor}'";
+        }
+
+        // Process Wi-Fi SSIDs if provided
+        if ($request->filled('wifi_ssids')) {
+            $rawSsids = explode(',', $request->input('wifi_ssids'));
+            foreach ($rawSsids as $rawSsid) {
+                $trimmed = trim($rawSsid);
+                if (!empty($trimmed)) {
+                    $existing = \Illuminate\Support\Facades\DB::table('wifi_kantor')
+                        ->where('ssid', $trimmed)
+                        ->first();
+                    if ($existing) {
+                        \Illuminate\Support\Facades\DB::table('wifi_kantor')
+                            ->where('wifi_id', $existing->wifi_id)
+                            ->update(['lokasi_id' => $lokasiId, 'aktif' => true]);
+                    } else {
+                        $randomHex = substr(md5($trimmed), 0, 12);
+                        $formattedBssid = implode(':', str_split($randomHex, 2));
+                        
+                        \Illuminate\Support\Facades\DB::table('wifi_kantor')->insert([
+                            'lokasi_id' => $lokasiId,
+                            'ssid'      => $trimmed,
+                            'bssid'     => $formattedBssid,
+                            'aktif'     => true,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Catat audit log
+        $user = Auth::user();
+        if ($user && $user->akun_id) {
+            logHelpers::record($user->akun_id, $actionLog);
+        }
+
+        return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
+            ->with('success', $msg);
+    }
+
+    public function hapusLokasi($id)
+    {
+        $lokasi = \Illuminate\Support\Facades\DB::table('lokasi_kantor')->where('lokasi_id', $id)->first();
+        if ($lokasi) {
+            // Unlink or delete associated wifi
+            \Illuminate\Support\Facades\DB::table('wifi_kantor')->where('lokasi_id', $id)->update(['lokasi_id' => null]);
+            \Illuminate\Support\Facades\DB::table('lokasi_kantor')->where('lokasi_id', $id)->delete();
+
+            $user = Auth::user();
+            if ($user && $user->akun_id) {
+                logHelpers::record($user->akun_id, "Menghapus lokasi kantor cabang '{$lokasi->nama_kantor}'");
+            }
+
+            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
+                ->with('success', "Kantor cabang '{$lokasi->nama_kantor}' berhasil dihapus.");
+        }
+
+        return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
+            ->with('error', 'Kantor cabang tidak ditemukan.');
     }
 
     public function simpanBranding(Request $request)

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $dbConnectionCodes = ['08000', '08003', '08006', '08001', '08004', 'HY000'];
 
         $exceptions->render(function (QueryException $e, Request $request) use ($dbConnectionCodes) {
-            $sqlState = $e->getSqlState() ?? '';
+            $sqlState = (string) ($e->getCode() ?? '');
             $message  = strtolower($e->getMessage());
 
             // Detect connection-level failures (not query logic errors)

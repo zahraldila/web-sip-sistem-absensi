@@ -47,7 +47,7 @@
 <body class="bg-[#F4F6F9] min-h-screen text-slate-800 flex flex-col antialiased" x-data="tvDashboard('{{ $selectedDate }}', '{{ $selectedCabang }}')">
 
     {{-- ===================================================== --}}
-    {{-- HEADER WITH RESPONSIVE MULTI-BRANCH TAB SWITCHER --}}
+    {{-- HEADER WITH DYNAMIC MULTI-BRANCH TAB SWITCHER --}}
     {{-- ===================================================== --}}
     <header class="bg-white sticky top-0 z-40 border-b border-slate-200">
         <div class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
@@ -73,7 +73,7 @@
                     </div>
                 </div>
 
-                <!-- Clock for Mobile Screen only (visible on small screens) -->
+                <!-- Clock for Mobile Screen only -->
                 <div class="text-right md:hidden">
                     <div class="text-xl font-extrabold text-slate-900 tracking-tight leading-none" x-text="clockTime">
                         00:00:00
@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <!-- Center: Multi-Cabang Interactive Tab Switcher (Scrollable on mobile) -->
+            <!-- Center: Dynamic Multi-Cabang Interactive Tab Switcher (From Database) -->
             <div class="flex items-center bg-slate-100/90 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-inner overflow-x-auto no-scrollbar max-w-full">
                 <!-- Tab: Semua Cabang -->
                 <button type="button" 
@@ -95,23 +95,16 @@
                     <span>Semua Cabang</span>
                 </button>
 
-                <!-- Tab: Kantor Sulaksana (WiFi SIP) -->
-                <button type="button" 
-                    @click="setCabang('sulaksana')" 
-                    :class="cabang === 'sulaksana' ? 'bg-white text-emerald-700 shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
-                    class="px-3 sm:px-3.5 py-1.5 rounded-lg sm:rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
-                    <i class="fa-solid fa-building text-xs text-emerald-600"></i>
-                    <span>Sulaksana</span>
-                </button>
-
-                <!-- Tab: Kantor Cikawao (WiFi Ideahub) -->
-                <button type="button" 
-                    @click="setCabang('cikawao')" 
-                    :class="cabang === 'cikawao' ? 'bg-white text-blue-700 shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
-                    class="px-3 sm:px-3.5 py-1.5 rounded-lg sm:rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
-                    <i class="fa-solid fa-location-dot text-xs text-blue-600"></i>
-                    <span>Cikawao</span>
-                </button>
+                <!-- Dynamic Branch Tabs from Database -->
+                <template x-for="b in branches" :key="b.lokasi_id">
+                    <button type="button" 
+                        @click="setCabang(b.lokasi_id.toString())" 
+                        :class="cabang === b.lokasi_id.toString() || cabang.toLowerCase() === b.nama_kantor.toLowerCase() ? 'bg-white text-primary shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
+                        class="px-3 sm:px-3.5 py-1.5 rounded-lg sm:rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                        <i class="fa-solid fa-building text-xs text-primary"></i>
+                        <span x-text="b.nama_kantor"></span>
+                    </button>
+                </template>
             </div>
 
             <!-- Right Info & Clock (Desktop / Tablet view) -->
@@ -353,7 +346,7 @@
                                     <span class="text-slate-300">&bull;</span>
                                     <span x-text="item.jabatan"></span>
                                     <span x-show="cabang === 'all'" class="text-slate-300">&bull;</span>
-                                    <span x-show="cabang === 'all'" class="text-[9px] sm:text-[10px] font-bold text-primary" x-text="item.cabang === 'sulaksana' ? 'Sulaksana' : (item.cabang === 'cikawao' ? 'Cikawao' : 'Remote')"></span>
+                                    <span x-show="cabang === 'all'" class="text-[9px] sm:text-[10px] font-bold text-primary" x-text="item.cabang_label"></span>
                                 </div>
                             </div>
                         </div>
@@ -384,7 +377,7 @@
     </main>
 
     {{-- ===================================================== --}}
-    {{-- POPUP MODAL (CHECK IN / CHECK OUT LIVE ALERT - FULLY RESPONSIVE) --}}
+    {{-- POPUP MODAL (CHECK IN / CHECK OUT LIVE ALERT) --}}
     {{-- ===================================================== --}}
     <div 
         x-show="showModal" 
@@ -529,6 +522,7 @@
             Alpine.data('tvDashboard', (selectedDate, selectedCabang = 'all') => ({
                 date: selectedDate,
                 cabang: selectedCabang || 'all',
+                branches: @json($branches) || [],
                 isDemo: selectedDate !== new Date().toISOString().split('T')[0],
                 totalPegawai: {{ $totalPegawai }},
                 totalHadir: {{ $totalHadir }},
@@ -552,15 +546,15 @@
                 autoScrollTimer: null,
 
                 get cabangTitle() {
-                    if (this.cabang === 'sulaksana') return 'Kantor Sulaksana';
-                    if (this.cabang === 'cikawao') return 'Kantor Cikawao';
-                    return 'Semua Cabang';
+                    if (this.cabang === 'all') return 'Semua Cabang';
+                    const found = this.branches.find(b => b.lokasi_id.toString() === this.cabang.toString() || b.nama_kantor.toLowerCase() === this.cabang.toLowerCase());
+                    return found ? found.nama_kantor : 'Kantor Cabang';
                 },
 
                 get cabangShortTitle() {
-                    if (this.cabang === 'sulaksana') return 'Sulaksana';
-                    if (this.cabang === 'cikawao') return 'Cikawao';
-                    return 'Semua';
+                    if (this.cabang === 'all') return 'Semua';
+                    const found = this.branches.find(b => b.lokasi_id.toString() === this.cabang.toString() || b.nama_kantor.toLowerCase() === this.cabang.toLowerCase());
+                    return found ? found.nama_kantor : 'Cabang';
                 },
 
                 init() {
@@ -661,6 +655,9 @@
                             this.wfhCount = data.wfhCount;
                             this.sakitCount = data.sakitCount;
                             this.belumHadir = data.belumHadir;
+                            if (data.branches) {
+                                this.branches = data.branches;
+                            }
                             
                             if (data.liveCheckIns && data.liveCheckIns.length > 0) {
                                 const newActivities = [];
