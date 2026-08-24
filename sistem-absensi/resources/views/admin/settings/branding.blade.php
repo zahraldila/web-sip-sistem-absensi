@@ -356,9 +356,6 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-extrabold text-slate-900 leading-tight">{{ $lokasi->nama_kantor }}</h3>
-                                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 mt-1 inline-block">
-                                    ID Cabang: {{ $lokasi->lokasi_id }}
-                                </span>
                             </div>
                         </div>
                     </div>
