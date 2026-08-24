@@ -51,6 +51,7 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
     Route::post('/tampilan-branding/logo', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanLogo'])->name('admin.tampilan-branding.logo');
     Route::post('/settings/lokasi/simpan', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanLokasi'])->name('admin.settings.lokasi.simpan');
     Route::delete('/settings/lokasi/{id}', [App\Http\Controllers\AdminPlaceholderController::class, 'hapusLokasi'])->name('admin.settings.lokasi.hapus');
+    Route::post('/settings/lokasi/hapus/{id}', [App\Http\Controllers\AdminPlaceholderController::class, 'hapusLokasi'])->name('admin.settings.lokasi.hapus.post');
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');
     Route::get('/bantuan', [App\Http\Controllers\AdminPlaceholderController::class, 'bantuan'])->name('admin.bantuan');
     Route::get('/chart-statistik', [App\Http\Controllers\DashboardControllers::class, 'chartStatistik'])->name('admin.chart-statistik');

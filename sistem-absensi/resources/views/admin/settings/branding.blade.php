@@ -452,9 +452,9 @@
                     Apakah Anda yakin ingin menghapus kantor cabang <strong class="text-slate-800 font-bold" x-text="deleteLokasiData.nama"></strong>? Seluruh tautan Wi-Fi terkait akan dilepaskan dan tindakan ini tidak dapat dibatalkan.
                 </p>
 
-                <form :action="'/admin/settings/lokasi/' + deleteLokasiData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
+                <form id="deleteLokasiForm" :action="'/admin/settings/lokasi/' + deleteLokasiData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
                     @csrf
-                    @method('DELETE')
+                    <input type="hidden" name="_method" value="DELETE">
                     <button type="button" @click="showDeleteLokasiModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
                         Batal
                     </button>
