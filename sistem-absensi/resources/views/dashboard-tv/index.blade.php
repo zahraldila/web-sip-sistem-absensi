@@ -25,7 +25,7 @@
         }
         /* Custom scrollbar style */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
@@ -98,9 +98,9 @@
                     </p>
                 </div>
                 <div class="hidden sm:flex items-center gap-3 text-xs font-semibold text-slate-600 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Sedang Bekerja</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Check In (Aktif)</span>
                     <span class="h-3 w-px bg-slate-200"></span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Sudah Pulang</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Check Out (Pulang)</span>
                     <span class="h-3 w-px bg-slate-200"></span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Belum Hadir</span>
                 </div>
@@ -113,7 +113,7 @@
                 <div class="bg-white rounded-[2rem] p-6 sm:p-7 border border-slate-200/70 shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="bg-[#E6F4EA] w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center relative">
+                            <div class="bg-[#E6F4EA] w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center relative flex-shrink-0">
                                 <i class="fa-solid fa-user-check text-2xl sm:text-3xl text-emerald-600"></i>
                                 <span class="absolute -top-1 -right-1 flex h-4 w-4">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -125,7 +125,7 @@
                                     {{ $totalHadir }}
                                 </div>
                                 <div class="text-slate-500 text-sm sm:text-base font-bold mt-0.5">
-                                    Total Hadir Hari Ini
+                                    Total Pegawai Hadir
                                 </div>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                     
                     <!-- Sub Breakdown: Sedang Bekerja vs Sudah Pulang -->
                     <div class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
-                        <div class="bg-emerald-50/60 rounded-xl p-3 border border-emerald-100">
+                        <div class="bg-emerald-50/70 rounded-xl p-3 border border-emerald-100">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
                                     <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -145,14 +145,14 @@
                             </div>
                         </div>
 
-                        <div class="bg-blue-50/60 rounded-xl p-3 border border-blue-100">
+                        <div class="bg-slate-100/70 rounded-xl p-3 border border-slate-200">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
-                                    <span class="h-2 w-2 rounded-full bg-blue-500"></span>
-                                    Sudah Pulang
+                                <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+                                    Sudah Check Out
                                 </span>
                             </div>
-                            <div class="text-2xl font-black text-blue-700 mt-1" x-text="sudahCheckOut">
+                            <div class="text-2xl font-black text-slate-700 mt-1" x-text="sudahCheckOut">
                                 {{ $sudahCheckOut }}
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                 <!-- Belum Hadir Card -->
                 <div class="bg-white rounded-[2rem] p-6 sm:p-7 border border-slate-200/70 shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-md">
                     <div class="flex items-center gap-4">
-                        <div class="bg-[#FCE8E6] w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center relative">
+                        <div class="bg-[#FCE8E6] w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center relative flex-shrink-0">
                             <i class="fa-solid fa-user-xmark text-2xl sm:text-3xl text-rose-600"></i>
                         </div>
                         <div>
@@ -177,7 +177,7 @@
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
                         <div class="bg-rose-50/50 rounded-xl p-3 border border-rose-100 flex items-center justify-between">
-                            <span class="text-xs font-semibold text-rose-700">Total Karyawan Aktif</span>
+                            <span class="text-xs font-semibold text-rose-700">Total Karyawan Terdaftar</span>
                             <span class="text-sm font-bold text-slate-800" x-text="totalPegawai + ' Orang'">{{ $totalPegawai }} Orang</span>
                         </div>
                     </div>
@@ -237,78 +237,79 @@
 
         </section>
 
-        <!-- Right Side: Live Aktivitas Kehadiran (1/3 width) -->
-        <section class="bg-white rounded-[2rem] p-6 border border-slate-200/60 shadow-sm flex flex-col h-[calc(100vh-10rem)]">
+        <!-- Right Side: Daftar Pegawai Hadir (1/3 width - 1 Kolom Bersih + Auto-Scroll Cerdas) -->
+        <section class="bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-200/60 shadow-sm flex flex-col h-[calc(100vh-10rem)]">
             
             <!-- Panel Header -->
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <span class="text-slate-900 font-bold flex items-center gap-2 text-lg">
-                        <span class="flex h-3 w-3 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                        </span>
-                        Live Aktivitas Kehadiran
-                    </span>
+            <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
+                <div>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                        <span>Daftar Pegawai Hadir</span>
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1 text-[11px] font-semibold text-slate-500">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Check In</span>
+                        <span class="text-slate-300">&bull;</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Check Out</span>
+                    </div>
                 </div>
-                <span class="text-xs font-semibold text-slate-400" x-text="liveCheckIns.length + ' Aktivitas'"></span>
+                <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200" x-text="liveCheckIns.length + ' Pegawai'"></span>
             </div>
 
-            <!-- List Body -->
-            <div class="flex-1 overflow-y-auto pr-1 mt-3 custom-scrollbar divide-y divide-slate-100">
+            <!-- List Body: 1 Column Sleek List with Auto-Scroll -->
+            <div id="attendance-list-container" class="flex-1 overflow-y-auto pr-1 mt-2.5 custom-scrollbar divide-y divide-slate-100">
                 
-                <!-- Loop Active Feed -->
+                <!-- Loop Pegawai Hadir -->
                 <template x-for="item in liveCheckIns" :key="item.id">
-                    <div class="py-3.5 flex items-center justify-between gap-3 transition hover:bg-slate-50/50 rounded-xl px-1">
+                    <div class="py-2.5 px-1.5 flex items-center justify-between gap-3 transition hover:bg-slate-50/70 rounded-xl">
                         
-                        <!-- Left Info (Avatar, Name, Time, Scheme) -->
-                        <div class="flex items-center gap-3.5 min-w-0">
-                            <!-- Avatar with Status Dot -->
+                        <!-- Left: Foto Profil & Lingkaran Indikator -->
+                        <div class="flex items-center gap-3 min-w-0">
+                            
                             <div class="relative flex-shrink-0">
                                 <template x-if="item.foto_profile">
                                     <img 
                                         :src="item.foto_profile" 
                                         :alt="item.nama" 
                                         @@error="item.foto_profile = null"
-                                        class="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-sm"
+                                        :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
+                                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover p-0.5 bg-white transition"
                                     >
                                 </template>
                                 <template x-if="!item.foto_profile">
-                                    <div class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base shadow-sm" x-text="item.nama.substring(0, 1).toUpperCase()">
+                                    <div 
+                                        :class="item.has_checkout ? 'bg-slate-400 ring-2 ring-slate-300 opacity-75' : 'bg-primary ring-2 ring-emerald-500 shadow-xs'"
+                                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center font-bold text-xs sm:text-sm transition" 
+                                        x-text="item.nama.substring(0, 1).toUpperCase()">
                                     </div>
                                 </template>
 
-                                <!-- Status Badge Indicator Dot on Avatar -->
-                                <span class="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
-                                    <span :class="item.has_checkout ? 'bg-blue-500' : 'bg-emerald-500'" class="relative inline-flex rounded-full h-3.5 w-3.5 border-2 border-white"></span>
+                                <!-- Dot Status -->
+                                <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                                    <template x-if="!item.has_checkout">
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
+                                    </template>
+                                    <template x-if="item.has_checkout">
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-slate-400 border-2 border-white"></span>
+                                    </template>
                                 </span>
                             </div>
 
+                            <!-- Nama & Divisi/Jabatan -->
                             <div class="min-w-0">
-                                <h4 class="font-extrabold text-slate-900 text-sm truncate" x-text="item.nama"></h4>
-                                <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
-                                    <span class="font-semibold text-slate-700" x-text="item.skema"></span>
-                                    <span class="h-2.5 w-px bg-slate-300"></span>
-                                    <span x-text="item.has_checkout ? 'Pulang: ' + item.jam_checkout : 'Masuk: ' + item.jam_checkin"></span>
+                                <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-xs sm:text-sm truncate" x-text="item.nama"></h4>
+                                <div class="flex items-center gap-1.5 text-[11px] text-slate-400 truncate mt-0.5">
+                                    <span x-text="item.divisi"></span>
+                                    <span class="text-slate-300">&bull;</span>
+                                    <span x-text="item.jabatan"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Info: Kontras Badge Check In vs Check Out -->
-                        <div class="flex-shrink-0 text-right">
-                            <template x-if="!item.has_checkout">
-                                <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full shadow-xs">
-                                    <i class="fa-solid fa-circle text-[6px] text-emerald-500 animate-pulse"></i>
-                                    <span>Sedang Bekerja</span>
-                                </span>
-                            </template>
-
-                            <template x-if="item.has_checkout">
-                                <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full shadow-xs">
-                                    <i class="fa-solid fa-arrow-right-from-bracket text-[10px] text-blue-600"></i>
-                                    <span>Sudah Pulang</span>
-                                </span>
-                            </template>
+                        <!-- Right: Label Mode Kerja -->
+                        <div class="flex-shrink-0">
+                            <span :class="item.has_checkout ? 'bg-slate-100 text-slate-500 border-slate-200' : (item.skema === 'WFO' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200')"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase" x-text="item.skema">
+                            </span>
                         </div>
 
                     </div>
@@ -316,11 +317,11 @@
 
                 <!-- Empty State -->
                 <div x-show="liveCheckIns.length === 0" class="flex flex-col items-center justify-center h-48 text-center px-4 py-8">
-                    <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-3 text-slate-300">
-                        <i class="fa-regular fa-clock text-2xl"></i>
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-2.5 text-slate-300">
+                        <i class="fa-regular fa-clock text-xl"></i>
                     </div>
-                    <h5 class="text-sm font-bold text-slate-600">Belum ada aktivitas</h5>
-                    <p class="text-xs text-slate-400 mt-1">Aktivitas Check-In dan Check-Out hari ini akan muncul di sini.</p>
+                    <h5 class="text-xs sm:text-sm font-bold text-slate-600">Belum ada pegawai hadir</h5>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Pegawai yang sudah check-in akan otomatis tampil di sini.</p>
                 </div>
 
             </div>
@@ -354,11 +355,10 @@
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
-            <!-- Modal Left Side (Status Icon & Status Message) -->
+            <!-- Modal Left Side -->
             <div class="flex-1 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-8">
                 
-                <!-- Dynamic Big Icon: Check In (Green) vs Check Out (Blue) -->
-                <div :class="modalData.tipe === 'checkout' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'"
+                <div :class="modalData.tipe === 'checkout' ? 'bg-slate-100 text-slate-700 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-100'"
                     class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl flex items-center justify-center relative shadow-sm border">
                     <template x-if="modalData.tipe !== 'checkout'">
                         <i class="fa-solid fa-check text-5xl animate-bounce"></i>
@@ -383,19 +383,17 @@
                         </span>
                     </template>
                     <template x-if="modalData.tipe === 'checkout'">
-                        <span class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 font-extrabold px-5 py-2.5 rounded-full text-sm shadow-xs">
-                            <i class="fa-solid fa-circle-check text-blue-500"></i>
+                        <span class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 border border-slate-200 font-extrabold px-5 py-2.5 rounded-full text-sm shadow-xs">
+                            <i class="fa-solid fa-circle-check text-slate-500"></i>
                             <span>Sudah Pulang</span>
                         </span>
                     </template>
                 </div>
             </div>
 
-            <!-- Modal Right Side (Employee & Activity Details) -->
+            <!-- Modal Right Side -->
             <div class="flex-[1.2] flex flex-col justify-center">
-                <!-- Employee Header info -->
                 <div class="flex items-center gap-4">
-                    <!-- Avatar -->
                     <template x-if="modalData.foto_profile">
                         <img 
                             :src="modalData.foto_profile" 
@@ -412,7 +410,7 @@
                     <div class="min-w-0">
                         <h4 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight truncate" x-text="modalData.nama"></h4>
                         <div class="flex items-center gap-2 mt-1">
-                            <span :class="modalData.tipe === 'checkout' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
+                            <span :class="modalData.tipe === 'checkout' ? 'bg-slate-100 text-slate-700 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
                                 class="text-[11px] font-black px-2.5 py-0.5 rounded-full border uppercase tracking-wider" x-text="modalData.tipe === 'checkout' ? 'Check Out' : 'Check In'">
                             </span>
                             <span class="text-xs font-semibold text-slate-500" x-text="modalData.skema_label"></span>
@@ -423,7 +421,6 @@
                 <!-- Table details -->
                 <div class="mt-5 bg-slate-50/70 border border-slate-200/70 rounded-2xl overflow-hidden divide-y divide-slate-100 text-xs sm:text-sm">
                     
-                    <!-- Row 1: Waktu Aktivitas -->
                     <div class="flex items-center justify-between p-3.5">
                         <div class="text-slate-500 font-semibold flex items-center gap-2">
                             <i class="fa-regular fa-clock text-slate-400"></i>
@@ -432,18 +429,16 @@
                         <div class="text-slate-900 font-extrabold" x-text="modalData.waktu ? modalData.waktu + ' WIB' : '-'"></div>
                     </div>
 
-                    <!-- Row 2: Jam Masuk & Pulang Lengkap (jika checkout) -->
                     <template x-if="modalData.tipe === 'checkout'">
                         <div class="flex items-center justify-between p-3.5">
                             <div class="text-slate-500 font-semibold flex items-center gap-2">
                                 <i class="fa-solid fa-business-time text-slate-400"></i>
                                 Total Durasi Kerja
                             </div>
-                            <div class="text-blue-700 font-extrabold" x-text="modalData.durasi || '-'"></div>
+                            <div class="text-slate-700 font-extrabold" x-text="modalData.durasi || '-'"></div>
                         </div>
                     </template>
 
-                    <!-- Row 3: Lokasi -->
                     <div class="flex items-center justify-between p-3.5">
                         <div class="text-slate-500 font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-location-dot text-slate-400"></i>
@@ -452,16 +447,14 @@
                         <div class="text-slate-900 font-extrabold" x-text="modalData.lokasi"></div>
                     </div>
 
-                    <!-- Row 4: Divisi & Jabatan -->
                     <div class="flex items-center justify-between p-3.5">
                         <div class="text-slate-500 font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-briefcase text-slate-400"></i>
                             Divisi / Jabatan
                         </div>
-                        <div class="text-slate-900 font-extrabold" x-text="modalData.divisi + ' - ' + modalData.jabatan"></div>
+                        <div class="text-slate-900 font-extrabold" x-text="modalData.divisi + ' &bull; ' + modalData.jabatan"></div>
                     </div>
 
-                    <!-- Row 5: Jam Kerja Standar -->
                     <div class="flex items-center justify-between p-3.5">
                         <div class="text-slate-500 font-semibold flex items-center gap-2">
                             <i class="fa-regular fa-calendar-check text-slate-400"></i>
@@ -499,6 +492,7 @@
                 modalData: {},
                 lastActivityKey: null,
                 modalTimer: null,
+                autoScrollTimer: null,
 
                 init() {
                     this.updateClock();
@@ -512,6 +506,38 @@
                     
                     // Auto-poll stats every 5 seconds
                     setInterval(() => this.fetchStats(), 5000);
+
+                    // Start smooth auto-scroll for TV screen
+                    this.initAutoScroll();
+                },
+
+                initAutoScroll() {
+                    const container = document.getElementById('attendance-list-container');
+                    if (!container) return;
+
+                    let scrollDirection = 1; // 1 = down, -1 = up
+                    let isPaused = false;
+
+                    setInterval(() => {
+                        if (isPaused) return;
+
+                        if (container.scrollHeight > container.clientHeight) {
+                            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
+                                scrollDirection = -1;
+                                isPaused = true;
+                                setTimeout(() => { isPaused = false; }, 2000); // Pause 2 detik di ujung bawah
+                            } else if (container.scrollTop <= 5 && scrollDirection === -1) {
+                                scrollDirection = 1;
+                                isPaused = true;
+                                setTimeout(() => { isPaused = false; }, 2000); // Pause 2 detik di ujung atas
+                            }
+
+                            container.scrollBy({
+                                top: scrollDirection * 55,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 2000);
                 },
 
                 updateClock() {
