@@ -247,23 +247,34 @@ class TvDashboardController extends Controller
 
         $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
 
-        // Group attendance by primary locations (Sulaksana vs Cikawao)
-        $sulaksanaLocation = $branches->firstWhere('nama_kantor', 'Kantor Sulaksana') ?? $branches->firstWhere('lokasi_id', 1);
-        $cikawaoLocation = $branches->firstWhere('nama_kantor', 'Kantor Cikawao') ?? $branches->firstWhere('lokasi_id', 2);
+        // Dynamically group attendances for EVERY branch in the database
+        $branchCards = [];
+        foreach ($branches as $branch) {
+            $branchId = (string)$branch->lokasi_id;
+            $branchName = $branch->nama_kantor;
+            $isHq = ($branch->lokasi_id == 1 || str_contains(strtolower($branchName), 'sulaksana'));
 
-        $sulaksanaId = $sulaksanaLocation ? (string)$sulaksanaLocation->lokasi_id : '1';
-        $cikawaoId = $cikawaoLocation ? (string)$cikawaoLocation->lokasi_id : '2';
+            $list = $mappedAttendances->filter(function ($i) use ($branchId, $branchName) {
+                return (string)$i['cabang_id'] === $branchId || str_contains(strtolower($i['cabang_label']), strtolower($branchName));
+            })->values();
 
-        $sulaksanaList = $mappedAttendances->filter(function ($i) use ($sulaksanaId) {
-            return (string)$i['cabang_id'] === $sulaksanaId || str_contains(strtolower($i['cabang_label']), 'sulaksana');
-        })->values();
+            $working = $list->where('has_checkout', false)->count();
+            $checkout = $list->where('has_checkout', true)->count();
 
-        $cikawaoList = $mappedAttendances->filter(function ($i) use ($cikawaoId) {
-            return (string)$i['cabang_id'] === $cikawaoId || str_contains(strtolower($i['cabang_label']), 'cikawao');
-        })->values();
+            $branchCards[] = [
+                'lokasi_id' => $branch->lokasi_id,
+                'nama_kantor' => $branchName,
+                'is_hq' => $isHq,
+                'total_hadir' => $list->count(),
+                'working_count' => $working,
+                'checkout_count' => $checkout,
+                'attendances' => $list,
+            ];
+        }
 
         return [
             'branches' => $branches,
+            'branchCards' => $branchCards,
             'totalPegawai' => $totalPegawai,
             'totalHadir' => $totalHadir,
             'sedangBekerja' => $sedangBekerja,
@@ -274,8 +285,6 @@ class TvDashboardController extends Controller
             'izinCount' => $izinCount,
             'belumHadir' => $belumHadir,
             'liveCheckIns' => $mappedAttendances,
-            'sulaksanaList' => $sulaksanaList,
-            'cikawaoList' => $cikawaoList,
         ];
     }
 }

@@ -51,336 +51,184 @@
     <!-- Background Decoration Grid -->
     <div class="fixed inset-0 pointer-events-none opacity-40 z-0 bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
-    <!-- Header Section (Company Branding + Global Metrics Strip + Clock) -->
-    <header class="relative z-10 w-full px-4 sm:px-6 lg:px-10 py-3 sm:py-3.5 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs flex-shrink-0">
-        <div class="max-w-[1920px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+    <!-- Header Section (Company Branding + Clock) -->
+    <header class="relative z-10 w-full px-4 sm:px-6 lg:px-10 py-3.5 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs flex-shrink-0">
+        <div class="max-w-[1920px] mx-auto flex items-center justify-between gap-4">
             
             <!-- Left: Logo & Company Name -->
-            <div class="flex items-center justify-between w-full lg:w-auto gap-3.5">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0">
-                        <img src="{{ company_logo_url() }}" alt="Logo" class="w-full h-full object-contain">
-                    </div>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
-                            PT Selada Indonesia Produktif
-                        </h1>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                            Live Attendance Dashboard
-                        </p>
-                    </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0">
+                    <img src="{{ company_logo_url() }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
-
-                <!-- Clock for Mobile only -->
-                <div class="text-right lg:hidden">
-                    <div class="text-xl font-extrabold text-slate-900 tracking-tight leading-none" x-text="clockTime">
-                        00:00:00
-                    </div>
-                    <div class="text-[10px] font-semibold text-slate-400 mt-0.5" x-text="clockDate">
-                        ...
-                    </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+                        PT Selada Indonesia Produktif
+                    </h1>
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                        Live Attendance Dashboard
+                    </p>
                 </div>
             </div>
 
-
-
-            <!-- Right: Clock (Desktop) -->
-            <div class="hidden lg:flex items-center text-right">
-                <div>
-                    <div class="text-2xl font-black text-slate-900 tracking-tight leading-none" x-text="clockTime">
-                        00:00:00
-                    </div>
-                    <div class="text-xs font-semibold text-slate-400 mt-1" x-text="clockDate">
-                        ...
-                    </div>
+            <!-- Right: Clock (Desktop & Mobile) -->
+            <div class="text-right">
+                <div class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-none" x-text="clockTime">
+                    00:00:00
+                </div>
+                <div class="text-[11px] sm:text-xs font-semibold text-slate-400 mt-1" x-text="clockDate">
+                    ...
                 </div>
             </div>
 
         </div>
     </header>
 
-    <!-- Main Content Area: Split Screen 2 Columns (Kiri = Sulaksana, Kanan = Cikawao) -->
+    <!-- Main Content Area: Dynamic Multi-Branch Responsive Grid -->
     <main class="relative z-10 flex-1 max-w-[1920px] w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-8 items-stretch h-[calc(100vh-8.5rem)]">
+        <div 
+            :class="gridColsClass"
+            class="grid gap-5 lg:gap-8 items-stretch h-[calc(100vh-8.5rem)] transition-all duration-300"
+        >
             
-            <!-- ===================================================== -->
-            <!-- KOLOM KIRI: KANTOR SULAKSANA -->
-            <!-- ===================================================== -->
-            <section class="bg-white rounded-3xl p-5 sm:p-6 border border-blue-100/80 shadow-sm flex flex-col h-full overflow-hidden">
-                
-                <!-- Header Kolom Sulaksana -->
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 flex-shrink-0">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-2xl bg-blue-50 text-primary flex items-center justify-center text-xl shadow-xs border border-blue-100">
-                            <i class="fa-solid fa-building-circle-check"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                                    Kantor Sulaksana
-                                </h2>
-                                <span class="bg-primary/10 text-primary border border-primary/20 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                                    Kantor Pusat
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Badge Total Hadir Sulaksana -->
-                    <div class="text-right">
-                        <div class="text-2xl sm:text-3xl font-black text-[#12B76A] leading-none" x-text="sulaksanaList.length"></div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Pegawai Hadir</div>
-                    </div>
-                </div>
-
-                <!-- Mini Stats Bar Sulaksana -->
-                <div class="grid grid-cols-3 gap-2.5 my-3.5 flex-shrink-0">
-                    <div class="bg-emerald-50/70 p-2.5 rounded-2xl border border-emerald-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Kerja</span>
-                        </div>
-                        <span class="text-base font-black text-emerald-700" x-text="sulaksanaWorkingCount"></span>
-                    </div>
-
-                    <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
-                            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                            <span>Pulang</span>
-                        </div>
-                        <span class="text-base font-black text-slate-700" x-text="sulaksanaCheckoutCount"></span>
-                    </div>
-
-                    <div class="bg-blue-50/70 p-2.5 rounded-2xl border border-blue-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-blue-800">
-                            <i class="fa-solid fa-laptop-house text-xs text-blue-600"></i>
-                            <span>WFO</span>
-                        </div>
-                        <span class="text-base font-black text-blue-700" x-text="sulaksanaList.length"></span>
-                    </div>
-                </div>
-
-                <!-- List Pegawai Sulaksana (Auto-Scrollable) -->
-                <div id="sulaksana-list-container" class="flex-1 overflow-y-auto pr-1 custom-scrollbar divide-y divide-slate-100">
+            <!-- Dynamic Branch Columns from Database -->
+            <template x-for="branch in branchCards" :key="branch.lokasi_id">
+                <section class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-sm flex flex-col h-full overflow-hidden transition-all">
                     
-                    <!-- Loop Pegawai Hadir di Sulaksana -->
-                    <template x-for="item in sulaksanaList" :key="item.id">
-                        <div class="py-2.5 px-2 flex items-center justify-between gap-3 transition hover:bg-slate-50/80 rounded-2xl">
-                            
-                            <!-- Left: Foto Profil & Info Pegawai -->
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="relative flex-shrink-0">
-                                    <template x-if="item.foto_profile">
-                                        <img 
-                                            :src="item.foto_profile" 
-                                            :alt="item.nama" 
-                                            x-on:error="item.foto_profile = null"
-                                            :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
-                                            class="w-10 h-10 rounded-full object-cover p-0.5 bg-white transition"
-                                        >
-                                    </template>
-                                    <template x-if="!item.foto_profile">
-                                        <div 
-                                            :class="item.has_checkout ? 'bg-slate-400 ring-2 ring-slate-300 opacity-75' : 'bg-primary ring-2 ring-emerald-500 shadow-xs'"
-                                            class="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm transition" 
-                                            x-text="item.nama.substring(0, 1).toUpperCase()">
-                                        </div>
-                                    </template>
-
-                                    <!-- Dot status -->
-                                    <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                                        <template x-if="!item.has_checkout">
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
-                                        </template>
-                                        <template x-if="item.has_checkout">
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-slate-400 border-2 border-white"></span>
-                                        </template>
+                    <!-- Header Kolom Cabang -->
+                    <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 flex-shrink-0">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div :class="branch.is_hq ? 'bg-blue-50 text-primary border-blue-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'"
+                                class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center text-lg sm:text-xl shadow-xs border flex-shrink-0">
+                                <i :class="branch.is_hq ? 'fa-solid fa-building-circle-check' : 'fa-solid fa-building'"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight truncate" x-text="branch.nama_kantor">
+                                    </h2>
+                                    <span :class="branch.is_hq ? 'bg-primary/10 text-primary border-primary/20' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
+                                        class="text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider border flex-shrink-0"
+                                        x-text="branch.is_hq ? 'Kantor Pusat' : 'Kantor Cabang'">
                                     </span>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="min-w-0">
-                                    <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-sm truncate leading-tight" x-text="item.nama"></h4>
-                                    <div class="flex items-center gap-1 text-[11px] text-slate-400 truncate mt-0.5">
-                                        <span x-text="item.divisi"></span>
-                                        <span class="text-slate-300">&bull;</span>
-                                        <span x-text="item.jabatan"></span>
-                                        <span class="text-slate-300">&bull;</span>
-                                        <span class="font-bold text-slate-600" x-text="item.waktu + ' WIB'"></span>
+                        <!-- Badge Total Hadir Cabang -->
+                        <div class="text-right flex-shrink-0 pl-2">
+                            <div class="text-2xl sm:text-3xl font-black text-[#12B76A] leading-none" x-text="branch.total_hadir"></div>
+                            <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Pegawai Hadir</div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stats Bar Cabang -->
+                    <div class="grid grid-cols-3 gap-2 my-3 flex-shrink-0">
+                        <div class="bg-emerald-50/70 p-2 sm:p-2.5 rounded-2xl border border-emerald-100 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-emerald-800">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Kerja</span>
+                            </div>
+                            <span class="text-sm sm:text-base font-black text-emerald-700" x-text="branch.working_count"></span>
+                        </div>
+
+                        <div class="bg-slate-50 p-2 sm:p-2.5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-slate-600">
+                                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                <span>Pulang</span>
+                            </div>
+                            <span class="text-sm sm:text-base font-black text-slate-700" x-text="branch.checkout_count"></span>
+                        </div>
+
+                        <div class="bg-blue-50/70 p-2 sm:p-2.5 rounded-2xl border border-blue-100 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-blue-800">
+                                <i class="fa-solid fa-laptop-house text-xs text-blue-600"></i>
+                                <span>WFO</span>
+                            </div>
+                            <span class="text-sm sm:text-base font-black text-blue-700" x-text="branch.total_hadir"></span>
+                        </div>
+                    </div>
+
+                    <!-- List Pegawai Hadir di Cabang (Auto-Scrollable) -->
+                    <div :id="'branch-list-' + branch.lokasi_id" class="flex-1 overflow-y-auto pr-1 custom-scrollbar divide-y divide-slate-100">
+                        
+                        <!-- Loop Pegawai Hadir di Cabang -->
+                        <template x-for="item in branch.attendances" :key="item.id">
+                            <div class="py-2.5 px-1.5 sm:px-2 flex items-center justify-between gap-2.5 sm:gap-3 transition hover:bg-slate-50/80 rounded-2xl">
+                                
+                                <!-- Left: Foto Profil & Info Pegawai -->
+                                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                    <div class="relative flex-shrink-0">
+                                        <template x-if="item.foto_profile">
+                                            <img 
+                                                :src="item.foto_profile" 
+                                                :alt="item.nama" 
+                                                x-on:error="item.foto_profile = null"
+                                                :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
+                                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover p-0.5 bg-white transition"
+                                            >
+                                        </template>
+                                        <template x-if="!item.foto_profile">
+                                            <div 
+                                                :class="item.has_checkout ? 'bg-slate-400 ring-2 ring-slate-300 opacity-75' : 'bg-primary ring-2 ring-emerald-500 shadow-xs'"
+                                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center font-bold text-xs sm:text-sm transition" 
+                                                x-text="item.nama.substring(0, 1).toUpperCase()">
+                                            </div>
+                                        </template>
+
+                                        <!-- Dot status -->
+                                        <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                                            <template x-if="!item.has_checkout">
+                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500 border-2 border-white"></span>
+                                            </template>
+                                            <template x-if="item.has_checkout">
+                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-slate-400 border-2 border-white"></span>
+                                            </template>
+                                        </span>
+                                    </div>
+
+                                    <div class="min-w-0">
+                                        <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-xs sm:text-sm truncate leading-tight" x-text="item.nama"></h4>
+                                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">
+                                            <span x-text="item.divisi"></span>
+                                            <span class="text-slate-300">&bull;</span>
+                                            <span x-text="item.jabatan"></span>
+                                            <span class="text-slate-300">&bull;</span>
+                                            <span class="font-bold text-slate-600" x-text="item.waktu + ' WIB'"></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Right: Status Mode & Kehadiran -->
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <template x-if="!item.has_checkout">
-                                    <span :class="item.status_kehadiran === 'Terlambat' ? 'bg-[#FFF4F2] text-[#B42318] border-[#FECDCA]' : 'bg-[#ECFDF3] text-[#027A48] border-[#A6F4C5]'"
-                                        class="text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-xs" x-text="item.status_kehadiran">
-                                    </span>
-                                </template>
-                                <template x-if="item.has_checkout">
-                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                        Pulang
-                                    </span>
-                                </template>
-                                <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="item.skema"></span>
-                            </div>
-
-                        </div>
-                    </template>
-
-                    <!-- Empty State Sulaksana -->
-                    <div x-show="sulaksanaList.length === 0" class="flex flex-col items-center justify-center h-48 text-center px-4 py-8">
-                        <div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-2.5 text-slate-300">
-                            <i class="fa-regular fa-building text-xl"></i>
-                        </div>
-                        <h5 class="text-sm font-bold text-slate-600">Belum ada pegawai hadir</h5>
-                        <p class="text-xs text-slate-400 mt-0.5">Belum ada aktivitas presensi di Kantor Sulaksana hari ini.</p>
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- ===================================================== -->
-            <!-- KOLOM KANAN: KANTOR CIKAWAO -->
-            <!-- ===================================================== -->
-            <section class="bg-white rounded-3xl p-5 sm:p-6 border border-emerald-100/80 shadow-sm flex flex-col h-full overflow-hidden">
-                
-                <!-- Header Kolom Cikawao -->
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 flex-shrink-0">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-xs border border-emerald-100">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                                    Kantor Cikawao
-                                </h2>
-                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                                    Kantor Cabang
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Badge Total Hadir Cikawao -->
-                    <div class="text-right">
-                        <div class="text-2xl sm:text-3xl font-black text-emerald-600 leading-none" x-text="cikawaoList.length"></div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Pegawai Hadir</div>
-                    </div>
-                </div>
-
-                <!-- Mini Stats Bar Cikawao -->
-                <div class="grid grid-cols-3 gap-2.5 my-3.5 flex-shrink-0">
-                    <div class="bg-emerald-50/70 p-2.5 rounded-2xl border border-emerald-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Kerja</span>
-                        </div>
-                        <span class="text-base font-black text-emerald-700" x-text="cikawaoWorkingCount"></span>
-                    </div>
-
-                    <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-600">
-                            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                            <span>Pulang</span>
-                        </div>
-                        <span class="text-base font-black text-slate-700" x-text="cikawaoCheckoutCount"></span>
-                    </div>
-
-                    <div class="bg-emerald-50/70 p-2.5 rounded-2xl border border-emerald-100 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800">
-                            <i class="fa-solid fa-laptop-house text-xs text-emerald-600"></i>
-                            <span>WFO</span>
-                        </div>
-                        <span class="text-base font-black text-emerald-700" x-text="cikawaoList.length"></span>
-                    </div>
-                </div>
-
-                <!-- List Pegawai Cikawao (Auto-Scrollable) -->
-                <div id="cikawao-list-container" class="flex-1 overflow-y-auto pr-1 custom-scrollbar divide-y divide-slate-100">
-                    
-                    <!-- Loop Pegawai Hadir di Cikawao -->
-                    <template x-for="item in cikawaoList" :key="item.id">
-                        <div class="py-2.5 px-2 flex items-center justify-between gap-3 transition hover:bg-slate-50/80 rounded-2xl">
-                            
-                            <!-- Left: Foto Profil & Info Pegawai -->
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="relative flex-shrink-0">
-                                    <template x-if="item.foto_profile">
-                                        <img 
-                                            :src="item.foto_profile" 
-                                            :alt="item.nama" 
-                                            x-on:error="item.foto_profile = null"
-                                            :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
-                                            class="w-10 h-10 rounded-full object-cover p-0.5 bg-white transition"
-                                        >
+                                <!-- Right: Status Mode & Kehadiran -->
+                                <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                                    <template x-if="!item.has_checkout">
+                                        <span :class="item.status_kehadiran === 'Terlambat' ? 'bg-[#FFF4F2] text-[#B42318] border-[#FECDCA]' : 'bg-[#ECFDF3] text-[#027A48] border-[#A6F4C5]'"
+                                            class="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-xs" x-text="item.status_kehadiran">
+                                        </span>
                                     </template>
-                                    <template x-if="!item.foto_profile">
-                                        <div 
-                                            :class="item.has_checkout ? 'bg-slate-400 ring-2 ring-slate-300 opacity-75' : 'bg-emerald-600 ring-2 ring-emerald-500 shadow-xs'"
-                                            class="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm transition" 
-                                            x-text="item.nama.substring(0, 1).toUpperCase()">
-                                        </div>
+                                    <template x-if="item.has_checkout">
+                                        <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                            Pulang
+                                        </span>
                                     </template>
-
-                                    <!-- Dot status -->
-                                    <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                                        <template x-if="!item.has_checkout">
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
-                                        </template>
-                                        <template x-if="item.has_checkout">
-                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-slate-400 border-2 border-white"></span>
-                                        </template>
-                                    </span>
+                                    <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="item.skema"></span>
                                 </div>
 
-                                <div class="min-w-0">
-                                    <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-sm truncate leading-tight" x-text="item.nama"></h4>
-                                    <div class="flex items-center gap-1 text-[11px] text-slate-400 truncate mt-0.5">
-                                        <span x-text="item.divisi"></span>
-                                        <span class="text-slate-300">&bull;</span>
-                                        <span x-text="item.jabatan"></span>
-                                        <span class="text-slate-300">&bull;</span>
-                                        <span class="font-bold text-slate-600" x-text="item.waktu + ' WIB'"></span>
-                                    </div>
-                                </div>
                             </div>
+                        </template>
 
-                            <!-- Right: Status Mode & Kehadiran -->
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <template x-if="!item.has_checkout">
-                                    <span :class="item.status_kehadiran === 'Terlambat' ? 'bg-[#FFF4F2] text-[#B42318] border-[#FECDCA]' : 'bg-[#ECFDF3] text-[#027A48] border-[#A6F4C5]'"
-                                        class="text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-xs" x-text="item.status_kehadiran">
-                                    </span>
-                                </template>
-                                <template x-if="item.has_checkout">
-                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                        Pulang
-                                    </span>
-                                </template>
-                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase" x-text="item.skema"></span>
+                        <!-- Empty State -->
+                        <div x-show="branch.attendances.length === 0" class="flex flex-col items-center justify-center h-48 text-center px-4 py-8">
+                            <div class="w-11 h-11 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-2.5 text-slate-300">
+                                <i class="fa-regular fa-building text-lg"></i>
                             </div>
-
+                            <h5 class="text-xs sm:text-sm font-bold text-slate-600">Belum ada pegawai hadir</h5>
+                            <p class="text-[11px] text-slate-400 mt-0.5" x-text="'Belum ada aktivitas presensi di ' + branch.nama_kantor + ' hari ini.'"></p>
                         </div>
-                    </template>
 
-                    <!-- Empty State Cikawao -->
-                    <div x-show="cikawaoList.length === 0" class="flex flex-col items-center justify-center h-48 text-center px-4 py-8">
-                        <div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-2.5 text-slate-300">
-                            <i class="fa-regular fa-building text-xl"></i>
-                        </div>
-                        <h5 class="text-sm font-bold text-slate-600">Belum ada pegawai hadir</h5>
-                        <p class="text-xs text-slate-400 mt-0.5">Belum ada aktivitas presensi di Kantor Cikawao hari ini.</p>
                     </div>
 
-                </div>
-
-            </section>
+                </section>
+            </template>
 
         </div>
 
@@ -551,6 +399,8 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('tvDashboard', (selectedDate) => ({
                 date: selectedDate,
+                branches: @json($branches) || [],
+                branchCards: @json($branchCards) || [],
                 totalPegawai: {{ $totalPegawai }},
                 totalHadir: {{ $totalHadir }},
                 sedangBekerja: {{ $sedangBekerja }},
@@ -559,9 +409,6 @@
                 wfhCount: {{ $wfhCount }},
                 sakitCount: {{ $sakitCount }},
                 belumHadir: {{ $belumHadir }},
-                
-                sulaksanaList: @json($sulaksanaList) || [],
-                cikawaoList: @json($cikawaoList) || [],
 
                 clockTime: '00:00:00',
                 clockDate: '...',
@@ -574,20 +421,12 @@
                 knownActivityKeys: new Set(),
                 modalTimer: null,
 
-                get sulaksanaWorkingCount() {
-                    return this.sulaksanaList.filter(i => !i.has_checkout).length;
-                },
-
-                get sulaksanaCheckoutCount() {
-                    return this.sulaksanaList.filter(i => i.has_checkout).length;
-                },
-
-                get cikawaoWorkingCount() {
-                    return this.cikawaoList.filter(i => !i.has_checkout).length;
-                },
-
-                get cikawaoCheckoutCount() {
-                    return this.cikawaoList.filter(i => i.has_checkout).length;
+                get gridColsClass() {
+                    const count = this.branchCards.length;
+                    if (count <= 1) return 'grid-cols-1 max-w-4xl mx-auto';
+                    if (count === 2) return 'grid-cols-1 lg:grid-cols-2';
+                    if (count === 3) return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+                    return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
                 },
 
                 init() {
@@ -595,26 +434,35 @@
                     setInterval(() => this.updateClock(), 1000);
 
                     // Initialize known activity keys on initial load
-                    const allInit = [...this.sulaksanaList, ...this.cikawaoList];
-                    allInit.forEach(item => {
-                        this.knownActivityKeys.add(this.getActivityKey(item));
+                    this.branchCards.forEach(b => {
+                        (b.attendances || []).forEach(item => {
+                            this.knownActivityKeys.add(this.getActivityKey(item));
+                        });
                     });
 
                     // Auto-poll stats every 5 seconds
                     setInterval(() => this.fetchStats(), 5000);
 
-                    // Start smooth auto-scroll for both TV columns
-                    this.initAutoScroll('sulaksana-list-container');
-                    this.initAutoScroll('cikawao-list-container');
+                    // Start smooth auto-scroll for all active branch columns
+                    this.initAllAutoScrolls();
                 },
 
                 getActivityKey(item) {
                     return item.id + '_' + (item.has_checkout ? 'out_' + item.jam_checkout : 'in_' + item.jam_checkin);
                 },
 
+                initAllAutoScrolls() {
+                    this.$nextTick(() => {
+                        this.branchCards.forEach(b => {
+                            this.initAutoScroll('branch-list-' + b.lokasi_id);
+                        });
+                    });
+                },
+
                 initAutoScroll(containerId) {
                     const container = document.getElementById(containerId);
-                    if (!container) return;
+                    if (!container || container.dataset.scrollInit) return;
+                    container.dataset.scrollInit = 'true';
 
                     let scrollDirection = 1;
                     let isPaused = false;
@@ -679,19 +527,24 @@
                             this.sakitCount = data.sakitCount;
                             this.belumHadir = data.belumHadir;
                             
-                            this.sulaksanaList = data.sulaksanaList || [];
-                            this.cikawaoList = data.cikawaoList || [];
+                            const prevLength = this.branchCards.length;
+                            this.branches = data.branches || [];
+                            this.branchCards = data.branchCards || [];
+
+                            if (this.branchCards.length !== prevLength) {
+                                this.initAllAutoScrolls();
+                            }
 
                             // Trigger live modal queue if new attendance occurs
-                            const allCurrent = [...this.sulaksanaList, ...this.cikawaoList];
                             const newActivities = [];
-
-                            allCurrent.forEach(item => {
-                                const key = this.getActivityKey(item);
-                                if (!this.knownActivityKeys.has(key)) {
-                                    this.knownActivityKeys.add(key);
-                                    newActivities.push(item);
-                                }
+                            this.branchCards.forEach(b => {
+                                (b.attendances || []).forEach(item => {
+                                    const key = this.getActivityKey(item);
+                                    if (!this.knownActivityKeys.has(key)) {
+                                        this.knownActivityKeys.add(key);
+                                        newActivities.push(item);
+                                    }
+                                });
                             });
 
                             if (newActivities.length > 0) {
