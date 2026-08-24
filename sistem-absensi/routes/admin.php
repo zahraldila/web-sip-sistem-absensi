@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApprovalControllers;
@@ -46,6 +46,7 @@ Route::prefix('admin')->middleware(['web','auth','role:Admin'])->group(function 
         ->name('admin.persetujuan.process');
     Route::get('/log-aktivitas', [App\Http\Controllers\AdminPlaceholderController::class, 'logAktivitas'])->name('admin.log-aktivitas');
     Route::get('/tampilan-branding', [App\Http\Controllers\AdminPlaceholderController::class, 'tampilanBranding'])->name('admin.tampilan-branding');
+    Route::get('/settings/lokasi', [App\Http\Controllers\AdminPlaceholderController::class, 'lokasiKantor'])->name('admin.settings.lokasi');
     Route::post('/tampilan-branding/simpan', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanBranding'])->name('admin.tampilan-branding.simpan');
     Route::post('/tampilan-branding/reset', [App\Http\Controllers\AdminPlaceholderController::class, 'resetBranding'])->name('admin.tampilan-branding.reset');
     Route::post('/tampilan-branding/logo', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanLogo'])->name('admin.tampilan-branding.logo');

@@ -1,4 +1,4 @@
-<div class="flex h-full w-full flex-col bg-white overflow-y-auto">
+﻿<div class="flex h-full w-full flex-col bg-white overflow-y-auto">
     {{-- ========================= --}}
     {{-- HEADER --}}
     {{-- ========================= --}}
@@ -120,7 +120,7 @@
             </a>
 
 
-            {{-- Settings --}}
+            {{-- Settings (Tampilan & Branding) --}}
             <a href="{{ route('admin.tampilan-branding') }}"
                 class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 

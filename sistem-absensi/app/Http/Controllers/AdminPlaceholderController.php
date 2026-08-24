@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Helpers\logHelpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+
 class AdminPlaceholderController extends Controller
 {
     public function dashboard()
@@ -39,118 +43,17 @@ class AdminPlaceholderController extends Controller
             $savedLogo  = company_logo_url();
             $activeTab  = $request->query('tab', 'branding');
 
-            $daftarLokasi = \Illuminate\Support\Facades\DB::table('lokasi_kantor')->get();
+            $daftarLokasi = DB::table('lokasi_kantor')->get();
             foreach ($daftarLokasi as $lokasi) {
-                $lokasi->wifis = \Illuminate\Support\Facades\DB::table('wifi_kantor')
+                $lokasi->wifis = DB::table('wifi_kantor')
                     ->where('lokasi_id', $lokasi->lokasi_id)
                     ->get();
             }
 
             return view('admin.settings.branding', compact('savedColor', 'savedLogo', 'daftarLokasi', 'activeTab'));
         } catch (\Exception $e) {
-            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings. Terjadi masalah koneksi ke database: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings: ' . $e->getMessage());
         }
-    }
-
-    public function simpanLokasi(Request $request)
-    {
-        $request->validate([
-            'lokasi_id'     => 'nullable|integer',
-            'nama_kantor'   => 'required|string|max:100',
-            'latitude'      => 'required|numeric',
-            'longitude'     => 'required|numeric',
-            'radius_meter'  => 'required|numeric|min:1',
-            'wifi_ssids'    => 'nullable|string',
-        ]);
-
-        $lokasiId = $request->input('lokasi_id');
-        $namaKantor = trim($request->input('nama_kantor'));
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
-        $radiusMeter = $request->input('radius_meter');
-
-        if ($lokasiId) {
-            // Update existing
-            \Illuminate\Support\Facades\DB::table('lokasi_kantor')
-                ->where('lokasi_id', $lokasiId)
-                ->update([
-                    'nama_kantor'  => $namaKantor,
-                    'latitude'     => $latitude,
-                    'longitude'    => $longitude,
-                    'radius_meter' => $radiusMeter,
-                ]);
-            $msg = "Kantor cabang '{$namaKantor}' berhasil diperbarui.";
-            $actionLog = "Memperbarui lokasi kantor cabang '{$namaKantor}'";
-        } else {
-            // Insert new
-            $lokasiId = \Illuminate\Support\Facades\DB::table('lokasi_kantor')
-                ->insertGetId([
-                    'nama_kantor'  => $namaKantor,
-                    'latitude'     => $latitude,
-                    'longitude'    => $longitude,
-                    'radius_meter' => $radiusMeter,
-                ], 'lokasi_id');
-            $msg = "Kantor cabang '{$namaKantor}' berhasil ditambahkan.";
-            $actionLog = "Menambahkan lokasi kantor cabang baru '{$namaKantor}'";
-        }
-
-        // Process Wi-Fi SSIDs if provided
-        if ($request->filled('wifi_ssids')) {
-            $rawSsids = explode(',', $request->input('wifi_ssids'));
-            foreach ($rawSsids as $rawSsid) {
-                $trimmed = trim($rawSsid);
-                if (!empty($trimmed)) {
-                    $existing = \Illuminate\Support\Facades\DB::table('wifi_kantor')
-                        ->where('ssid', $trimmed)
-                        ->first();
-                    if ($existing) {
-                        \Illuminate\Support\Facades\DB::table('wifi_kantor')
-                            ->where('wifi_id', $existing->wifi_id)
-                            ->update(['lokasi_id' => $lokasiId, 'aktif' => true]);
-                    } else {
-                        $randomHex = substr(md5($trimmed), 0, 12);
-                        $formattedBssid = implode(':', str_split($randomHex, 2));
-                        
-                        \Illuminate\Support\Facades\DB::table('wifi_kantor')->insert([
-                            'lokasi_id' => $lokasiId,
-                            'ssid'      => $trimmed,
-                            'bssid'     => $formattedBssid,
-                            'aktif'     => true,
-                        ]);
-                    }
-                }
-            }
-        }
-
-        // Catat audit log
-        $user = Auth::user();
-        if ($user && $user->akun_id) {
-            logHelpers::record($user->akun_id, $actionLog);
-        }
-
-        return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
-            ->with('success', $msg);
-    }
-
-    public function hapusLokasi($id)
-    {
-        $lokasi = \Illuminate\Support\Facades\DB::table('lokasi_kantor')->where('lokasi_id', $id)->first();
-        if ($lokasi) {
-            // Unlink or delete associated wifi
-            \Illuminate\Support\Facades\DB::table('wifi_kantor')->where('lokasi_id', $id)->update(['lokasi_id' => null]);
-            \Illuminate\Support\Facades\DB::table('lokasi_kantor')->where('lokasi_id', $id)->delete();
-
-            $user = Auth::user();
-            if ($user && $user->akun_id) {
-                logHelpers::record($user->akun_id, "Menghapus lokasi kantor cabang '{$lokasi->nama_kantor}'");
-            }
-
-            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
-                ->with('success', "Kantor cabang '{$lokasi->nama_kantor}' berhasil dihapus.");
-        }
-
-        return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])
-            ->with('error', 'Kantor cabang tidak ditemukan.');
     }
 
     public function simpanBranding(Request $request)
@@ -174,8 +77,7 @@ class AdminPlaceholderController extends Controller
     
         // Catat aktivitas admin
         $user = Auth::user();
-    
-        if ($user && $user->akun_id) {
+        if ($user && isset($user->akun_id)) {
             $aktivitas = $request->hasFile('logo')
                 ? 'Mengubah tampilan branding dan logo sistem'
                 : 'Mengubah warna branding sistem';
@@ -187,10 +89,9 @@ class AdminPlaceholderController extends Controller
         }
     
         return redirect()
-            ->back()
+            ->route('admin.tampilan-branding', ['tab' => 'branding'])
             ->with('success', 'Pengaturan tampilan & branding berhasil disimpan.');
     }
-    
 
     public function resetBranding()
     {
@@ -204,8 +105,7 @@ class AdminPlaceholderController extends Controller
     
         // Catat aktivitas admin
         $user = Auth::user();
-    
-        if ($user && $user->akun_id) {
+        if ($user && isset($user->akun_id)) {
             logHelpers::record(
                 $user->akun_id,
                 'Mereset tampilan branding sistem ke pengaturan awal'
@@ -213,7 +113,7 @@ class AdminPlaceholderController extends Controller
         }
     
         return redirect()
-            ->back()
+            ->route('admin.tampilan-branding', ['tab' => 'branding'])
             ->with('success', 'Tampilan & branding berhasil direset ke pengaturan awal.');
     }
 
@@ -235,8 +135,7 @@ class AdminPlaceholderController extends Controller
     
         // Catat aktivitas admin
         $user = Auth::user();
-    
-        if ($user && $user->akun_id) {
+        if ($user && isset($user->akun_id)) {
             logHelpers::record(
                 $user->akun_id,
                 'Mengubah logo sistem'
@@ -244,15 +143,128 @@ class AdminPlaceholderController extends Controller
         }
     
         return redirect()
-            ->back()
+            ->route('admin.tampilan-branding', ['tab' => 'branding'])
             ->with('success', 'Logo berhasil diperbarui.');
+    }
+
+    public function simpanLokasi(Request $request)
+    {
+        $request->validate([
+            'lokasi_id'     => 'nullable|integer',
+            'nama_kantor'   => 'required|string|max:100',
+            'latitude'      => 'required|numeric',
+            'longitude'     => 'required|numeric',
+            'radius_meter'  => 'required|integer|min:1',
+            'wifi_ssids'    => 'nullable|string',
+        ]);
+
+        $lokasiId = $request->input('lokasi_id');
+        $namaKantor = $request->input('nama_kantor');
+        $latitude = (float) $request->input('latitude');
+        $longitude = (float) $request->input('longitude');
+        $radiusMeter = (int) $request->input('radius_meter');
+        $wifiSsids = $request->input('wifi_ssids', '');
+
+        try {
+            if ($lokasiId) {
+                // Update existing location
+                DB::table('lokasi_kantor')
+                    ->where('lokasi_id', $lokasiId)
+                    ->update([
+                        'nama_kantor'  => $namaKantor,
+                        'latitude'     => $latitude,
+                        'longitude'    => $longitude,
+                        'radius_meter' => $radiusMeter,
+                    ]);
+
+                $pesan = "Kantor cabang '{$namaKantor}' berhasil diperbarui.";
+            } else {
+                // Insert new location
+                $lokasiId = DB::table('lokasi_kantor')
+                    ->insertGetId([
+                        'nama_kantor'  => $namaKantor,
+                        'latitude'     => $latitude,
+                        'longitude'    => $longitude,
+                        'radius_meter' => $radiusMeter,
+                    ], 'lokasi_id');
+
+                $pesan = "Kantor cabang '{$namaKantor}' berhasil ditambahkan.";
+            }
+
+            // Sync Wi-Fi SSIDs if provided
+            if ($wifiSsids !== null) {
+                $ssids = array_filter(array_map('trim', explode(',', $wifiSsids)));
+
+                // Unlink old wifis for this location
+                DB::table('wifi_kantor')->where('lokasi_id', $lokasiId)->delete();
+
+                foreach ($ssids as $ssid) {
+                    $trimmed = trim($ssid);
+                    if (!empty($trimmed)) {
+                        $randomHex = substr(md5($trimmed), 0, 12);
+                        $formattedBssid = implode(':', str_split($randomHex, 2));
+
+                        DB::table('wifi_kantor')->insert([
+                            'lokasi_id' => $lokasiId,
+                            'ssid'      => $trimmed,
+                            'bssid'     => $formattedBssid,
+                            'aktif'     => true,
+                        ]);
+                    }
+                }
+            }
+
+            // Audit log with integer akun_id
+            $user = Auth::user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record(
+                    $user->akun_id,
+                    "Admin menyimpan konfigurasi kantor cabang: {$namaKantor} (ID: {$lokasiId})"
+                );
+            }
+
+            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])->with('success', $pesan);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])->with('error', 'Gagal menyimpan data kantor cabang: ' . $e->getMessage());
+        }
+    }
+
+    public function hapusLokasi($id)
+    {
+        try {
+            $lokasi = DB::table('lokasi_kantor')->where('lokasi_id', $id)->first();
+            if (!$lokasi) {
+                return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])->with('error', 'Data kantor cabang tidak ditemukan.');
+            }
+
+            $nama = $lokasi->nama_kantor;
+
+            // Unlink Wi-Fis
+            DB::table('wifi_kantor')->where('lokasi_id', $id)->delete();
+
+            // Delete location
+            DB::table('lokasi_kantor')->where('lokasi_id', $id)->delete();
+
+            // Audit log with integer akun_id
+            $user = Auth::user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record(
+                    $user->akun_id,
+                    "Admin menghapus kantor cabang: {$nama} (ID: {$id})"
+                );
+            }
+
+            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])->with('success', "Kantor cabang '{$nama}' berhasil dihapus.");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.tampilan-branding', ['tab' => 'lokasi'])->with('error', 'Gagal menghapus kantor cabang: ' . $e->getMessage());
+        }
     }
 
     protected function uploadCompanyLogo($file): string
     {
         $bucket = config('supabase.assets_bucket', 'company-assets');
         $ext = $file->getClientOriginalExtension() ?: $file->extension() ?: 'png';
-        $fileName = 'logo_' . time() . '_' . \Illuminate\Support\Str::random(6) . '.' . strtolower($ext);
+        $fileName = 'logo_' . time() . '_' . Str::random(6) . '.' . strtolower($ext);
         $remotePath = 'logos/' . $fileName;
 
         $baseUrl = supabase_url() ?: config('supabase.url');
@@ -271,7 +283,7 @@ class AdminPlaceholderController extends Controller
             throw new \RuntimeException('Supabase key belum dikonfigurasi. Pastikan SUPABASE_KEY di .env terisi.');
         }
 
-        $resp = \Illuminate\Support\Facades\Http::withHeaders([
+        $resp = Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'apikey' => $apiKey,
             'Content-Type' => $file->getClientMimeType(),
@@ -279,7 +291,7 @@ class AdminPlaceholderController extends Controller
         ])->withBody(file_get_contents($file->getRealPath()), $file->getClientMimeType())->post($uploadUrl);
 
         if (! $resp->successful()) {
-            $resp = \Illuminate\Support\Facades\Http::withHeaders([
+            $resp = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'apikey' => $apiKey,
                 'Content-Type' => $file->getClientMimeType(),
@@ -326,7 +338,7 @@ class AdminPlaceholderController extends Controller
 
         $deleteUrl = $baseUrl . '/storage/v1/object/' . rawurlencode($bucket) . '/' . implode('/', array_map('rawurlencode', explode('/', $objectPath)));
 
-        \Illuminate\Support\Facades\Http::withHeaders([
+        Http::withHeaders([
             'Authorization' => 'Bearer ' . $apiKey,
             'apikey' => $apiKey,
         ])->delete($deleteUrl);
