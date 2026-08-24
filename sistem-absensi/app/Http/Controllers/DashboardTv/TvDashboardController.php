@@ -136,7 +136,7 @@ class TvDashboardController extends Controller
                 'jadwal_kerja.jam_pulang'
             )
             ->orderByRaw('COALESCE(absensi.jam_checkout, absensi.jam_checkin) DESC')
-            ->limit(30)
+            
             ->get()
             ->map(function ($item) {
                 $hasCheckOut = !empty($item->jam_checkout);

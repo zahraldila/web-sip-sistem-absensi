@@ -252,7 +252,7 @@
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Check Out</span>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200" x-text="liveCheckIns.length + ' Pegawai'"></span>
+                <span class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200" x-text="liveCheckIns.length + ' Pegawai Hadir'"></span>
             </div>
 
             <!-- List Body: 1 Column Sleek List with Auto-Scroll -->
