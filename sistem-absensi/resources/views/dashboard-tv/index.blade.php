@@ -106,18 +106,9 @@
             </div>
 
             <!-- Right Info & Clock (Desktop / Tablet view) -->
-            <div class="hidden md:flex items-center gap-6">
-                <!-- Live Pulsing Indicator -->
-                <div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/60 shadow-xs">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Live System</span>
-                </div>
-
+            <div class="hidden md:flex items-center">
                 <!-- Clock -->
-                <div class="text-right border-l border-slate-200/80 pl-6">
+                <div class="text-right">
                     <div class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-none" x-text="clockTime">
                         00:00:00
                     </div>
@@ -333,7 +324,7 @@
                                         <img 
                                             :src="item.foto_profile" 
                                             :alt="item.nama" 
-                                            @error="item.foto_profile = null"
+                                            x-on:error="item.foto_profile = null"
                                             :class="item.has_checkout ? 'ring-2 ring-slate-300 grayscale-[25%] opacity-75' : 'ring-2 ring-emerald-500 shadow-xs'"
                                             class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover p-0.5 bg-white transition"
                                         >
@@ -477,7 +468,7 @@
                         <img 
                             :src="modalData.foto_profile" 
                             :alt="modalData.nama" 
-                            @error="modalData.foto_profile = null"
+                            x-on:error="modalData.foto_profile = null"
                             class="w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18 rounded-full object-cover border-2 border-slate-200 shadow-sm flex-shrink-0"
                         >
                     </template>
