@@ -36,17 +36,17 @@
         }
     </style>
 </head>
-<body class="bg-[#F4F6F9] min-h-screen text-slate-800 flex flex-col antialiased" x-data="tvDashboard('{{ $selectedDate }}')">
+<body class="bg-[#F4F6F9] min-h-screen text-slate-800 flex flex-col antialiased" x-data="tvDashboard('{{ $selectedDate }}', '{{ $selectedCabang }}')">
 
     {{-- ===================================================== --}}
-    {{-- HEADER --}}
+    {{-- HEADER WITH MULTI-BRANCH TAB SWITCHER --}}
     {{-- ===================================================== --}}
     <header class="bg-white sticky top-0 z-40 border-b border-slate-200">
-        <div class="max-w-[1800px] mx-auto px-6 sm:px-8 py-4 flex items-center justify-between">
+        <div class="max-w-[1800px] mx-auto px-6 sm:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            <!-- Left Info -->
-            <div class="flex items-center gap-4">
-                <div class="w-13 h-13 sm:w-14 sm:h-14 bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center p-1.5 overflow-hidden">
+            <!-- Left Info: Logo & Company -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 sm:w-13 sm:h-13 bg-white border border-slate-200 shadow-sm rounded-2xl flex items-center justify-center p-1.5 overflow-hidden">
                     <img 
                         src="{{ company_logo_url() }}" 
                         alt="Logo SIP" 
@@ -55,22 +55,52 @@
                     >
                 </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                    <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                         PT Selada Indonesia Produktif
                     </h1>
-                    <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                         Live Attendance Dashboard
                     </p>
                 </div>
             </div>
 
+            <!-- Center: Multi-Cabang Interactive Tab Switcher -->
+            <div class="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 shadow-inner self-start md:self-auto">
+                <!-- Tab: Semua Cabang -->
+                <button type="button" 
+                    @click="setCabang('all')" 
+                    :class="cabang === 'all' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
+                    class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group text-xs text-primary"></i>
+                    <span>Semua Cabang</span>
+                </button>
+
+                <!-- Tab: Kantor Sulaksana (WiFi SIP) -->
+                <button type="button" 
+                    @click="setCabang('sulaksana')" 
+                    :class="cabang === 'sulaksana' ? 'bg-white text-emerald-700 shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
+                    class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-building text-xs text-emerald-600"></i>
+                    <span>Sulaksana</span>
+                </button>
+
+                <!-- Tab: Kantor Cikawao (WiFi Ideahub) -->
+                <button type="button" 
+                    @click="setCabang('cikawao')" 
+                    :class="cabang === 'cikawao' ? 'bg-white text-blue-700 shadow-sm font-black' : 'text-slate-500 font-semibold hover:text-slate-800'"
+                    class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-location-dot text-xs text-blue-600"></i>
+                    <span>Cikawao</span>
+                </button>
+            </div>
+
             <!-- Right Info & Clock -->
             <div class="flex items-center gap-6">
                 <div class="text-right">
-                    <div class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight" x-text="clockTime">
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight" x-text="clockTime">
                         00:00:00
                     </div>
-                    <div class="text-xs sm:text-sm font-semibold text-slate-400 mt-0.5" x-text="clockDate">
+                    <div class="text-xs font-semibold text-slate-400 mt-0.5" x-text="clockDate">
                         ...
                     </div>
                 </div>
@@ -90,8 +120,9 @@
             <!-- Summary Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
-                        Ringkasan Kehadiran Hari Ini
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        <span>Ringkasan Kehadiran</span>
+                        <span class="text-sm font-extrabold text-primary bg-primary/10 px-3 py-0.5 rounded-full border border-primary/20" x-text="cabangTitle"></span>
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
                         Status kehadiran pegawai secara real-time <span x-show="isDemo" class="ml-2 px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Mode Demo ({{ $selectedDate }})</span>
@@ -125,7 +156,7 @@
                                     {{ $totalHadir }}
                                 </div>
                                 <div class="text-slate-500 text-sm sm:text-base font-bold mt-0.5">
-                                    Total Pegawai Hadir
+                                    Pegawai Hadir (<span x-text="cabangShortTitle"></span>)
                                 </div>
                             </div>
                         </div>
@@ -170,7 +201,7 @@
                                 {{ $belumHadir }}
                             </div>
                             <div class="text-slate-500 text-sm sm:text-base font-bold mt-0.5">
-                                Belum Hadir / Belum Check In
+                                Belum Hadir
                             </div>
                         </div>
                     </div>
@@ -198,7 +229,7 @@
                             {{ $wfoCount }}
                         </div>
                         <div class="text-slate-500 text-xs sm:text-sm font-bold mt-0.5 truncate">
-                            WFO (Kantor)
+                            WFO di Lokasi
                         </div>
                     </div>
                 </div>
@@ -294,13 +325,15 @@
                                 </span>
                             </div>
 
-                            <!-- Nama & Divisi/Jabatan -->
+                            <!-- Nama & Divisi/Jabatan & Badge Lokasi Cabang -->
                             <div class="min-w-0">
                                 <h4 :class="item.has_checkout ? 'text-slate-600 font-semibold' : 'text-slate-900 font-bold'" class="text-xs sm:text-sm truncate" x-text="item.nama"></h4>
                                 <div class="flex items-center gap-1.5 text-[11px] text-slate-400 truncate mt-0.5">
                                     <span x-text="item.divisi"></span>
                                     <span class="text-slate-300">&bull;</span>
                                     <span x-text="item.jabatan"></span>
+                                    <span x-show="cabang === 'all'" class="text-slate-300">&bull;</span>
+                                    <span x-show="cabang === 'all'" class="text-[10px] font-bold text-primary" x-text="item.cabang === 'sulaksana' ? 'Sulaksana' : (item.cabang === 'cikawao' ? 'Cikawao' : 'Remote')"></span>
                                 </div>
                             </div>
                         </div>
@@ -321,7 +354,7 @@
                         <i class="fa-regular fa-clock text-xl"></i>
                     </div>
                     <h5 class="text-xs sm:text-sm font-bold text-slate-600">Belum ada pegawai hadir</h5>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Pegawai yang sudah check-in akan otomatis tampil di sini.</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5" x-text="'Belum ada aktivitas di ' + cabangTitle"></p>
                 </div>
 
             </div>
@@ -376,18 +409,19 @@
                 </p>
 
                 <!-- Status Badge -->
-                <div class="mt-5">
+                <div class="mt-5 flex items-center gap-2">
                     <template x-if="modalData.tipe !== 'checkout'">
                         <span :class="modalData.status_kehadiran === 'Terlambat' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
-                            class="inline-flex items-center gap-2 font-extrabold px-5 py-2.5 rounded-full text-sm border shadow-xs" x-text="modalData.status_kehadiran">
+                            class="inline-flex items-center gap-2 font-extrabold px-4 py-2 rounded-full text-xs sm:text-sm border shadow-xs" x-text="modalData.status_kehadiran">
                         </span>
                     </template>
                     <template x-if="modalData.tipe === 'checkout'">
-                        <span class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 border border-slate-200 font-extrabold px-5 py-2.5 rounded-full text-sm shadow-xs">
+                        <span class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 border border-slate-200 font-extrabold px-4 py-2 rounded-full text-xs sm:text-sm shadow-xs">
                             <i class="fa-solid fa-circle-check text-slate-500"></i>
                             <span>Sudah Pulang</span>
                         </span>
                     </template>
+                    <span class="bg-primary/10 text-primary border border-primary/20 font-bold px-3 py-2 rounded-full text-xs" x-text="modalData.cabang_label"></span>
                 </div>
             </div>
 
@@ -442,9 +476,9 @@
                     <div class="flex items-center justify-between p-3.5">
                         <div class="text-slate-500 font-semibold flex items-center gap-2">
                             <i class="fa-solid fa-location-dot text-slate-400"></i>
-                            Lokasi
+                            Lokasi / Cabang
                         </div>
-                        <div class="text-slate-900 font-extrabold" x-text="modalData.lokasi"></div>
+                        <div class="text-slate-900 font-extrabold" x-text="modalData.cabang_label || modalData.lokasi"></div>
                     </div>
 
                     <div class="flex items-center justify-between p-3.5">
@@ -472,8 +506,9 @@
     <!-- Polling & Clock Logic using Alpine.js -->
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('tvDashboard', (selectedDate) => ({
+            Alpine.data('tvDashboard', (selectedDate, selectedCabang = 'all') => ({
                 date: selectedDate,
+                cabang: selectedCabang || 'all',
                 isDemo: selectedDate !== new Date().toISOString().split('T')[0],
                 totalPegawai: {{ $totalPegawai }},
                 totalHadir: {{ $totalHadir }},
@@ -496,6 +531,18 @@
                 modalTimer: null,
                 autoScrollTimer: null,
 
+                get cabangTitle() {
+                    if (this.cabang === 'sulaksana') return 'Kantor Sulaksana';
+                    if (this.cabang === 'cikawao') return 'Kantor Cikawao';
+                    return 'Semua Cabang';
+                },
+
+                get cabangShortTitle() {
+                    if (this.cabang === 'sulaksana') return 'Sulaksana';
+                    if (this.cabang === 'cikawao') return 'Cikawao';
+                    return 'Semua';
+                },
+
                 init() {
                     this.updateClock();
                     setInterval(() => this.updateClock(), 1000);
@@ -512,6 +559,21 @@
 
                     // Start smooth auto-scroll for TV screen
                     this.initAutoScroll();
+                },
+
+                setCabang(newCabang) {
+                    this.cabang = newCabang;
+                    // Update URL parameter without full page reload
+                    const url = new URL(window.location.href);
+                    if (newCabang === 'all') {
+                        url.searchParams.delete('cabang');
+                    } else {
+                        url.searchParams.set('cabang', newCabang);
+                    }
+                    window.history.replaceState({}, '', url.toString());
+
+                    // Immediately fetch fresh stats for the branch
+                    this.fetchStats();
                 },
 
                 getActivityKey(item) {
@@ -532,11 +594,11 @@
                             if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
                                 scrollDirection = -1;
                                 isPaused = true;
-                                setTimeout(() => { isPaused = false; }, 2000); // Pause 2 detik di ujung bawah
+                                setTimeout(() => { isPaused = false; }, 2000);
                             } else if (container.scrollTop <= 5 && scrollDirection === -1) {
                                 scrollDirection = 1;
                                 isPaused = true;
-                                setTimeout(() => { isPaused = false; }, 2000); // Pause 2 detik di ujung atas
+                                setTimeout(() => { isPaused = false; }, 2000);
                             }
 
                             container.scrollBy({
@@ -570,7 +632,7 @@
 
                 async fetchStats() {
                     try {
-                        const response = await fetch(`/api/tv-dashboard/stats?date=${this.date}`);
+                        const response = await fetch(`/api/tv-dashboard/stats?date=${this.date}&cabang=${this.cabang}`);
                         if (response.ok) {
                             const data = await response.json();
                             this.totalPegawai = data.totalPegawai;
@@ -594,7 +656,6 @@
                                     }
                                 });
 
-                                // Queue new activities (reverse so older events appear first)
                                 if (newActivities.length > 0) {
                                     newActivities.reverse().forEach(item => {
                                         this.modalQueue.push(item);
@@ -603,6 +664,8 @@
                                 }
 
                                 this.liveCheckIns = data.liveCheckIns;
+                            } else {
+                                this.liveCheckIns = [];
                             }
                         }
                     } catch (error) {
@@ -624,7 +687,6 @@
                         clearTimeout(this.modalTimer);
                     }
 
-                    // Display modal for 4 seconds, then transition to next
                     this.modalTimer = setTimeout(() => {
                         this.closeModalAndProceed();
                     }, 4000);
@@ -638,7 +700,6 @@
 
                     this.showModal = false;
 
-                    // Allow 350ms fade-out transition, then process next item in queue
                     setTimeout(() => {
                         this.isProcessingQueue = false;
                         if (this.modalQueue.length > 0) {
