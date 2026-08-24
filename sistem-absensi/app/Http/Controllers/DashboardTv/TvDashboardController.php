@@ -54,11 +54,17 @@ class TvDashboardController extends Controller
      */
     private function fetchStats($date, $cabang = 'all')
     {
-        // 1. Fetch dynamic list of branches from database
-        $branches = DB::table('lokasi_kantor')->get(['lokasi_id', 'nama_kantor', 'latitude', 'longitude', 'radius_meter']);
+        // 1. Fetch dynamic list of branches from database ordered by ID
+        $branches = DB::table('lokasi_kantor')
+            ->orderBy('lokasi_id', 'asc')
+            ->get(['lokasi_id', 'nama_kantor', 'latitude', 'longitude', 'radius_meter']);
 
-        // Fetch registered office Wi-Fis linked to locations
-        $officeWifis = DB::table('wifi_kantor')->whereNotNull('lokasi_id')->where('aktif', true)->get();
+        // Fetch registered office Wi-Fis linked to locations (sorted by SSID length desc for exact match)
+        $officeWifis = DB::table('wifi_kantor')
+            ->whereNotNull('lokasi_id')
+            ->where('aktif', true)
+            ->get()
+            ->sortByDesc(fn($w) => strlen($w->ssid));
 
         // 2. Total Pegawai (Aktif)
         $totalPegawai = DB::table('pegawai')
@@ -104,7 +110,7 @@ class TvDashboardController extends Controller
             $matchedLocationId = null;
             $matchedLocationName = 'Remote';
 
-            // A. Check Wi-Fi match first
+            // A. Check Wi-Fi match first (exact SSID match)
             foreach ($officeWifis as $wifi) {
                 if (!empty($wifi->ssid) && str_contains($catatan, strtolower($wifi->ssid))) {
                     $matchedLocationId = $wifi->lokasi_id;
@@ -113,7 +119,7 @@ class TvDashboardController extends Controller
             }
 
             // B. If not matched by Wi-Fi, check Geo-Location coordinates against all branches
-            if (!$matchedLocationId && $item->latitude && $item->longitude) {
+            if (!$matchedLocationId && !empty($item->latitude) && !empty($item->longitude)) {
                 $lat = (float) $item->latitude;
                 $long = (float) $item->longitude;
 
@@ -132,6 +138,7 @@ class TvDashboardController extends Controller
                     }
                 }
 
+                // If within reasonable proximity (~5km)
                 if ($closestBranch && $closestDist < 0.05) {
                     $matchedLocationId = $closestBranch->lokasi_id;
                 }
@@ -143,15 +150,18 @@ class TvDashboardController extends Controller
                     $matchedLocationId = 'remote';
                     $matchedLocationName = 'Remote (WFH/WFC)';
                 } else {
-                    // Default WFO to first branch
-                    $matchedLocationId = $branches->first()?->lokasi_id ?? 1;
+                    // Default headquarters is Kantor Sulaksana (ID: 1)
+                    $sulaksana = $branches->firstWhere('nama_kantor', 'Kantor Sulaksana') 
+                              ?? $branches->firstWhere('lokasi_id', 1) 
+                              ?? $branches->first();
+                    $matchedLocationId = $sulaksana?->lokasi_id ?? 1;
                 }
             }
 
             // Resolve name
             if ($matchedLocationId !== 'remote') {
-                $found = $branches->firstWhere('lokasi_id', $matchedLocationId);
-                $matchedLocationName = $found ? $found->nama_kantor : 'Kantor Cabang';
+                $found = $branches->firstWhere('lokasi_id', (int)$matchedLocationId);
+                $matchedLocationName = $found ? $found->nama_kantor : 'Kantor Sulaksana';
             }
 
             $hasCheckOut = !empty($item->jam_checkout);
@@ -244,7 +254,7 @@ class TvDashboardController extends Controller
                 if ((string)$i['cabang_id'] === (string)$cabang) {
                     return true;
                 }
-                $found = $branches->firstWhere('lokasi_id', $i['cabang_id']);
+                $found = $branches->firstWhere('lokasi_id', (int)$i['cabang_id']);
                 if ($found && str_contains(strtolower($found->nama_kantor), strtolower($cabang))) {
                     return true;
                 }

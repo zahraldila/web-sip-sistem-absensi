@@ -1,4 +1,4 @@
-﻿<div class="flex h-full w-full flex-col bg-white overflow-y-auto">
+<div class="flex h-full w-full flex-col bg-white overflow-y-auto">
     {{-- ========================= --}}
     {{-- HEADER --}}
     {{-- ========================= --}}
