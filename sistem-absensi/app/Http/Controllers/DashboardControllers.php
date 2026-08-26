@@ -19,7 +19,7 @@ class DashboardControllers extends Controller
 
         $totalPegawai = Pegawai::whereDoesntHave('akun', function ($query) {
             $query->whereRaw('LOWER(role) = ?', ['admin']);
-        })->count();
+        })->where('status', 'Aktif')->count();
 
         $hadirHariIni = Attendance::whereDate('tanggal_absensi', $today)
             ->distinct('pegawai_id')

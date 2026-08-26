@@ -115,7 +115,7 @@
                     {{ $totalPegawai }}
                 </h2>
                 <p class="mt-2 text-xs font-medium text-blue-400">
-                    Total karyawan aktif
+                    Total pegawai aktif
                 </p>
             </div>
 
