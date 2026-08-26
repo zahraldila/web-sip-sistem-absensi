@@ -107,8 +107,12 @@
                         </div>
                     </div>
                     <div class="flex-shrink-0">
-                        <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                            {{ $employee->status ?? 'Aktif' }}
+                        @php
+                            $statusText = $employee->status ?? 'Aktif';
+                            $isAktif = strcasecmp(trim($statusText), 'Aktif') === 0;
+                        @endphp
+                        <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $isAktif ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-rose-50 border border-rose-200 text-rose-700' }}">
+                            {{ $statusText }}
                         </span>
                     </div>
                 </div>
@@ -215,8 +219,12 @@
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $employee->masterDivisi->nama_divisi ?? '-' }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">{{ $employee->masterJabatan->nama_jabatan ?? '-' }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
-                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                                    {{ $employee->status ?? 'Aktif' }}
+                                @php
+                                    $statusText = $employee->status ?? 'Aktif';
+                                    $isAktif = strcasecmp(trim($statusText), 'Aktif') === 0;
+                                @endphp
+                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $isAktif ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-rose-50 border border-rose-200 text-rose-700' }}">
+                                    {{ $statusText }}
                                 </span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
@@ -397,7 +405,13 @@
                         <h3 class="text-base sm:text-lg font-bold text-slate-900 truncate" x-text="detailData.nama_pegawai"></h3>
                         <p class="text-xs text-slate-500 mt-0.5">NIP: <span class="font-semibold text-slate-700" x-text="detailData.nip || '-'"></span></p>
                         <div class="mt-1">
-                            <span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-semibold text-green-700" x-text="detailData.status || 'Aktif'"></span>
+                            <span 
+                                :class="(detailData.status && detailData.status.toLowerCase() === 'aktif') 
+                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                                    : 'bg-rose-50 border-rose-200 text-rose-700'"
+                                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold" 
+                                x-text="detailData.status || 'Aktif'"
+                            ></span>
                         </div>
                     </div>
                 </div>
