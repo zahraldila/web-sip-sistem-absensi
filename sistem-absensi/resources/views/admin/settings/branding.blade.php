@@ -133,8 +133,14 @@
                             Pilih File
                             <input id="logoInput" type="file" class="hidden" accept="image/png,image/jpeg,image/svg+xml" @change="onLogoChange">
                         </label>
-                        <p x-show="logoFileName" x-text="logoFileName ? '-- ' + logoFileName : ''"
+                        <p x-show="logoFileName && !logoErrorMessage" x-text="logoFileName ? '-- ' + logoFileName : ''"
                            class="mt-3 text-xs font-medium text-primary"></p>
+                        <div x-show="logoErrorMessage" 
+                             x-transition
+                             class="mt-3 flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 px-3.5 py-2.5 text-xs font-medium text-rose-700 shadow-xs">
+                            <i class="fa-solid fa-circle-exclamation text-rose-500 flex-shrink-0 text-sm"></i>
+                            <span x-text="logoErrorMessage"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -676,6 +682,7 @@ document.addEventListener('alpine:init', () => {
         logoPreviewUrl: initialLogo,
         logoFileName:   '',
         logoFile:       null,
+        logoErrorMessage: '',
         colorPickerOpen: false,
         confirmReset:    false,
         tempHex:    initialColor,
@@ -718,11 +725,15 @@ document.addEventListener('alpine:init', () => {
 
         onLogoChange(event) {
             const file = event.target.files[0];
+            this.logoErrorMessage = '';
             if (!file) return;
 
             if (file.size > 2 * 1024 * 1024) {
-                alert('Ukuran file logo melebihi batas maksimal 2 MB. Silakan pilih file yang lebih kecil.');
+                const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                this.logoErrorMessage = `Ukuran file logo (${sizeMb} MB) melebihi batas maksimal 2 MB. Silakan pilih file yang lebih kecil.`;
                 event.target.value = '';
+                this.logoFile = null;
+                this.logoFileName = '';
                 return;
             }
 
