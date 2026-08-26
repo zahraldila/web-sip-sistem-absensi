@@ -59,6 +59,23 @@ class AuthenticationControllers extends Controller
                     ->onlyInput('email');
             }
 
+            // Cek status pegawai — hanya tolak jika eksplisit 'Tidak Aktif'.
+            // Status 'Aktif' dan NULL tetap dapat login seperti sebelumnya.
+            if ($akun->pegawai && $akun->pegawai->status === 'Tidak Aktif') {
+                $pesanTidakAktif = 'Akun Anda tidak aktif. Silakan hubungi Admin.';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => $pesanTidakAktif,
+                    ], 403);
+                }
+
+                return back()
+                    ->withErrors(['email' => $pesanTidakAktif])
+                    ->onlyInput('email');
+            }
+
             $remember = $request->boolean('remember');
 
             // Login user tanpa remember-token DB (kolom remember_token tidak ada di tabel akun).
