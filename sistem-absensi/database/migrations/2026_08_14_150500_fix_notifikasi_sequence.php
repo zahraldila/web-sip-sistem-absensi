@@ -8,13 +8,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        // Ensure the notifikasi_id sequence is set to max(id) + 1 to prevent duplicate key errors.
-        DB::statement(
-            "SELECT setval(pg_get_serial_sequence('notifikasi', 'notifikasi_id'), (SELECT COALESCE(MAX(notifikasi_id), 0) FROM notifikasi) + 1, false)"
-        );
+public function up(): void
+{
+    if (DB::getDriverName() !== 'pgsql') {
+        return;
     }
+
+    // Ensure the notifikasi_id sequence is set to max(id) + 1 to prevent duplicate key errors.
+    DB::statement(
+        "SELECT setval(pg_get_serial_sequence('notifikasi', 'notifikasi_id'), (SELECT COALESCE(MAX(notifikasi_id), 0) FROM notifikasi) + 1, false)"
+    );
+}
 
     /**
      * Reverse the migrations.
