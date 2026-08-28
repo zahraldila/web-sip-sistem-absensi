@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Employee;    // Model Pegawai
+use App\Models\Pegawai;
 use App\Models\Attendance;  // Model Absensi
 
 class AuditLogControllers extends Controller
@@ -53,7 +53,9 @@ class AuditLogControllers extends Controller
             ->orderBy('audit_log.waktu_log', 'desc')
             ->paginate(15);
 
-        $totalPegawai = Employee::count(); 
+        $totalPegawai = Pegawai::whereDoesntHave('akun', function ($query) {
+            $query->whereRaw('LOWER(role) = ?', ['admin']);
+        })->where('status', 'Aktif')->count(); 
         
         $hadirHariIni = Attendance::where('tanggal_absensi', today())->count();
         
