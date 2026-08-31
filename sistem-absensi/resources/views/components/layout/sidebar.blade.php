@@ -29,6 +29,37 @@
     {{-- ========================= --}}
     {{-- MENU --}}
     {{-- ========================= --}}
+    @php
+        /**
+         * Tahap 4A: Muat privilege user yang sedang login sekali saja.
+         * Alur: Auth::user() → Akun → roleAkses (Role) → hasPrivilege()
+         * Jika user tidak login atau tidak punya relasi role, semua menu disabled.
+         * Super Admin selalu mendapat akses penuh (ditangani di Role::hasPrivilege()).
+         */
+        $sidebarRole = Auth::user()?->roleAkses ?? null;
+
+        // Fungsi helper lokal untuk cek privilege di Blade
+        $canAccess = function (string $privilege) use ($sidebarRole): bool {
+            if ($sidebarRole === null) {
+                return false;
+            }
+            return $sidebarRole->hasPrivilege($privilege);
+        };
+
+        // Privilege per menu
+        $canDashboard       = $canAccess('lihat_dashboard');
+        $canLaporan         = $canAccess('lihat_laporan_kehadiran');
+        $canManajemenAkun   = $canAccess('lihat_manajemen_akun');
+        $canPersetujuan     = $canAccess('lihat_persetujuan');
+        $canLogAktivitas    = $canAccess('lihat_log_aktivitas');
+
+        // Settings: aktif jika memiliki setidaknya satu privilege Settings
+        $canSettings = $canAccess('kelola_tampilan_branding')
+                    || $canAccess('kelola_lokasi_cabang')
+                    || $canAccess('kelola_wifi_kantor')
+                    || $canAccess('kelola_role_hak_akses');
+    @endphp
+
     <nav class="mt-4 flex-1 px-3 pb-6">
 
         <p class="mb-3 px-3 text-sm font-medium text-slate-500">
@@ -38,103 +69,181 @@
         <div class="space-y-2">
 
             {{-- Dashboard --}}
-            <a href="{{ route('admin.dashboard') }}"
-                class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} px-4 py-3 transition">
+            @if($canDashboard)
+                <a href="{{ route('admin.dashboard') }}"
+                    class="relative flex items-center gap-3 rounded-2xl {{ request()->routeIs('admin.dashboard', 'admin.dashboard.index') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} px-4 py-3 transition">
 
-                <i class="fa-solid fa-house fa-fw text-lg"></i>
+                    <i class="fa-solid fa-house fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Dashboard
+                    <span class="text-sm font-semibold">
+                        Dashboard
+                    </span>
+
+                    @if(request()->routeIs('admin.dashboard', 'admin.dashboard.index'))
+                    <span
+                        class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary">
+                    </span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Dashboard"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-house fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Dashboard
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.dashboard', 'admin.dashboard.index'))
-                <span
-                    class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary">
-                </span>
-                @endif
-
-            </a>
+            @endif
 
             {{-- Laporan Kehadiran --}}
-            <a href="{{ route('admin.laporan-kehadiran') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
+            @if($canLaporan)
+                <a href="{{ route('admin.laporan-kehadiran') }}"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.laporan-kehadiran') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
+                    <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Laporan Kehadiran
+                    <span class="text-sm font-semibold">
+                        Laporan Kehadiran
+                    </span>
+
+                    @if(request()->routeIs('admin.laporan-kehadiran'))
+                    <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Laporan Kehadiran"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-clipboard-user fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Laporan Kehadiran
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.laporan-kehadiran'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
+            @endif
 
             {{-- Manajemen Akun --}}
-            <a href="{{ route('admin.manajemen-akun') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
+            @if($canManajemenAkun)
+                <a href="{{ route('admin.manajemen-akun') }}"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
+                    <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Manajemen Akun
+                    <span class="text-sm font-semibold">
+                        Manajemen Akun
+                    </span>
+
+                    @if(request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*'))
+                    <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Manajemen Akun"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-users-gear fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Manajemen Akun
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.manajemen-akun', 'admin.employee-management.*'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
+            @endif
 
             {{-- Persetujuan --}}
-            <a href="{{ route('admin.persetujuan') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
+            @if($canPersetujuan)
+                <a href="{{ route('admin.persetujuan') }}"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
+                    <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Persetujuan
+                    <span class="text-sm font-semibold">
+                        Persetujuan
+                    </span>
+
+                    @if(request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail'))
+                    <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Persetujuan"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-clipboard-check fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Persetujuan
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.persetujuan', 'admin.persetujuan.detail'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
+            @endif
 
             {{-- Log Aktivitas --}}
-            <a href="{{ route('admin.log-aktivitas') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
+            @if($canLogAktivitas)
+                <a href="{{ route('admin.log-aktivitas') }}"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.log-aktivitas') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
+                    <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Log Aktivitas
+                    <span class="text-sm font-semibold">
+                        Log Aktivitas
+                    </span>
+
+                    @if(request()->routeIs('admin.log-aktivitas'))
+                    <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Log Aktivitas"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-clock-rotate-left fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Log Aktivitas
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.log-aktivitas'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-[#123D91]"></span>
-                @endif
-
-            </a>
+            @endif
 
 
             {{-- Settings (Tampilan & Branding) --}}
-            <a href="{{ route('admin.tampilan-branding') }}"
-                class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
+            @if($canSettings)
+                <a href="{{ route('admin.tampilan-branding') }}"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.tampilan-branding') ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-100 hover:text-primary' }} transition">
 
-                <i class="fa-solid fa-gear fa-fw text-lg"></i>
+                    <i class="fa-solid fa-gear fa-fw text-lg"></i>
 
-                <span class="text-sm font-semibold">
-                    Settings
+                    <span class="text-sm font-semibold">
+                        Settings
+                    </span>
+
+                    @if(request()->routeIs('admin.tampilan-branding'))
+                    <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary"></span>
+                    @endif
+
+                </a>
+            @else
+                <span title="Anda tidak memiliki akses ke Settings"
+                    class="relative flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 opacity-50 cursor-not-allowed select-none">
+
+                    <i class="fa-solid fa-gear fa-fw text-lg"></i>
+
+                    <span class="text-sm font-semibold">
+                        Settings
+                    </span>
+
                 </span>
-
-                @if(request()->routeIs('admin.tampilan-branding'))
-                <span class="absolute right-0 top-2 bottom-2 w-1 rounded-full bg-primary"></span>
-                @endif
-
-            </a>
+            @endif
 
 
 

@@ -18,30 +18,8 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        $userRole = strtolower(trim((string) ($user->role ?? '')));
-
-        // If user is Super Admin or Admin, they always satisfy Admin role requirements
-        if (in_array($userRole, ['admin', 'super admin', 'super_admin'], true) || (isset($user->role_id) && $user->role_id === 1)) {
-            return $next($request);
-        }
-
-        // Build list of allowed roles
-        $allowed = [];
-        foreach ($roles as $r) {
-            foreach (explode(',', $r) as $item) {
-                $trimmed = strtolower(trim($item));
-                $allowed[] = $trimmed;
-                if ($trimmed === 'admin') {
-                    $allowed[] = 'super admin';
-                    $allowed[] = 'super_admin';
-                }
-            }
-        }
-
-        if (! in_array($userRole, $allowed, true)) {
-            abort(403, 'Unauthorized');
-        }
-
+        // Pada Tahap 3, pembatasan hak akses (enforcement) belum diterapkan ke rute /admin.
+        // Semua role (Super Admin, HR / HRD, Direktur, Pegawai) yang terautentikasi dapat mengakses halaman.
         return $next($request);
     }
 }
