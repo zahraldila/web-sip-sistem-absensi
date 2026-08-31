@@ -639,7 +639,7 @@
             $allPrivIds = $daftarPrivilege->flatten()->pluck('privilege_id')->toArray();
         @endphp
 
-        <form method="POST" action="{{ route('admin.settings.roles.simpan') }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.settings.roles.simpan') }}" @submit="if (isSavingPrivileges) { $event.preventDefault(); return false; } isSavingPrivileges = true;" class="space-y-6">
             @csrf
             <input type="hidden" name="role_id" :value="currentRoleId">
 
@@ -774,9 +774,15 @@
                     <div class="flex items-center gap-3">
                         @if($canRoles)
                             <button type="submit"
-                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition active:scale-[0.98]">
-                                <i class="fa-solid fa-floppy-disk text-sm"></i>
-                                <span>Simpan Hak Akses Role</span>
+                                    :disabled="isSavingPrivileges"
+                                    :class="isSavingPrivileges ? 'opacity-75 cursor-not-allowed' : 'hover:bg-primary/90 active:scale-[0.98]'"
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-primary text-white font-bold text-sm shadow-md transition">
+                                <svg x-show="isSavingPrivileges" x-cloak class="h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <i x-show="!isSavingPrivileges" class="fa-solid fa-floppy-disk text-sm"></i>
+                                <span x-text="isSavingPrivileges ? 'Menyimpan...' : 'Simpan Hak Akses Role'">Simpan Hak Akses Role</span>
                             </button>
                         @else
                             <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengelola role & hak akses"
@@ -1189,6 +1195,7 @@ document.addEventListener('alpine:init', () => {
         deleteRoleData: { id: '', nama: '', akun_count: 0 },
 
         // Role & Privilege states
+        isSavingPrivileges: false,
         roles: initialRoles || [],
         currentRoleId: initialSelectedRoleId || (initialRoles && initialRoles.length > 0 ? initialRoles[0].role_id : 1),
         rolePrivilegesMap: {},
