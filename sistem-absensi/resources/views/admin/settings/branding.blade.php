@@ -581,7 +581,7 @@
                                   :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600'">
                                 <i class="fa-solid {{ $roleIcon }}"></i>
                             </span>
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-2">
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
                                       :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'">
                                     {{ $roleItem->akun_count ?? 0 }} Akun
@@ -590,12 +590,12 @@
                                 <button type="button"
                                         @click.stop="confirmDeleteRole({{ $roleItem->role_id }}, '{{ addslashes($roleItem->nama_role) }}', {{ $roleItem->akun_count ?? 0 }})"
                                         title="Hapus Role {{ $roleItem->nama_role }}"
-                                        class="h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition">
+                                        class="h-8 w-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-100 flex items-center justify-center transition">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                                 @else
                                 <button type="button" disabled title="Anda tidak memiliki hak akses untuk menghapus role"
-                                        class="h-7 w-7 rounded-lg text-slate-300 opacity-60 cursor-not-allowed flex items-center justify-center">
+                                        class="h-8 w-8 rounded-xl bg-slate-50 border border-slate-100 text-slate-300 opacity-60 cursor-not-allowed flex items-center justify-center">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                                 @endif
@@ -1117,15 +1117,19 @@
                     </div>
                 </template>
 
-                <form id="deleteRoleForm" :action="'/admin/settings/roles/' + deleteRoleData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
+                <form id="deleteRoleForm" :action="'/admin/settings/roles/' + deleteRoleData.id" method="POST" @submit="if (isDeletingRole) { $event.preventDefault(); return false; } isDeletingRole = true;" class="mt-6 flex items-center justify-center gap-3">
                     @csrf
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="button" @click="showDeleteRoleModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                    <button type="button" :disabled="isDeletingRole" @click="showDeleteRoleModal = false" :class="isDeletingRole ? 'opacity-50 cursor-not-allowed' : ''" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
                         Batal
                     </button>
-                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-trash text-xs"></i>
-                        <span>Ya, Hapus Role</span>
+                    <button type="submit" :disabled="isDeletingRole" :class="isDeletingRole ? 'opacity-75 cursor-not-allowed' : 'hover:bg-rose-700'" class="w-1/2 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
+                        <svg x-show="isDeletingRole" x-cloak class="h-3.5 w-3.5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <i x-show="!isDeletingRole" class="fa-solid fa-trash text-xs"></i>
+                        <span x-text="isDeletingRole ? 'Menghapus...' : 'Ya, Hapus Role'">Ya, Hapus Role</span>
                     </button>
                 </form>
 
@@ -1176,6 +1180,7 @@ document.addEventListener('alpine:init', () => {
             deskripsi: '',
         },
         showDeleteRoleModal: false,
+        isDeletingRole: false,
         deleteRoleData: { id: '', nama: '', akun_count: 0 },
 
         // Role & Privilege states
@@ -1412,6 +1417,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         confirmDeleteRole(id, nama, akunCount) {
+            this.isDeletingRole = false;
             this.deleteRoleData = { id: id, nama: nama, akun_count: akunCount || 0 };
             this.showDeleteRoleModal = true;
         }
