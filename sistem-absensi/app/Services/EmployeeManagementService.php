@@ -345,10 +345,10 @@ class EmployeeManagementService
         $this->repository->update($pegawai, $updateData);
 
         if ($pegawai->akun) {
+            // Simpan null jika username dikosongkan (kolom sudah nullable di DB).
+            // Validasi di controller sudah memastikan minimal email atau username ada.
             $akunUpdate = [
-                'email' => $data['email'] ?? $pegawai->akun->email,
-                'username' => $data['username'] ?? $pegawai->akun->username,
-                'status' => $data['status'] ?? $pegawai->akun->status,
+                'username' => trim($data['username'] ?? '') !== '' ? trim($data['username']) : null,
             ];
 
             if (isset($data['role_id']) || isset($data['role'])) {
