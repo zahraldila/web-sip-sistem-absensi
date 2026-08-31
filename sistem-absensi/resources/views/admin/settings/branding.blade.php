@@ -9,9 +9,12 @@
     $savedLogo  = $savedLogo ?? asset('images/logo-sip.png');
     $activeTab  = $activeTab ?? 'branding';
     $daftarLokasi = $daftarLokasi ?? [];
+    $daftarRole = $daftarRole ?? [];
+    $daftarPrivilege = $daftarPrivilege ?? collect([]);
+    $selectedRoleId = $selectedRoleId ?? ($daftarRole->first()?->role_id ?? 1);
 @endphp
 
-<div class="space-y-8" x-data="settingsMasterApp('{{ $savedColor }}', '{{ $savedLogo }}', '{{ $activeTab }}')">
+<div class="space-y-8" x-data="settingsMasterApp('{{ $savedColor }}', '{{ $savedLogo }}', '{{ $activeTab }}', {{ json_encode($daftarRole->map(fn($r) => ['role_id' => $r->role_id, 'nama_role' => $r->nama_role, 'akun_count' => $r->akun_count ?? 0, 'privilege_ids' => $r->privileges->pluck('privilege_id')->toArray()])) }}, {{ $selectedRoleId }})">
 
     {{-- ===== HEADER ===== --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -20,8 +23,10 @@
             <p class="mt-1 text-[15px] text-slate-500">
                 @if($activeTab === 'branding')
                 Sesuaikan identitas visual sistem, pratinjau perubahan sebelum disimpan.
-                @else
+                @elseif($activeTab === 'lokasi')
                 Kelola daftar kantor cabang, titik koordinat GPS presensi, radius kehadiran, serta jaringan Wi-Fi kantor.
+                @else
+                Kelola daftar role pengguna dan atur hak akses (privilege) fitur Web Admin untuk masing-masing role.
                 @endif
             </p>
         </div>
@@ -45,16 +50,21 @@
                   :class="hasChanges ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-500'">3</span>
             <span :class="hasChanges ? 'text-green-600' : ''">Simpan</span>
         </div>
-        @else
+        @elseif($activeTab === 'lokasi')
         <button type="button" @click="openModalTambah()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition">
             <i class="fa-solid fa-plus text-sm"></i>
             <span>Tambah Kantor Cabang</span>
         </button>
+        @else
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
+            <i class="fa-solid fa-shield-halved text-primary text-sm"></i>
+            <span>Pengaturan Hak Akses Role</span>
+        </div>
         @endif
     </div>
 
     {{-- ===== TAB SWITCHER ===== --}}
-    <div class="flex items-center gap-2 border-b border-slate-200 pb-4">
+    <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
         <a href="{{ route('admin.tampilan-branding', ['tab' => 'branding']) }}"
            class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ $activeTab === 'branding' ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
             <i class="fa-solid fa-palette text-sm"></i>
@@ -65,6 +75,12 @@
             <i class="fa-solid fa-building-circle-check text-sm"></i>
             <span>Lokasi Kantor & Cabang</span>
             <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ $activeTab === 'lokasi' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarLokasi) }}</span>
+        </a>
+        <a href="{{ route('admin.tampilan-branding', ['tab' => 'roles']) }}"
+           class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <span>Role & Hak Akses</span>
+            <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarRole) }}</span>
         </a>
     </div>
 
@@ -434,7 +450,244 @@
                 </button>
             </div>
             @endforelse
+    </div>
+    @endif
+
+    {{-- ======================================================== --}}
+    {{-- TAB 3: ROLE & HAK AKSES (PRIVILEGE MANAGEMENT)          --}}
+    {{-- ======================================================== --}}
+    @if(in_array($activeTab, ['roles', 'role-akses']))
+    <div class="space-y-8">
+
+        {{-- Top Description Card --}}
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2.5">
+                    <span class="h-8 w-8 rounded-xl bg-blue-50 text-primary flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </span>
+                    <span>Manajemen Role & Hak Akses (Privilege)</span>
+                </h2>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Atur kewenangan fitur Web Admin untuk setiap kelompok role pengguna. Pilih role di bawah untuk melihat dan mengonfigurasi privilege yang diizinkan.
+                </p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap flex-shrink-0">
+                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200">
+                    Total: {{ count($daftarRole) }} Role Master
+                </span>
+                <span class="text-xs font-bold text-primary bg-blue-50 px-3.5 py-1.5 rounded-xl border border-blue-100">
+                    {{ $daftarPrivilege->flatten()->count() }} Fitur Privilege
+                </span>
+            </div>
         </div>
+
+        {{-- Role Selector Cards (Horizontal Grid) --}}
+        <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pilih Role Pengguna :</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach($daftarRole as $roleItem)
+                @php
+                    $isSuper = strcasecmp($roleItem->nama_role, 'Super Admin') === 0;
+                    $isHR = strcasecmp($roleItem->nama_role, 'HR / HRD') === 0;
+                    $isDir = strcasecmp($roleItem->nama_role, 'Direktur') === 0;
+                    $roleIcon = $isSuper ? 'fa-shield-halved' : ($isHR ? 'fa-user-tie' : ($isDir ? 'fa-building-user' : 'fa-users'));
+                @endphp
+                <button type="button"
+                        @click="selectRole({{ $roleItem->role_id }})"
+                        class="relative flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 hover:shadow-md"
+                        :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-blue-50/70 border-primary ring-2 ring-primary/20 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'">
+                    
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="h-10 w-10 rounded-xl flex items-center justify-center text-base"
+                                  :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600'">
+                                <i class="fa-solid {{ $roleIcon }}"></i>
+                            </span>
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+                                  :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'">
+                                {{ $roleItem->akun_count ?? 0 }} Akun
+                            </span>
+                        </div>
+
+                        <h3 class="text-base font-bold text-slate-900 leading-snug">{{ $roleItem->nama_role }}</h3>
+                        <p class="text-xs text-slate-500 mt-1">
+                            @if($isSuper)
+                            Akses sistem penuh dan konfigurasi master.
+                            @elseif($isHR)
+                            Manajemen pegawai, pengajuan, & kehadiran.
+                            @elseif($isDir)
+                            Monitoring laporan eksekutif & persetujuan.
+                            @else
+                            Akses standar operasional kehadiran pegawai.
+                            @endif
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-600"
+                              x-text="getRolePrivilegeCount({{ $roleItem->role_id }}) + ' / {{ $daftarPrivilege->flatten()->count() }} Hak Akses'">
+                            {{ $roleItem->privileges->count() }} / {{ $daftarPrivilege->flatten()->count() }} Hak Akses
+                        </span>
+                        <span x-show="currentRoleId === {{ $roleItem->role_id }}" class="text-primary text-xs font-bold flex items-center gap-1">
+                            <span>Aktif</span>
+                            <i class="fa-solid fa-circle-check text-xs"></i>
+                        </span>
+                    </div>
+                </button>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Active Role Privilege Editor Form --}}
+        @php
+            $corePrivId = \App\Models\Privilege::where('nama_privilege', 'kelola_role_hak_akses')->value('privilege_id') ?? 16;
+            $allPrivIds = $daftarPrivilege->flatten()->pluck('privilege_id')->toArray();
+        @endphp
+
+        <form method="POST" action="{{ route('admin.settings.roles.simpan') }}" class="space-y-6">
+            @csrf
+            <input type="hidden" name="role_id" :value="currentRoleId">
+
+            {{-- Role Header & Quick Controls --}}
+            <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-card">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-3 py-1 rounded-xl bg-primary text-white text-xs font-bold">Role Terpilih</span>
+                            <h3 class="text-xl font-bold text-slate-900" x-text="getCurrentRoleName()"></h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Centang fitur-fitur yang diizinkan untuk diakses oleh role <strong class="text-slate-800 font-bold" x-text="getCurrentRoleName()"></strong>.
+                        </p>
+                    </div>
+
+                    {{-- Quick Action Buttons --}}
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <button type="button"
+                                @click="selectAllPrivileges({{ json_encode($allPrivIds) }})"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition">
+                            <i class="fa-solid fa-check-double text-xs text-primary"></i>
+                            <span>Pilih Semua</span>
+                        </button>
+                        <button type="button"
+                                @click="unselectAllPrivileges({{ $corePrivId }})"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition">
+                            <i class="fa-solid fa-xmark text-xs text-rose-500"></i>
+                            <span>Batalkan Semua</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Super Admin Lock Notice --}}
+                <div x-show="isSuperAdminActive()" class="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
+                    <div class="text-xs text-amber-900 leading-relaxed">
+                        <strong class="font-bold">Proteksi Akses Super Admin:</strong> Hak akses <em>"Kelola Role & Hak Akses"</em> dilindungi secara otomatis agar Super Admin tidak dapat kehilangan wewenang pengaturan sistem.
+                    </div>
+                </div>
+
+                {{-- Categories Grid --}}
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    @php
+                        $categoryIcons = [
+                            'Dashboard' => 'fa-chart-pie',
+                            'Laporan Kehadiran' => 'fa-file-invoice',
+                            'Manajemen Akun' => 'fa-users-gear',
+                            'Persetujuan' => 'fa-clipboard-check',
+                            'Log Aktivitas' => 'fa-clock-rotate-left',
+                            'Jadwal Kerja' => 'fa-calendar-days',
+                            'Settings' => 'fa-sliders',
+                        ];
+                    @endphp
+
+                    @foreach($daftarPrivilege as $kategori => $privs)
+                    @php
+                        $catPrivIds = $privs->pluck('privilege_id')->toArray();
+                        $iconClass = $categoryIcons[$kategori] ?? 'fa-cube';
+                    @endphp
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5 space-y-4">
+                        
+                        {{-- Category Header --}}
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-200/80">
+                            <div class="flex items-center gap-2.5">
+                                <span class="h-7 w-7 rounded-lg bg-white shadow-xs border border-slate-200 text-primary flex items-center justify-center text-xs">
+                                    <i class="fa-solid {{ $iconClass }}"></i>
+                                </span>
+                                <h4 class="text-sm font-bold text-slate-800">{{ $kategori }}</h4>
+                            </div>
+                            <button type="button"
+                                    @click="toggleCategoryPrivileges({{ json_encode($catPrivIds) }}, {{ $corePrivId }})"
+                                    class="text-[11px] font-bold text-primary hover:text-primary/80 transition">
+                                <span x-text="isCategoryFullySelected({{ json_encode($catPrivIds) }}) ? 'Batal Semua' : 'Pilih Semua'"></span>
+                            </button>
+                        </div>
+
+                        {{-- Privilege Items Checklist --}}
+                        <div class="space-y-2.5">
+                            @foreach($privs as $priv)
+                            @php
+                                $isCore = $priv->nama_privilege === 'kelola_role_hak_akses';
+                            @endphp
+                            <label class="flex items-start gap-3.5 p-3 rounded-xl border transition-all cursor-pointer select-none"
+                                   :class="isPrivilegeChecked({{ $priv->privilege_id }}) ? 'bg-white border-primary/40 shadow-xs ring-1 ring-primary/10' : 'bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300'">
+                                
+                                {{-- Checkbox --}}
+                                <div class="relative flex items-center pt-0.5">
+                                    <input type="checkbox"
+                                           name="privilege_ids[]"
+                                           value="{{ $priv->privilege_id }}"
+                                           :checked="isPrivilegeChecked({{ $priv->privilege_id }})"
+                                           @change="togglePrivilegeCheck({{ $priv->privilege_id }})"
+                                           :disabled="isSuperAdminActive() && {{ $isCore ? 'true' : 'false' }}"
+                                           class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary">
+                                    
+                                    {{-- Hidden input fallback for locked Super Admin core privilege --}}
+                                    @if($isCore)
+                                    <template x-if="isSuperAdminActive()">
+                                        <input type="hidden" name="privilege_ids[]" value="{{ $priv->privilege_id }}">
+                                    </template>
+                                    @endif
+                                </div>
+
+                                {{-- Text & Description --}}
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-xs font-bold text-slate-800">{{ $priv->label_privilege }}</span>
+                                        @if($isCore)
+                                        <span x-show="isSuperAdminActive()" class="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Terkunci</span>
+                                        @endif
+                                    </div>
+                                    @if($priv->deskripsi)
+                                    <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{{ $priv->deskripsi }}</p>
+                                    @endif
+                                </div>
+                            </label>
+                            @endforeach
+                        </div>
+
+                    </div>
+                    @endforeach
+                </div>
+
+                {{-- Submit Bar --}}
+                <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                        <i class="fa-solid fa-circle-info text-primary"></i>
+                        <span>Privilege yang tersimpan akan langsung terhubung ke master data role di database.</span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <button type="submit"
+                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition active:scale-[0.98]">
+                            <i class="fa-solid fa-floppy-disk text-sm"></i>
+                            <span>Simpan Hak Akses Role</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
 
     </div>
     @endif
@@ -674,7 +927,7 @@
 
 <script>
 document.addEventListener('alpine:init', () => {
-    Alpine.data('settingsMasterApp', (initialColor, initialLogo, initialTab) => ({
+    Alpine.data('settingsMasterApp', (initialColor, initialLogo, initialTab, initialRoles, initialSelectedRoleId) => ({
         activeTab: initialTab || 'branding',
         savedColor:     initialColor,
         savedLogo:      initialLogo,
@@ -706,6 +959,11 @@ document.addEventListener('alpine:init', () => {
         showDeleteLokasiModal: false,
         deleteLokasiData: { id: '', nama: '' },
 
+        // Role & Privilege states
+        roles: initialRoles || [],
+        currentRoleId: initialSelectedRoleId || (initialRoles && initialRoles.length > 0 ? initialRoles[0].role_id : 1),
+        rolePrivilegesMap: {},
+
         get hasChanges() {
             return this.selectedHex.toUpperCase() !== this.savedColor.toUpperCase() || this.logoFile !== null;
         },
@@ -721,6 +979,77 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             this.hexToHsv(this.selectedHex);
+
+            // Populate role privileges map
+            (this.roles || []).forEach(r => {
+                this.rolePrivilegesMap[r.role_id] = Array.isArray(r.privilege_ids) ? [...r.privilege_ids] : [];
+            });
+        },
+
+        // Role & Privilege methods
+        selectRole(roleId) {
+            this.currentRoleId = roleId;
+        },
+        getCurrentRole() {
+            return (this.roles || []).find(r => r.role_id === this.currentRoleId) || { role_id: this.currentRoleId, nama_role: 'Role' };
+        },
+        getCurrentRoleName() {
+            return this.getCurrentRole().nama_role;
+        },
+        isSuperAdminActive() {
+            const r = this.getCurrentRole();
+            return (r.nama_role || '').toLowerCase() === 'super admin' || r.role_id === 1;
+        },
+        getRolePrivilegeCount(roleId) {
+            const list = this.rolePrivilegesMap[roleId] || [];
+            return list.length;
+        },
+        isPrivilegeChecked(privId) {
+            const list = this.rolePrivilegesMap[this.currentRoleId] || [];
+            return list.includes(privId);
+        },
+        togglePrivilegeCheck(privId) {
+            if (!this.rolePrivilegesMap[this.currentRoleId]) {
+                this.rolePrivilegesMap[this.currentRoleId] = [];
+            }
+            const idx = this.rolePrivilegesMap[this.currentRoleId].indexOf(privId);
+            if (idx > -1) {
+                this.rolePrivilegesMap[this.currentRoleId].splice(idx, 1);
+            } else {
+                this.rolePrivilegesMap[this.currentRoleId].push(privId);
+            }
+        },
+        selectAllPrivileges(allPrivIds) {
+            this.rolePrivilegesMap[this.currentRoleId] = [...allPrivIds];
+        },
+        unselectAllPrivileges(corePrivId) {
+            if (this.isSuperAdminActive()) {
+                this.rolePrivilegesMap[this.currentRoleId] = [corePrivId];
+            } else {
+                this.rolePrivilegesMap[this.currentRoleId] = [];
+            }
+        },
+        isCategoryFullySelected(catPrivIds) {
+            const list = this.rolePrivilegesMap[this.currentRoleId] || [];
+            return catPrivIds.every(id => list.includes(id));
+        },
+        toggleCategoryPrivileges(catPrivIds, corePrivId) {
+            if (!this.rolePrivilegesMap[this.currentRoleId]) {
+                this.rolePrivilegesMap[this.currentRoleId] = [];
+            }
+            const fullySelected = this.isCategoryFullySelected(catPrivIds);
+            if (fullySelected) {
+                this.rolePrivilegesMap[this.currentRoleId] = this.rolePrivilegesMap[this.currentRoleId].filter(id => {
+                    if (this.isSuperAdminActive() && id === corePrivId) return true;
+                    return !catPrivIds.includes(id);
+                });
+            } else {
+                catPrivIds.forEach(id => {
+                    if (!this.rolePrivilegesMap[this.currentRoleId].includes(id)) {
+                        this.rolePrivilegesMap[this.currentRoleId].push(id);
+                    }
+                });
+            }
         },
 
         onLogoChange(event) {

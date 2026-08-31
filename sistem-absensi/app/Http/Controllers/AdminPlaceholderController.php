@@ -50,9 +50,74 @@ class AdminPlaceholderController extends Controller
                     ->get();
             }
 
-            return view('admin.settings.branding', compact('savedColor', 'savedLogo', 'daftarLokasi', 'activeTab'));
+            // Data Master Role & Privileges untuk Tab Role & Hak Akses
+            $daftarRole = \App\Models\Role::with('privileges')->withCount('akun')->orderBy('role_id')->get();
+            $daftarPrivilege = \App\Models\Privilege::orderBy('privilege_id')->get()->groupBy('kategori');
+            $selectedRoleId = (int) $request->query('role_id', ($daftarRole->first()?->role_id ?? 1));
+
+            return view('admin.settings.branding', compact(
+                'savedColor',
+                'savedLogo',
+                'daftarLokasi',
+                'activeTab',
+                'daftarRole',
+                'daftarPrivilege',
+                'selectedRoleId'
+            ));
         } catch (\Exception $e) {
             return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman Settings: ' . $e->getMessage());
+        }
+    }
+
+    public function simpanRolePrivilege(Request $request)
+    {
+        $request->validate([
+            'role_id'         => 'required|integer|exists:role,role_id',
+            'privilege_ids'   => 'nullable|array',
+            'privilege_ids.*' => 'integer|exists:privilege,privilege_id',
+        ], [
+            'role_id.required' => 'Role wajib dipilih.',
+            'role_id.exists'   => 'Role tidak valid.',
+        ]);
+
+        try {
+            $role = \App\Models\Role::findOrFail($request->role_id);
+            $privilegeIds = $request->input('privilege_ids', []);
+
+            // Proteksi Super Admin: Hak akses inti Kelola Role & Hak Akses wajib selalu aktif
+            $isSuperAdmin = strcasecmp($role->nama_role, 'Super Admin') === 0 || $role->role_id === 1;
+            if ($isSuperAdmin) {
+                $corePrivilegeId = \App\Models\Privilege::where('nama_privilege', 'kelola_role_hak_akses')->value('privilege_id');
+                if ($corePrivilegeId && ! in_array($corePrivilegeId, $privilegeIds)) {
+                    $privilegeIds[] = $corePrivilegeId;
+                }
+            }
+
+            // Sinkronisasi hak akses ke tabel pivot role_privilege
+            $role->privileges()->sync($privilegeIds);
+
+            // Catat log aktivitas
+            $user = Auth::user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record(
+                    $user->akun_id,
+                    "Memperbarui hak akses (privilege) untuk role: {$role->nama_role}"
+                );
+            }
+
+            return redirect()
+                ->route('admin.tampilan-branding', [
+                    'tab' => 'roles',
+                    'role_id' => $role->role_id,
+                ])
+                ->with('success', "Hak akses untuk role \"{$role->nama_role}\" berhasil diperbarui.");
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.tampilan-branding', [
+                    'tab' => 'roles',
+                    'role_id' => $request->role_id,
+                ])
+                ->with('error', 'Gagal menyimpan hak akses: ' . $e->getMessage());
         }
     }
 
