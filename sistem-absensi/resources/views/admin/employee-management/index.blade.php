@@ -1,6 +1,13 @@
 @extends('layouts.admin.app')
 
 @section('content')
+@php
+    $currentRole = Auth::user()?->roleAkses ?? null;
+    $canTambahPegawai = $currentRole?->hasPrivilege('tambah_pegawai') ?? false;
+    $canEditPegawai   = $currentRole?->hasPrivilege('edit_pegawai') ?? false;
+    $canExportPegawai = $currentRole?->hasPrivilege('export_pegawai') ?? false;
+@endphp
+
 <div x-data="employeeModal()" x-init="init()">
     {{-- Header --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6">
@@ -8,12 +15,21 @@
             <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 leading-tight">Manajemen Akun Karyawan</h1>
             <p class="mt-1 text-xs sm:text-sm text-gray-600">Kelola akun dan data pegawai yang terhubung dengan sistem absensi.</p>
         </div>
-        <button type="button" @click.prevent="openCreate()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover flex-shrink-0 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Pegawai</span>
-        </button>
+        @if($canTambahPegawai)
+            <button type="button" @click.prevent="openCreate()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover flex-shrink-0 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Pegawai</span>
+            </button>
+        @else
+            <button type="button" disabled title="Anda tidak memiliki hak akses untuk menambah pegawai" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-200 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none flex-shrink-0 shadow-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Pegawai</span>
+            </button>
+        @endif
     </div>
 
     {{-- Flash Notifications --}}
@@ -73,12 +89,21 @@
                 </div>
 
                 <div class="flex items-center">
-                    <button type="button" @click.prevent="openExport()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        <span>Export</span>
-                    </button>
+                    @if($canExportPegawai)
+                        <button type="button" @click.prevent="openExport()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 whitespace-nowrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                    @else
+                        <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengekspor data pegawai" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-100 px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-gray-400 opacity-60 cursor-not-allowed select-none whitespace-nowrap">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Export</span>
+                        </button>
+                    @endif
                 </div>
             </div>
         </form>
@@ -154,27 +179,35 @@
                         <span>Detail</span>
                     </button>
 
-                    <button type="button" @click.prevent="openEdit($event)"
-                            data-employee="{{ json_encode([
-                                'pegawai_id' => $employee->pegawai_id,
-                                'nama_pegawai' => $employee->nama_pegawai,
-                                'nip' => $employee->nip,
-                                'email' => $employee->email,
-                                'divisi_id' => $employee->divisi_id,
-                                'jabatan_id' => $employee->jabatan_id,
-                                'status' => $employee->status ?? 'Aktif',
-                                'no_handphone' => $employee->no_handphone,
-                                'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
-                                'foto_profile_path' => $employee->foto_profile ?? '',
-                                'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
-                                'username' => $employee->akun->username ?? '',
-                                'role_id' => $employee->akun->role_id ?? '',
-                                'role' => $employee->akun->roleAkses->nama_role ?? $employee->akun->role ?? 'Pegawai'
-                            ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
-                            class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 py-2 text-xs font-semibold text-primary transition hover:bg-blue-100">
-                        <i class="fa-solid fa-pen-to-square text-primary text-xs"></i>
-                        <span>Edit</span>
-                    </button>
+                    @if($canEditPegawai)
+                        <button type="button" @click.prevent="openEdit($event)"
+                                data-employee="{{ json_encode([
+                                    'pegawai_id' => $employee->pegawai_id,
+                                    'nama_pegawai' => $employee->nama_pegawai,
+                                    'nip' => $employee->nip,
+                                    'email' => $employee->email,
+                                    'divisi_id' => $employee->divisi_id,
+                                    'jabatan_id' => $employee->jabatan_id,
+                                    'status' => $employee->status ?? 'Aktif',
+                                    'no_handphone' => $employee->no_handphone,
+                                    'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
+                                    'foto_profile_path' => $employee->foto_profile ?? '',
+                                    'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
+                                    'username' => $employee->akun->username ?? '',
+                                    'role_id' => $employee->akun->role_id ?? '',
+                                    'role' => $employee->akun->roleAkses->nama_role ?? $employee->akun->role ?? 'Pegawai'
+                                ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 py-2 text-xs font-semibold text-primary transition hover:bg-blue-100">
+                            <i class="fa-solid fa-pen-to-square text-primary text-xs"></i>
+                            <span>Edit</span>
+                        </button>
+                    @else
+                        <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengubah data pegawai"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 py-2 text-xs font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none">
+                            <i class="fa-solid fa-pen-to-square text-slate-400 text-xs"></i>
+                            <span>Edit</span>
+                        </button>
+                    @endif
                 </div>
             </div>
         @empty
@@ -254,30 +287,41 @@
                                         <circle cx="12" cy="12" r="3" />
                                     </svg>
                                 </button>
-                                <button type="button" @click.prevent="openEdit($event)"
-                                        data-employee="{{ json_encode([
-                                            'pegawai_id' => $employee->pegawai_id,
-                                            'nama_pegawai' => $employee->nama_pegawai,
-                                            'nip' => $employee->nip,
-                                            'email' => $employee->email,
-                                            'divisi_id' => $employee->divisi_id,
-                                            'jabatan_id' => $employee->jabatan_id,
-                                            'status' => $employee->status ?? 'Aktif',
-                                            'no_handphone' => $employee->no_handphone,
-                                            'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
-                                            'foto_profile_path' => $employee->foto_profile ?? '',
-                                            'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
-                                            'username' => $employee->akun->username ?? '',
-                                            'role_id' => $employee->akun->role_id ?? '',
-                                            'role' => $employee->akun->roleAkses->nama_role ?? $employee->akun->role ?? 'Pegawai'
-                                        ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
-                                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:bg-blue-50 shadow-sm"
-                                        aria-label="Edit pegawai">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
-                                    </svg>
-                                </button>
+                                @if($canEditPegawai)
+                                    <button type="button" @click.prevent="openEdit($event)"
+                                            data-employee="{{ json_encode([
+                                                'pegawai_id' => $employee->pegawai_id,
+                                                'nama_pegawai' => $employee->nama_pegawai,
+                                                'nip' => $employee->nip,
+                                                'email' => $employee->email,
+                                                'divisi_id' => $employee->divisi_id,
+                                                'jabatan_id' => $employee->jabatan_id,
+                                                'status' => $employee->status ?? 'Aktif',
+                                                'no_handphone' => $employee->no_handphone,
+                                                'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
+                                                'foto_profile_path' => $employee->foto_profile ?? '',
+                                                'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
+                                                'username' => $employee->akun->username ?? '',
+                                                'role_id' => $employee->akun->role_id ?? '',
+                                                'role' => $employee->akun->roleAkses->nama_role ?? $employee->akun->role ?? 'Pegawai'
+                                            ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
+                                            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:bg-blue-50 shadow-sm"
+                                            aria-label="Edit pegawai">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                        </svg>
+                                    </button>
+                                @else
+                                    <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengubah data pegawai"
+                                            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-300 opacity-60 cursor-not-allowed select-none shadow-none"
+                                            aria-label="Edit pegawai dinonaktifkan">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                        </svg>
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @empty

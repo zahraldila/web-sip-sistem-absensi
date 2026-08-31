@@ -43,6 +43,33 @@ class AdminPlaceholderController extends Controller
             $savedLogo  = company_logo_url();
             $activeTab  = $request->query('tab', 'branding');
 
+            // ── Tahap 4B: Proteksi per-tab Settings ──────────────────────────
+            // Route Settings hanya satu (?tab=branding/lokasi/roles).
+            // Cek privilege berdasarkan tab yang sedang diakses.
+            $tabPrivilegeMap = [
+                'branding'   => 'kelola_tampilan_branding',
+                'lokasi'     => 'kelola_lokasi_cabang',
+                'roles'      => 'kelola_role_hak_akses',
+                'role-akses' => 'kelola_role_hak_akses',
+            ];
+
+            /** @var \App\Models\Role|null $currentRole */
+            $currentRole = Auth::user()?->roleAkses;
+
+            $requiredPrivilege = $tabPrivilegeMap[$activeTab] ?? null;
+
+            if ($requiredPrivilege && (! $currentRole || ! $currentRole->hasPrivilege($requiredPrivilege))) {
+                // Tab yang diminta tidak boleh diakses — coba redirect ke tab yang bisa
+                foreach ($tabPrivilegeMap as $tab => $priv) {
+                    if ($currentRole && $currentRole->hasPrivilege($priv)) {
+                        return redirect()->route('admin.tampilan-branding', ['tab' => $tab]);
+                    }
+                }
+                // Tidak ada tab Settings yang bisa diakses sama sekali
+                abort(403, 'Anda tidak memiliki akses ke halaman Settings ini.');
+            }
+            // ── /Tahap 4B ─────────────────────────────────────────────────────
+
             $daftarLokasi = DB::table('lokasi_kantor')->get();
             foreach ($daftarLokasi as $lokasi) {
                 $lokasi->wifis = DB::table('wifi_kantor')

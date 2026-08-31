@@ -2,7 +2,11 @@
 
 @section('title', 'Persetujuan Pengajuan')
 
-@section('content')
+@php
+    $currentRole = Auth::user()?->roleAkses ?? null;
+    $canApprove = $currentRole?->hasPrivilege('approve_pengajuan') ?? false;
+    $canReject  = $currentRole?->hasPrivilege('reject_pengajuan') ?? false;
+@endphp
 
 <div class="space-y-6 sm:space-y-8" x-data="approvalModal()">
 
@@ -267,16 +271,35 @@
             <div class="border-t border-slate-200 bg-white px-5 sm:px-6 py-4 flex items-center justify-end gap-2.5">
                 <template x-if="detailData.status_pengajuan === 'Pending'">
                     <div class="grid grid-cols-2 gap-2.5 w-full sm:w-auto sm:flex sm:items-center">
-                        <button type="button"
-                            @click="confirmApprove(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
-                            class="inline-flex items-center justify-center rounded-2xl bg-green-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-green-700 shadow-sm">
-                            Setujui
-                        </button>
-                        <button type="button"
-                            @click="openRejectModal(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
-                            class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-red-700 shadow-sm">
-                            Tolak
-                        </button>
+                        @if($canApprove)
+                            <button type="button"
+                                @click="confirmApprove(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
+                                class="inline-flex items-center justify-center rounded-2xl bg-green-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-green-700 shadow-sm">
+                                Setujui
+                            </button>
+                        @else
+                            <button type="button"
+                                disabled
+                                title="Anda tidak memiliki hak akses untuk menyetujui pengajuan"
+                                class="inline-flex items-center justify-center rounded-2xl bg-slate-200 px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none shadow-none">
+                                Setujui
+                            </button>
+                        @endif
+
+                        @if($canReject)
+                            <button type="button"
+                                @click="openRejectModal(detailData.approval_id, detailData.jenis_pengajuan, detailData.nama_pegawai)"
+                                class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-red-700 shadow-sm">
+                                Tolak
+                            </button>
+                        @else
+                            <button type="button"
+                                disabled
+                                title="Anda tidak memiliki hak akses untuk menolak pengajuan"
+                                class="inline-flex items-center justify-center rounded-2xl bg-slate-200 px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none shadow-none">
+                                Tolak
+                            </button>
+                        @endif
                     </div>
                 </template>
             </div>

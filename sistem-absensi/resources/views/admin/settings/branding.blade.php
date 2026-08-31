@@ -12,6 +12,12 @@
     $daftarRole = $daftarRole ?? [];
     $daftarPrivilege = $daftarPrivilege ?? collect([]);
     $selectedRoleId = $selectedRoleId ?? ($daftarRole->first()?->role_id ?? 1);
+
+    $currentRole = Auth::user()?->roleAkses ?? null;
+    $canBranding = $currentRole?->hasPrivilege('kelola_tampilan_branding') ?? false;
+    $canLokasi   = $currentRole?->hasPrivilege('kelola_lokasi_cabang') ?? false;
+    $canWifi     = $currentRole?->hasPrivilege('kelola_wifi_kantor') ?? false;
+    $canRoles    = $currentRole?->hasPrivilege('kelola_role_hak_akses') ?? false;
 @endphp
 
 <div class="space-y-8" x-data="settingsMasterApp('{{ $savedColor }}', '{{ $savedLogo }}', '{{ $activeTab }}', {{ json_encode($daftarRole->map(fn($r) => ['role_id' => $r->role_id, 'nama_role' => $r->nama_role, 'akun_count' => $r->akun_count ?? 0, 'privilege_ids' => $r->privileges->pluck('privilege_id')->toArray()])) }}, {{ $selectedRoleId }})">
@@ -51,10 +57,17 @@
             <span :class="hasChanges ? 'text-green-600' : ''">Simpan</span>
         </div>
         @elseif($activeTab === 'lokasi')
+        @if($canLokasi)
         <button type="button" @click="openModalTambah()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition">
             <i class="fa-solid fa-plus text-sm"></i>
             <span>Tambah Kantor Cabang</span>
         </button>
+        @else
+        <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengelola lokasi cabang" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-200 text-slate-400 font-bold text-sm opacity-60 cursor-not-allowed select-none">
+            <i class="fa-solid fa-plus text-sm"></i>
+            <span>Tambah Kantor Cabang</span>
+        </button>
+        @endif
         @else
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
             <i class="fa-solid fa-shield-halved text-primary text-sm"></i>
@@ -65,23 +78,51 @@
 
     {{-- ===== TAB SWITCHER ===== --}}
     <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
-        <a href="{{ route('admin.tampilan-branding', ['tab' => 'branding']) }}"
-           class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ $activeTab === 'branding' ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
-            <i class="fa-solid fa-palette text-sm"></i>
-            <span>Tampilan & Branding</span>
-        </a>
-        <a href="{{ route('admin.tampilan-branding', ['tab' => 'lokasi']) }}"
-           class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ $activeTab === 'lokasi' ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
-            <i class="fa-solid fa-building-circle-check text-sm"></i>
-            <span>Lokasi Kantor & Cabang</span>
-            <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ $activeTab === 'lokasi' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarLokasi) }}</span>
-        </a>
-        <a href="{{ route('admin.tampilan-branding', ['tab' => 'roles']) }}"
-           class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
-            <i class="fa-solid fa-shield-halved text-sm"></i>
-            <span>Role & Hak Akses</span>
-            <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarRole) }}</span>
-        </a>
+        @if($canBranding)
+            <a href="{{ route('admin.tampilan-branding', ['tab' => 'branding']) }}"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ $activeTab === 'branding' ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                <i class="fa-solid fa-palette text-sm"></i>
+                <span>Tampilan & Branding</span>
+            </a>
+        @else
+            <span title="Anda tidak memiliki hak akses untuk mengelola tampilan & branding"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-300 opacity-50 cursor-not-allowed select-none bg-slate-50 border border-slate-200">
+                <i class="fa-solid fa-palette text-sm"></i>
+                <span>Tampilan & Branding</span>
+            </span>
+        @endif
+
+        @if($canLokasi)
+            <a href="{{ route('admin.tampilan-branding', ['tab' => 'lokasi']) }}"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ $activeTab === 'lokasi' ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                <i class="fa-solid fa-building-circle-check text-sm"></i>
+                <span>Lokasi Kantor & Cabang</span>
+                <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ $activeTab === 'lokasi' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarLokasi) }}</span>
+            </a>
+        @else
+            <span title="Anda tidak memiliki hak akses untuk mengelola lokasi & cabang"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-300 opacity-50 cursor-not-allowed select-none bg-slate-50 border border-slate-200">
+                <i class="fa-solid fa-building-circle-check text-sm"></i>
+                <span>Lokasi Kantor & Cabang</span>
+                <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs bg-slate-100 text-slate-400">{{ count($daftarLokasi) }}</span>
+            </span>
+        @endif
+
+        @if($canRoles)
+            <a href="{{ route('admin.tampilan-branding', ['tab' => 'roles']) }}"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200' }}">
+                <i class="fa-solid fa-shield-halved text-sm"></i>
+                <span>Role & Hak Akses</span>
+                <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs {{ in_array($activeTab, ['roles', 'role-akses']) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700' }}">{{ count($daftarRole) }}</span>
+            </a>
+        @else
+            <span title="Anda tidak memiliki hak akses untuk mengelola role & hak akses"
+               class="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-300 opacity-50 cursor-not-allowed select-none bg-slate-50 border border-slate-200">
+                <i class="fa-solid fa-shield-halved text-sm"></i>
+                <span>Role & Hak Akses</span>
+                <span class="ml-1 px-2.5 py-0.5 rounded-full text-xs bg-slate-100 text-slate-400">{{ count($daftarRole) }}</span>
+            </span>
+        @endif
     </div>
 
     {{-- ===== FLASH ===== --}}
@@ -215,23 +256,38 @@
 
             {{-- TOMBOL AKSI --}}
             <div class="flex items-center justify-between pt-2">
-                <button type="button" @click="confirmReset = true"
-                        class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    Reset
-                </button>
+                @if($canBranding)
+                    <button type="button" @click="confirmReset = true"
+                            class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Reset
+                    </button>
 
-                <button type="button" @click="onSubmit()"
-                        :disabled="!hasChanges"
-                        :class="hasChanges ? 'bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20 text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
-                        class="flex items-center gap-2 rounded-2xl px-8 py-3 text-sm font-semibold transition">
-                    <svg x-show="hasChanges" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span x-text="hasChanges ? 'Simpan Perubahan' : 'Belum Ada Perubahan'"></span>
-                </button>
+                    <button type="button" @click="onSubmit()"
+                            :disabled="!hasChanges"
+                            :class="hasChanges ? 'bg-primary hover:bg-primary-hover shadow-lg shadow-blue-500/20 text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                            class="flex items-center gap-2 rounded-2xl px-8 py-3 text-sm font-semibold transition">
+                        <svg x-show="hasChanges" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span x-text="hasChanges ? 'Simpan Perubahan' : 'Belum Ada Perubahan'"></span>
+                    </button>
+                @else
+                    <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengubah branding"
+                            class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Reset
+                    </button>
+
+                    <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengubah branding"
+                            class="flex items-center gap-2 rounded-2xl bg-slate-200 text-slate-400 px-8 py-3 text-sm font-semibold opacity-60 cursor-not-allowed select-none">
+                        <span>Simpan Perubahan</span>
+                    </button>
+                @endif
             </div>
 
         </div>
@@ -423,19 +479,33 @@
 
                 {{-- Action Buttons --}}
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <button type="button"
-                            @click="openModalEdit({{ json_encode($lokasi) }})"
-                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-primary hover:bg-blue-50 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        <span>Edit</span>
-                    </button>
+                    @if($canLokasi)
+                        <button type="button"
+                                @click="openModalEdit({{ json_encode($lokasi) }})"
+                                class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-primary hover:bg-blue-50 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Edit</span>
+                        </button>
 
-                    <button type="button"
-                            @click="confirmDeleteLokasi({{ $lokasi->lokasi_id }}, '{{ addslashes($lokasi->nama_kantor) }}')"
-                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-trash"></i>
-                        <span>Hapus</span>
-                    </button>
+                        <button type="button"
+                                @click="confirmDeleteLokasi({{ $lokasi->lokasi_id }}, '{{ addslashes($lokasi->nama_kantor) }}')"
+                                class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Hapus</span>
+                        </button>
+                    @else
+                        <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengubah lokasi cabang"
+                                class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 opacity-60 cursor-not-allowed select-none flex items-center gap-1.5">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Edit</span>
+                        </button>
+
+                        <button type="button" disabled title="Anda tidak memiliki hak akses untuk menghapus lokasi cabang"
+                                class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 opacity-60 cursor-not-allowed select-none flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Hapus</span>
+                        </button>
+                    @endif
                 </div>
             </div>
             @empty
@@ -678,11 +748,19 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <button type="submit"
-                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition active:scale-[0.98]">
-                            <i class="fa-solid fa-floppy-disk text-sm"></i>
-                            <span>Simpan Hak Akses Role</span>
-                        </button>
+                        @if($canRoles)
+                            <button type="submit"
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition active:scale-[0.98]">
+                                <i class="fa-solid fa-floppy-disk text-sm"></i>
+                                <span>Simpan Hak Akses Role</span>
+                            </button>
+                        @else
+                            <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengelola role & hak akses"
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-slate-200 text-slate-400 font-bold text-sm opacity-60 cursor-not-allowed select-none shadow-none">
+                                <i class="fa-solid fa-floppy-disk text-sm"></i>
+                                <span>Simpan Hak Akses Role</span>
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -868,8 +946,7 @@
                     <div>
                         <label class="text-xs font-bold text-slate-700">Nama SSID Wi-Fi Kantor <span class="text-xs text-slate-400 font-normal">(Pisahkan dengan koma jika lebih dari satu)</span></label>
                         <input type="text" name="wifi_ssids" x-model="formLokasi.wifi_ssids"
-                               placeholder="Contoh: SIP, SIP-5G"
-                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                               @if(!$canWifi) disabled title="Anda tidak memiliki hak akses untuk mengelola Wi-Fi kantor" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-2.5 text-sm font-mono text-slate-400 opacity-60 cursor-not-allowed select-none" @else placeholder="Contoh: SIP, SIP-5G" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-mono text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" @endif>
                     </div>
 
                     {{-- Submit Buttons --}}

@@ -22,4 +22,8 @@ if (file_exists($path = base_path('routes/auth.php'))) {
     require $path;
 }
 
-Route::get('/admin/log-aktivitas', [\App\Http\Controllers\AuditLogControllers::class, 'webIndex'])->name('admin.log-aktivitas');
+// Tahap 4B: Route log-aktivitas ini menimpa nama 'admin.log-aktivitas' dari admin.php.
+// Harus dilindungi auth + privilege di sini karena berada di luar grup middleware admin.php.
+Route::get('/admin/log-aktivitas', [\App\Http\Controllers\AuditLogControllers::class, 'webIndex'])
+    ->name('admin.log-aktivitas')
+    ->middleware(['web', 'auth', 'privilege:lihat_log_aktivitas']);

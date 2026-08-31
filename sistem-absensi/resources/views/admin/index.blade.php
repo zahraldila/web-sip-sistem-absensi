@@ -9,6 +9,10 @@
     {{-- ===================================================== --}}
     {{-- HEADER --}}
     {{-- ===================================================== --}}
+    @php
+        $canKelolaJadwal = Auth::user()?->roleAkses?->hasPrivilege('kelola_jadwal_kerja') ?? false;
+    @endphp
+
     <section class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
@@ -23,26 +27,51 @@
 
         </div>
 
-        <button
-            @click="editJamOpen = true"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 sm:px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-primary-hover flex-shrink-0">
+        @if($canKelolaJadwal)
+            <button
+                @click="editJamOpen = true"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 sm:px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:bg-primary-hover flex-shrink-0 shadow-sm">
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
 
-                <path stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 
-            </svg>
+                </svg>
 
-            Edit Jam Masuk
+                Edit Jam Masuk
 
-        </button>
+            </button>
+        @else
+            <button
+                type="button"
+                disabled
+                title="Anda tidak memiliki hak akses untuk mengelola jadwal kerja"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-200 px-5 sm:px-6 py-3 text-sm font-semibold text-slate-400 opacity-60 cursor-not-allowed select-none flex-shrink-0 shadow-none">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                </svg>
+
+                Edit Jam Masuk
+
+            </button>
+        @endif
 
     </section>
 
