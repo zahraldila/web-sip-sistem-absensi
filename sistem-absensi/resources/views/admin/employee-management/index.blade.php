@@ -799,13 +799,13 @@
                         }
                     }
 
-                    // Email / Username — minimal salah satu wajib diisi (untuk tambah baru)
+                    // Email / Username — minimal salah satu wajib diisi (tambah baru maupun edit)
                     // karena login menggunakan email atau username.
-                    if (!this.isEdit) {
-                        const emailInput  = form.querySelector('input[name="email"]');
+                    {
+                        const emailInput    = form.querySelector('input[name="email"]');
                         const usernameInput = form.querySelector('input[name="username"]');
-                        const emailVal    = emailInput  ? emailInput.value.trim()   : '';
-                        const usernameVal = usernameInput ? usernameInput.value.trim() : '';
+                        const emailVal      = emailInput    ? emailInput.value.trim()    : '';
+                        const usernameVal   = usernameInput ? usernameInput.value.trim() : '';
                         if (!emailVal && !usernameVal) {
                             showError(emailInput,    'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
                             showError(usernameInput, 'Email atau Username wajib diisi (minimal salah satu) agar pegawai dapat login.');
