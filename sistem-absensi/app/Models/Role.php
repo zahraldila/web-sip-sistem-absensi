@@ -16,6 +16,7 @@ class Role extends Model
 
     protected $fillable = [
         'nama_role',
+        'deskripsi',
     ];
 
     public function akun(): HasMany

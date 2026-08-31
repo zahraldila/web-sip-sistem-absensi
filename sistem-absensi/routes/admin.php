@@ -90,6 +90,7 @@ Route::prefix('admin')->middleware(['web', 'auth', 'role:Admin'])->group(functio
     Route::delete('/settings/lokasi/{id}', [App\Http\Controllers\AdminPlaceholderController::class, 'hapusLokasi'])->name('admin.settings.lokasi.hapus');
     Route::post('/settings/lokasi/hapus/{id}', [App\Http\Controllers\AdminPlaceholderController::class, 'hapusLokasi'])->name('admin.settings.lokasi.hapus.post');
     Route::post('/settings/roles/simpan', [App\Http\Controllers\AdminPlaceholderController::class, 'simpanRolePrivilege'])->name('admin.settings.roles.simpan');
+    Route::post('/settings/roles/tambah', [App\Http\Controllers\AdminPlaceholderController::class, 'tambahRole'])->name('admin.settings.roles.tambah');
 
     // ── Misc ──────────────────────────────────────────────────────────────────
     Route::get('/pengaturan', [App\Http\Controllers\AdminPlaceholderController::class, 'pengaturan'])->name('admin.pengaturan');

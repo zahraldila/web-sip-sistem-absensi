@@ -69,10 +69,17 @@
         </button>
         @endif
         @else
-        <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
-            <i class="fa-solid fa-shield-halved text-primary text-sm"></i>
-            <span>Pengaturan Hak Akses Role</span>
-        </div>
+        @if($canRoles)
+        <button type="button" @click="openModalTambahRole()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/90 transition">
+            <i class="fa-solid fa-plus text-sm"></i>
+            <span>Tambah Role</span>
+        </button>
+        @else
+        <button type="button" disabled title="Anda tidak memiliki hak akses untuk mengelola role & hak akses" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-200 text-slate-400 font-bold text-sm opacity-60 cursor-not-allowed select-none">
+            <i class="fa-solid fa-plus text-sm"></i>
+            <span>Tambah Role</span>
+        </button>
+        @endif
         @endif
     </div>
 
@@ -555,13 +562,14 @@
         {{-- Role Selector Cards (Horizontal Grid) --}}
         <div>
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pilih Role Pengguna :</label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($daftarRole as $roleItem)
                 @php
                     $isSuper = strcasecmp($roleItem->nama_role, 'Super Admin') === 0;
                     $isHR = strcasecmp($roleItem->nama_role, 'HR / HRD') === 0;
                     $isDir = strcasecmp($roleItem->nama_role, 'Direktur') === 0;
-                    $roleIcon = $isSuper ? 'fa-shield-halved' : ($isHR ? 'fa-user-tie' : ($isDir ? 'fa-building-user' : 'fa-users'));
+                    $isPegawai = strcasecmp($roleItem->nama_role, 'Pegawai') === 0;
+                    $roleIcon = $isSuper ? 'fa-shield-halved' : ($isHR ? 'fa-user-tie' : ($isDir ? 'fa-building-user' : ($isPegawai ? 'fa-users' : 'fa-id-badge')));
                 @endphp
                 <button type="button"
                         @click="selectRole({{ $roleItem->role_id }})"
@@ -588,8 +596,10 @@
                             Manajemen pegawai, pengajuan, & kehadiran.
                             @elseif($isDir)
                             Monitoring laporan eksekutif & persetujuan.
-                            @else
+                            @elseif($isPegawai)
                             Akses standar operasional kehadiran pegawai.
+                            @else
+                            {{ $roleItem->deskripsi ?: 'Role pengguna kustom.' }}
                             @endif
                         </p>
                     </div>
@@ -1000,6 +1010,72 @@
         </div>
     </template>
 
+    {{-- MODAL 5: TAMBAH ROLE MASTER BARU --}}
+    <template x-teleport="body">
+        <div x-show="showTambahRoleModal"
+             x-transition.opacity.duration.300ms
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+             x-cloak
+             style="display: none;">
+            <div @click.away="showTambahRoleModal = false"
+                 class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-7 relative border border-slate-100 my-auto">
+                
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-shield-plus"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Tambah Role Master Baru</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Buat role baru dan konfigurasikan hak akses privilege-nya</p>
+                        </div>
+                    </div>
+                    <button @click="showTambahRoleModal = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-50 transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('admin.settings.roles.tambah') }}" method="POST" class="mt-5 space-y-4">
+                    @csrf
+
+                    {{-- Nama Role --}}
+                    <div>
+                        <label class="text-xs font-bold text-slate-700">Nama Role <span class="text-rose-500">*</span></label>
+                        <input type="text" name="nama_role" x-model="formRole.nama_role" required maxlength="100"
+                               placeholder="Contoh: Supervisor, Finance, Manager"
+                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                    </div>
+
+                    {{-- Deskripsi Role --}}
+                    <div>
+                        <label class="text-xs font-bold text-slate-700">Deskripsi Role <span class="text-xs text-slate-400 font-normal">(Opsional)</span></label>
+                        <textarea name="deskripsi" x-model="formRole.deskripsi" rows="3" maxlength="255"
+                                  placeholder="Contoh: Mengelola operasional tim dan menyetujui jadwal"
+                                  class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                    </div>
+
+                    {{-- Default Privilege Info Notice --}}
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-blue-50/80 border border-blue-100 text-xs text-blue-800">
+                        <i class="fa-solid fa-circle-info text-primary mt-0.5 flex-shrink-0"></i>
+                        <span>Role baru akan memiliki <strong>0 / {{ $daftarPrivilege->flatten()->count() }} Hak Akses</strong> secara default. Anda dapat langsung mencentang dan menyimpan hak akses yang diizinkan setelah role dibuat.</span>
+                    </div>
+
+                    {{-- Submit Buttons --}}
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                        <button type="button" @click="showTambahRoleModal = false" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-md hover:bg-primary/90 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>Simpan & Buat Role</span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </template>
+
 </div>
 
 <script>
@@ -1035,6 +1111,13 @@ document.addEventListener('alpine:init', () => {
         },
         showDeleteLokasiModal: false,
         deleteLokasiData: { id: '', nama: '' },
+
+        // Role modal states
+        showTambahRoleModal: false,
+        formRole: {
+            nama_role: '',
+            deskripsi: '',
+        },
 
         // Role & Privilege states
         roles: initialRoles || [],
@@ -1259,6 +1342,14 @@ document.addEventListener('alpine:init', () => {
         confirmDeleteLokasi(id, nama) {
             this.deleteLokasiData = { id: id, nama: nama };
             this.showDeleteLokasiModal = true;
+        },
+
+        openModalTambahRole() {
+            this.formRole = {
+                nama_role: '',
+                deskripsi: '',
+            };
+            this.showTambahRoleModal = true;
         }
     }));
 });

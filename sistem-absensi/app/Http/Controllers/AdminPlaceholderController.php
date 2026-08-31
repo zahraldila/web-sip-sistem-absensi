@@ -148,6 +148,48 @@ class AdminPlaceholderController extends Controller
         }
     }
 
+    public function tambahRole(Request $request)
+    {
+        $request->validate([
+            'nama_role' => 'required|string|max:100|unique:role,nama_role',
+            'deskripsi' => 'nullable|string|max:255',
+        ], [
+            'nama_role.required' => 'Nama role wajib diisi.',
+            'nama_role.max'      => 'Nama role maksimal 100 karakter.',
+            'nama_role.unique'   => 'Nama role sudah terdaftar, silakan gunakan nama lain.',
+            'deskripsi.max'      => 'Deskripsi role maksimal 255 karakter.',
+        ]);
+
+        try {
+            $role = \App\Models\Role::create([
+                'nama_role' => trim($request->nama_role),
+                'deskripsi' => $request->filled('deskripsi') ? trim($request->deskripsi) : null,
+            ]);
+
+            // Catat log aktivitas
+            $user = Auth::user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record(
+                    $user->akun_id,
+                    "Menambahkan role master baru: {$role->nama_role}"
+                );
+            }
+
+            return redirect()
+                ->route('admin.tampilan-branding', [
+                    'tab' => 'roles',
+                    'role_id' => $role->role_id,
+                ])
+                ->with('success', "Role \"{$role->nama_role}\" berhasil ditambahkan. Silakan atur hak akses privilege untuk role ini.");
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.tampilan-branding', [
+                    'tab' => 'roles',
+                ])
+                ->with('error', 'Gagal menambahkan role: ' . $e->getMessage());
+        }
+    }
+
     public function simpanBranding(Request $request)
     {
         $request->validate([
