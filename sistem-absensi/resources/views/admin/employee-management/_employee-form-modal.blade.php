@@ -160,10 +160,16 @@
                         <select name="role" x-model="form.role"
                             class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary">
                             <option value="">Pilih Role Akses</option>
-                            <option value="Super Admin">Super Admin</option>
-                            <option value="HR / HRD">HR / HRD</option>
-                            <option value="Direktur">Direktur</option>
-                            <option value="Pegawai">Pegawai</option>
+                            @if (!empty($filters['master_roles']) && count($filters['master_roles']) > 0)
+                                @foreach ($filters['master_roles'] as $mr)
+                                    <option value="{{ $mr->nama_role }}">{{ $mr->nama_role }}</option>
+                                @endforeach
+                            @else
+                                <option value="Super Admin">Super Admin</option>
+                                <option value="HR / HRD">HR / HRD</option>
+                                <option value="Direktur">Direktur</option>
+                                <option value="Pegawai">Pegawai</option>
+                            @endif
                         </select>
                         @error('role')
                             <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">

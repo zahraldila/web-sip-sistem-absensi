@@ -195,6 +195,49 @@ class EmployeeManagementService
         return [
             'divisions' => $this->repository->getDivisions(),
             'roles' => $this->repository->getRoles(),
+            'master_roles' => $this->repository->getMasterRoles(),
+        ];
+    }
+
+    public function resolveRoleData(mixed $roleInput): array
+    {
+        $masterRoles = $this->repository->getMasterRoles();
+
+        if (is_numeric($roleInput)) {
+            $found = $masterRoles->firstWhere('role_id', (int) $roleInput);
+            if ($found) {
+                return ['role_id' => $found->role_id, 'nama_role' => $found->nama_role];
+            }
+        }
+
+        if (is_string($roleInput) && trim($roleInput) !== '') {
+            $normalized = trim($roleInput);
+            $lower = strtolower($normalized);
+
+            if (in_array($lower, ['admin', 'super_admin', 'super admin'])) {
+                $normalized = 'Super Admin';
+            } elseif (in_array($lower, ['hr', 'hrd', 'hr / hrd'])) {
+                $normalized = 'HR / HRD';
+            } elseif (in_array($lower, ['direktur', 'director'])) {
+                $normalized = 'Direktur';
+            } elseif (in_array($lower, ['pegawai', 'karyawan'])) {
+                $normalized = 'Pegawai';
+            }
+
+            $found = $masterRoles->first(function ($r) use ($normalized) {
+                return strcasecmp($r->nama_role, $normalized) === 0;
+            });
+
+            if ($found) {
+                return ['role_id' => $found->role_id, 'nama_role' => $found->nama_role];
+            }
+        }
+
+        $defaultRole = $masterRoles->firstWhere('nama_role', 'Pegawai') ?? $masterRoles->first();
+
+        return [
+            'role_id' => $defaultRole?->role_id,
+            'nama_role' => $defaultRole?->nama_role ?? 'Pegawai',
         ];
     }
 
@@ -239,12 +282,15 @@ class EmployeeManagementService
                 ]);
             }
 
+            $roleData = $this->resolveRoleData($data['role_id'] ?? $data['role'] ?? null);
+
             $akunData = [
                 'pegawai_id' => $pegawai->pegawai_id,
                 'email' => $data['email'] ?? null,
                 'username' => $username,
                 'password' => Hash::make($data['password'] ?? 'password123'),
-                'role' => !empty($data['role']) ? $data['role'] : 'Pegawai',
+                'role_id' => $roleData['role_id'],
+                'role' => $roleData['nama_role'],
                 'status' => $data['status'] ?? 'Aktif',
             ];
 
@@ -305,8 +351,10 @@ class EmployeeManagementService
                 'status' => $data['status'] ?? $pegawai->akun->status,
             ];
 
-            if (!empty($data['role'])) {
-                $akunUpdate['role'] = $data['role'];
+            if (isset($data['role_id']) || isset($data['role'])) {
+                $roleData = $this->resolveRoleData($data['role_id'] ?? $data['role']);
+                $akunUpdate['role_id'] = $roleData['role_id'];
+                $akunUpdate['role'] = $roleData['nama_role'];
             }
 
             if (!empty($data['password'])) {

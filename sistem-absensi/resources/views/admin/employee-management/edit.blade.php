@@ -60,7 +60,7 @@
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Role Akses</label>
                 @php
-                    $currentRole = old('role', $employee->akun->role ?? 'Pegawai');
+                    $currentRole = old('role', $employee->akun->roleAkses->nama_role ?? $employee->akun->role ?? 'Pegawai');
                     if (strtolower($currentRole) === 'admin') $currentRole = 'Super Admin';
                     elseif (strtolower($currentRole) === 'pegawai' || strtolower($currentRole) === 'karyawan') $currentRole = 'Pegawai';
                     elseif (strtolower($currentRole) === 'hr' || strtolower($currentRole) === 'hrd' || strtolower($currentRole) === 'hr / hrd') $currentRole = 'HR / HRD';
@@ -68,10 +68,16 @@
                 @endphp
                 <select name="role" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
                     <option value="">Pilih Role Akses</option>
-                    <option value="Super Admin" {{ $currentRole == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
-                    <option value="HR / HRD" {{ $currentRole == 'HR / HRD' ? 'selected' : '' }}>HR / HRD</option>
-                    <option value="Direktur" {{ $currentRole == 'Direktur' ? 'selected' : '' }}>Direktur</option>
-                    <option value="Pegawai" {{ $currentRole == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
+                    @if (!empty($filters['master_roles']) && count($filters['master_roles']) > 0)
+                        @foreach ($filters['master_roles'] as $mr)
+                            <option value="{{ $mr->nama_role }}" {{ $currentRole == $mr->nama_role ? 'selected' : '' }}>{{ $mr->nama_role }}</option>
+                        @endforeach
+                    @else
+                        <option value="Super Admin" {{ $currentRole == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
+                        <option value="HR / HRD" {{ $currentRole == 'HR / HRD' ? 'selected' : '' }}>HR / HRD</option>
+                        <option value="Direktur" {{ $currentRole == 'Direktur' ? 'selected' : '' }}>Direktur</option>
+                        <option value="Pegawai" {{ $currentRole == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
+                    @endif
                 </select>
                 @error('role')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>

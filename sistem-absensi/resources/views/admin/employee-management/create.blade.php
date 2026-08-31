@@ -62,10 +62,16 @@
                 <label class="mb-1 block text-sm font-medium text-gray-700">Role Akses</label>
                 <select name="role" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
                     <option value="">Pilih Role Akses</option>
-                    <option value="Super Admin" {{ old('role') == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
-                    <option value="HR / HRD" {{ old('role') == 'HR / HRD' ? 'selected' : '' }}>HR / HRD</option>
-                    <option value="Direktur" {{ old('role') == 'Direktur' ? 'selected' : '' }}>Direktur</option>
-                    <option value="Pegawai" {{ old('role', 'Pegawai') == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
+                    @if (!empty($filters['master_roles']) && count($filters['master_roles']) > 0)
+                        @foreach ($filters['master_roles'] as $mr)
+                            <option value="{{ $mr->nama_role }}" {{ old('role', 'Pegawai') == $mr->nama_role ? 'selected' : '' }}>{{ $mr->nama_role }}</option>
+                        @endforeach
+                    @else
+                        <option value="Super Admin" {{ old('role') == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
+                        <option value="HR / HRD" {{ old('role') == 'HR / HRD' ? 'selected' : '' }}>HR / HRD</option>
+                        <option value="Direktur" {{ old('role') == 'Direktur' ? 'selected' : '' }}>Direktur</option>
+                        <option value="Pegawai" {{ old('role', 'Pegawai') == 'Pegawai' ? 'selected' : '' }}>Pegawai</option>
+                    @endif
                 </select>
                 @error('role')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>

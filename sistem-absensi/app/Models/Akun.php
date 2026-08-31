@@ -20,6 +20,7 @@ class Akun extends Authenticatable
         'username',
         'password',
         'role',
+        'role_id',
         'pegawai_id',
     ];
 
@@ -53,5 +54,18 @@ class Akun extends Authenticatable
     public function pegawai(): BelongsTo
     {
         return $this->belongsTo(Pegawai::class, 'pegawai_id', 'pegawai_id');
+    }
+
+    public function roleAkses(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+    }
+
+    /**
+     * Accessor untuk $akun->role agar tetap kompatibel dengan pemanggilan string role lama.
+     */
+    public function getRoleAttribute($value): ?string
+    {
+        return $this->roleAkses?->nama_role ?? $value;
     }
 }

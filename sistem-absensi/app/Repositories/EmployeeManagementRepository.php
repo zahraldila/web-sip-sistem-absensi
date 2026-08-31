@@ -7,6 +7,7 @@ use App\Models\MasterDivisi;
 use App\Models\MasterJabatan;
 use App\Models\Nfc;
 use App\Models\Pegawai;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -14,12 +15,12 @@ class EmployeeManagementRepository
 {
     public function query(): Builder
     {
-        return Pegawai::query()->with(['akun', 'masterDivisi', 'masterJabatan', 'nfc']);
+        return Pegawai::query()->with(['akun.roleAkses', 'masterDivisi', 'masterJabatan', 'nfc']);
     }
 
     public function findByPegawaiId(int $pegawaiId): ?Pegawai
     {
-        return Pegawai::with(['akun', 'masterDivisi', 'masterJabatan', 'nfc'])
+        return Pegawai::with(['akun.roleAkses', 'masterDivisi', 'masterJabatan', 'nfc'])
             ->where('pegawai_id', $pegawaiId)
             ->first();
     }
@@ -93,6 +94,13 @@ class EmployeeManagementRepository
     {
         return MasterJabatan::query()
             ->orderBy('nama_jabatan')
+            ->get();
+    }
+
+    public function getMasterRoles(): Collection
+    {
+        return Role::query()
+            ->orderBy('role_id')
             ->get();
     }
 
