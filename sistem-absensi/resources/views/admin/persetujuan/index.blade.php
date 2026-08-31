@@ -2,6 +2,7 @@
 
 @section('title', 'Persetujuan Pengajuan')
 
+@section('content')
 @php
     $currentRole = Auth::user()?->roleAkses ?? null;
     $canApprove = $currentRole?->hasPrivilege('approve_pengajuan') ?? false;
