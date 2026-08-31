@@ -128,12 +128,12 @@
                         @enderror
                     </div>
 
-                    {{-- Role / Jabatan --}}
+                    {{-- Jabatan --}}
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Role / Jabatan</label>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Jabatan</label>
                         <select name="jabatan_id" x-model="form.jabatan_id"
                             class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary">
-                            <option value="">Pilih Role/Jabatan</option>
+                            <option value="">Pilih Jabatan</option>
                             @foreach ($filters['roles'] ?? [] as $role)
                                 <option value="{{ $role['jabatan_id'] }}">{{ $role['nama_jabatan'] }}</option>
                             @endforeach
@@ -147,6 +147,25 @@
                             <p class="mt-1 text-xs text-green-600" x-text="roleSuccess"></p>
                         </template>
                         @error('jabatan_id')
+                            <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                <span>{{ $message }}</span>
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Role Akses --}}
+                    <div>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Role Akses</label>
+                        <select name="role" x-model="form.role"
+                            class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">Pilih Role Akses</option>
+                            <option value="Super Admin">Super Admin</option>
+                            <option value="HR / HRD">HR / HRD</option>
+                            <option value="Direktur">Direktur</option>
+                            <option value="Pegawai">Pegawai</option>
+                        </select>
+                        @error('role')
                             <p class="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1.5">
                                 <i class="fa-solid fa-circle-exclamation text-xs"></i>
                                 <span>{{ $message }}</span>

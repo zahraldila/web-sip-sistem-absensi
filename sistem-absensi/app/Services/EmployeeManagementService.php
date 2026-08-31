@@ -244,7 +244,7 @@ class EmployeeManagementService
                 'email' => $data['email'] ?? null,
                 'username' => $username,
                 'password' => Hash::make($data['password'] ?? 'password123'),
-                'role' => 'pegawai',
+                'role' => !empty($data['role']) ? $data['role'] : 'Pegawai',
                 'status' => $data['status'] ?? 'Aktif',
             ];
 
@@ -304,6 +304,10 @@ class EmployeeManagementService
                 'username' => $data['username'] ?? $pegawai->akun->username,
                 'status' => $data['status'] ?? $pegawai->akun->status,
             ];
+
+            if (!empty($data['role'])) {
+                $akunUpdate['role'] = $data['role'];
+            }
 
             if (!empty($data['password'])) {
                 $akunUpdate['password'] = Hash::make($data['password']);

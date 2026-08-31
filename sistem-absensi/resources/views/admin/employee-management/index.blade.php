@@ -167,7 +167,8 @@
                                 'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
                                 'foto_profile_path' => $employee->foto_profile ?? '',
                                 'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
-                                'username' => $employee->akun->username ?? ''
+                                'username' => $employee->akun->username ?? '',
+                                'role' => $employee->akun->role ?? 'Pegawai'
                             ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
                             class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 py-2 text-xs font-semibold text-primary transition hover:bg-blue-100">
                         <i class="fa-solid fa-pen-to-square text-primary text-xs"></i>
@@ -265,7 +266,8 @@
                                             'nfc_id' => $employee->nfc->nfc_serial_number ?? '',
                                             'foto_profile_path' => $employee->foto_profile ?? '',
                                             'foto_profile' => $employee->foto_profile ? supabase_public_url($employee->foto_profile) : '',
-                                            'username' => $employee->akun->username ?? ''
+                                            'username' => $employee->akun->username ?? '',
+                                            'role' => $employee->akun->role ?? 'Pegawai'
                                         ], JSON_HEX_APOS | JSON_HEX_QUOT) }}"
                                         class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:bg-blue-50 shadow-sm"
                                         aria-label="Edit pegawai">
@@ -578,6 +580,7 @@
                     no_handphone: '{{ old('no_handphone', '') }}',
                     divisi_id: '{{ old('divisi_id', '') }}',
                     jabatan_id: '{{ old('jabatan_id', '') }}',
+                    role: '{{ old('role', '') }}',
                     status: '{{ old('status', 'Aktif') }}',
                     nfc_id: '{{ old('nfc_id', '') }}',
                     username: '{{ old('username', '') }}',
@@ -640,6 +643,7 @@
                         no_handphone: '',
                         divisi_id: '',
                         jabatan_id: '',
+                        role: '',
                         status: 'Aktif',
                         nfc_id: '',
                         username: '',
@@ -663,6 +667,18 @@
                     this.isEdit = true;
                     this.formAction = `/admin/employee-management/${employee.pegawai_id}`;
 
+                    let rawRole = employee.role || 'Pegawai';
+                    let mappedRole = rawRole;
+                    if (rawRole.toLowerCase() === 'admin') {
+                        mappedRole = 'Super Admin';
+                    } else if (rawRole.toLowerCase() === 'pegawai' || rawRole.toLowerCase() === 'karyawan') {
+                        mappedRole = 'Pegawai';
+                    } else if (rawRole.toLowerCase() === 'hr' || rawRole.toLowerCase() === 'hrd' || rawRole.toLowerCase() === 'hr / hrd') {
+                        mappedRole = 'HR / HRD';
+                    } else if (rawRole.toLowerCase() === 'direktur') {
+                        mappedRole = 'Direktur';
+                    }
+
                     this.form = {
                         pegawai_id: employee.pegawai_id || '',
                         nama_pegawai: employee.nama_pegawai || '',
@@ -671,6 +687,7 @@
                         no_handphone: employee.no_handphone || '',
                         divisi_id: employee.divisi_id || '',
                         jabatan_id: employee.jabatan_id || '',
+                        role: mappedRole,
                         status: employee.status || 'Aktif',
                         nfc_id: employee.nfc_id || '',
                         username: employee.username || '',

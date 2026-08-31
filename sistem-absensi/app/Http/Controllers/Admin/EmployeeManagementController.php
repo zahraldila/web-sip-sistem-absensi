@@ -43,6 +43,7 @@ class EmployeeManagementController extends Controller
             'foto_profile' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
+            'role' => 'nullable|string|max:50',
             'username' => ['nullable', 'string', 'max:100', 'unique:akun,username'],
             'password' => 'required|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
@@ -114,6 +115,7 @@ class EmployeeManagementController extends Controller
             'foto_profile' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
+            'role' => 'nullable|string|max:50',
             'username' => [
                 'nullable',
                 'string',
