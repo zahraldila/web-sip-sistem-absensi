@@ -571,10 +571,9 @@
                     $isPegawai = strcasecmp($roleItem->nama_role, 'Pegawai') === 0;
                     $roleIcon = $isSuper ? 'fa-shield-halved' : ($isHR ? 'fa-user-tie' : ($isDir ? 'fa-building-user' : ($isPegawai ? 'fa-users' : 'fa-id-badge')));
                 @endphp
-                <button type="button"
-                        @click="selectRole({{ $roleItem->role_id }})"
-                        class="relative flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 hover:shadow-md"
-                        :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-blue-50/70 border-primary ring-2 ring-primary/20 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'">
+                <div @click="selectRole({{ $roleItem->role_id }})"
+                     class="relative flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 hover:shadow-md cursor-pointer"
+                     :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-blue-50/70 border-primary ring-2 ring-primary/20 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'">
                     
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-3">
@@ -582,10 +581,25 @@
                                   :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600'">
                                 <i class="fa-solid {{ $roleIcon }}"></i>
                             </span>
-                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
-                                  :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'">
-                                {{ $roleItem->akun_count ?? 0 }} Akun
-                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+                                      :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'">
+                                    {{ $roleItem->akun_count ?? 0 }} Akun
+                                </span>
+                                @if($canRoles)
+                                <button type="button"
+                                        @click.stop="confirmDeleteRole({{ $roleItem->role_id }}, '{{ addslashes($roleItem->nama_role) }}', {{ $roleItem->akun_count ?? 0 }})"
+                                        title="Hapus Role {{ $roleItem->nama_role }}"
+                                        class="h-7 w-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                                @else
+                                <button type="button" disabled title="Anda tidak memiliki hak akses untuk menghapus role"
+                                        class="h-7 w-7 rounded-lg text-slate-300 opacity-60 cursor-not-allowed flex items-center justify-center">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                                @endif
+                            </div>
                         </div>
 
                         <h3 class="text-base font-bold text-slate-900 leading-snug">{{ $roleItem->nama_role }}</h3>
@@ -614,7 +628,7 @@
                             <i class="fa-solid fa-circle-check text-xs"></i>
                         </span>
                     </div>
-                </button>
+                </div>
                 @endforeach
             </div>
         </div>
@@ -1076,6 +1090,49 @@
         </div>
     </template>
 
+    {{-- MODAL 6: CUSTOM CONFIRM DELETE ROLE MASTER --}}
+    <template x-teleport="body">
+        <div x-show="showDeleteRoleModal"
+             x-transition.opacity.duration.300ms
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+             x-cloak
+             style="display: none;">
+            <div @click.away="showDeleteRoleModal = false"
+                 class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 relative border border-slate-100 text-center">
+                
+                {{-- Danger Warning Icon --}}
+                <div class="h-16 w-16 mx-auto rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-2xl mb-4">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+
+                <h3 class="text-lg font-extrabold text-slate-900">Hapus Role Master?</h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus role <strong class="text-slate-800 font-bold" x-text="deleteRoleData.nama"></strong>? Seluruh pemetaan hak akses privilege terkait role ini akan dihapus dan tindakan ini tidak dapat dibatalkan.
+                </p>
+
+                <template x-if="deleteRoleData.akun_count > 0">
+                    <div class="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2 text-left">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 flex-shrink-0"></i>
+                        <span>Role ini saat ini masih digunakan oleh <strong x-text="deleteRoleData.akun_count"></strong> akun pengguna. Lepaskan atau ubah role akun terlebih dahulu sebelum menghapus.</span>
+                    </div>
+                </template>
+
+                <form id="deleteRoleForm" :action="'/admin/settings/roles/' + deleteRoleData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
+                    @csrf
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="button" @click="showDeleteRoleModal = false" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-100 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                        <span>Ya, Hapus Role</span>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </template>
+
 </div>
 
 <script>
@@ -1118,6 +1175,8 @@ document.addEventListener('alpine:init', () => {
             nama_role: '',
             deskripsi: '',
         },
+        showDeleteRoleModal: false,
+        deleteRoleData: { id: '', nama: '', akun_count: 0 },
 
         // Role & Privilege states
         roles: initialRoles || [],
@@ -1350,6 +1409,11 @@ document.addEventListener('alpine:init', () => {
                 deskripsi: '',
             };
             this.showTambahRoleModal = true;
+        },
+
+        confirmDeleteRole(id, nama, akunCount) {
+            this.deleteRoleData = { id: id, nama: nama, akun_count: akunCount || 0 };
+            this.showDeleteRoleModal = true;
         }
     }));
 });

@@ -190,6 +190,63 @@ class AdminPlaceholderController extends Controller
         }
     }
 
+    public function hapusRole($id)
+    {
+        try {
+            $role = \App\Models\Role::withCount('akun')->find($id);
+            if (! $role) {
+                return redirect()
+                    ->route('admin.tampilan-branding', ['tab' => 'roles'])
+                    ->with('error', 'Data role tidak ditemukan.');
+            }
+
+            // Proteksi Super Admin demi integritas sistem
+            if (strcasecmp($role->nama_role, 'Super Admin') === 0 || (int) $role->role_id === 1) {
+                return redirect()
+                    ->route('admin.tampilan-branding', [
+                        'tab' => 'roles',
+                        'role_id' => $role->role_id,
+                    ])
+                    ->with('error', 'Role Super Admin tidak dapat dihapus demi keamanan sistem.');
+            }
+
+            // Periksa apakah role masih direferensikan oleh akun/user
+            if ($role->akun_count > 0 || \App\Models\Akun::where('role_id', $role->role_id)->exists()) {
+                return redirect()
+                    ->route('admin.tampilan-branding', [
+                        'tab' => 'roles',
+                        'role_id' => $role->role_id,
+                    ])
+                    ->with('error', "Role \"{$role->nama_role}\" tidak dapat dihapus karena masih digunakan oleh {$role->akun_count} akun pengguna. Silakan alihkan atau lepaskan role tersebut dari akun pengguna terlebih dahulu.");
+            }
+
+            $namaRole = $role->nama_role;
+
+            // Lepaskan relasi privilege pada tabel pivot role_privilege
+            $role->privileges()->detach();
+
+            // Hapus record Role dari database
+            $role->delete();
+
+            // Catat log aktivitas
+            $user = Auth::user();
+            if ($user && isset($user->akun_id)) {
+                logHelpers::record(
+                    $user->akun_id,
+                    "Menghapus role master: {$namaRole} (ID: {$id})"
+                );
+            }
+
+            return redirect()
+                ->route('admin.tampilan-branding', ['tab' => 'roles'])
+                ->with('success', "Role \"{$namaRole}\" berhasil dihapus.");
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.tampilan-branding', ['tab' => 'roles'])
+                ->with('error', 'Gagal menghapus role: ' . $e->getMessage());
+        }
+    }
+
     public function simpanBranding(Request $request)
     {
         $request->validate([
