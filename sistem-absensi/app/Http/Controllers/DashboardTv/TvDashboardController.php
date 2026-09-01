@@ -76,25 +76,72 @@ class TvDashboardController extends Controller
                 'jadwal_kerja.jam_masuk',
                 'jadwal_kerja.jam_pulang'
             )
-            ->orderByRaw('COALESCE(absensi.jam_checkout, absensi.jam_checkin) DESC')
+            ->orderBy('absensi.absensi_id', 'desc')
             ->get();
 
-        // 4. Map records with dynamic branch determination
-        $mappedAttendances = $allAttendances->map(function ($item) use ($branches, $officeWifis) {
+        // 4. Group by pegawai_id to handle Multi-Session Check-in/Check-out (1 Employee = 1 Active/Latest Card)
+        $groupedByPegawai = $allAttendances->groupBy('pegawai_id');
+
+        $latestAttendances = $groupedByPegawai->map(function ($employeeAttendances) {
+            // Check if there is an active session (working / not yet checked out)
+            $activeSession = $employeeAttendances->first(function ($a) {
+                return empty($a->jam_checkout);
+            });
+
+            if ($activeSession) {
+                $primary = $activeSession;
+            } else {
+                // All sessions checked out -> pick the latest one based on checkout time / checkin time / id
+                $primary = $employeeAttendances->sortByDesc(function ($a) {
+                    return $a->jam_checkout ?? $a->jam_checkin ?? $a->absensi_id;
+                })->first();
+            }
+
+            // Calculate total accumulated duration across all completed sessions today
+            $totalMinutes = 0;
+            foreach ($employeeAttendances as $att) {
+                if ($att->jam_checkin && $att->jam_checkout) {
+                    $totalMinutes += Carbon::parse($att->jam_checkin)->diffInMinutes(Carbon::parse($att->jam_checkout));
+                } elseif ($att->jam_checkin && empty($att->jam_checkout)) {
+                    $totalMinutes += Carbon::parse($att->jam_checkin)->diffInMinutes(now());
+                }
+            }
+
+            $primary->total_duration_minutes = $totalMinutes;
+            $primary->sessions_count = $employeeAttendances->count();
+
+            return $primary;
+        })->values();
+
+        // 5. Map records with dynamic branch determination
+        $mappedAttendances = $latestAttendances->map(function ($item) use ($branches, $officeWifis) {
             $catatan = strtolower($item->catatan ?? '');
             
             $matchedLocationId = null;
             $matchedLocationName = 'Remote';
 
-            // A. Check Wi-Fi match first (exact SSID match)
-            foreach ($officeWifis as $wifi) {
-                if (!empty($wifi->ssid) && str_contains($catatan, strtolower($wifi->ssid))) {
-                    $matchedLocationId = $wifi->lokasi_id;
+            // A. Check branch name in catatan first (e.g. "di Kantor Cikawao", "di Kantor Sulaksana")
+            foreach ($branches as $branch) {
+                $bName = strtolower($branch->nama_kantor);
+                $bShort = trim(str_replace('kantor', '', $bName));
+                if (str_contains($catatan, $bName) || (!empty($bShort) && strlen($bShort) >= 3 && str_contains($catatan, $bShort))) {
+                    $matchedLocationId = $branch->lokasi_id;
+                    $matchedLocationName = $branch->nama_kantor;
                     break;
                 }
             }
 
-            // B. If not matched by Wi-Fi, check Geo-Location coordinates against all branches
+            // B. Check Wi-Fi match if not matched by name
+            if (!$matchedLocationId) {
+                foreach ($officeWifis as $wifi) {
+                    if (!empty($wifi->ssid) && str_contains($catatan, strtolower($wifi->ssid))) {
+                        $matchedLocationId = $wifi->lokasi_id;
+                        break;
+                    }
+                }
+            }
+
+            // C. If not matched by Wi-Fi or name, check Geo-Location coordinates against all branches
             if (!$matchedLocationId && !empty($item->latitude) && !empty($item->longitude)) {
                 $lat = (float) $item->latitude;
                 $long = (float) $item->longitude;
@@ -120,7 +167,7 @@ class TvDashboardController extends Controller
                 }
             }
 
-            // C. Fallback for WFO / WFH
+            // D. Fallback for WFO / WFH
             if (!$matchedLocationId) {
                 if (in_array(strtoupper($item->skema_kerja ?? ''), ['WFH', 'WFC'])) {
                     $matchedLocationId = 'remote';
@@ -147,7 +194,11 @@ class TvDashboardController extends Controller
             $waktuTerbaru = $hasCheckOut ? $checkoutTime : $checkinTime;
 
             $durasiKerja = '-';
-            if ($item->jam_checkin && $item->jam_checkout) {
+            if (isset($item->total_duration_minutes) && $item->total_duration_minutes > 0) {
+                $hours = intdiv($item->total_duration_minutes, 60);
+                $mins = $item->total_duration_minutes % 60;
+                $durasiKerja = "{$hours} Jam {$mins} Menit";
+            } elseif ($item->jam_checkin && $item->jam_checkout) {
                 $diffMins = Carbon::parse($item->jam_checkin)->diffInMinutes(Carbon::parse($item->jam_checkout));
                 $hours = intdiv($diffMins, 60);
                 $mins = $diffMins % 60;
@@ -223,12 +274,12 @@ class TvDashboardController extends Controller
             ];
         });
 
-        // Global Summary counts
-        $totalHadir = $mappedAttendances->pluck('pegawai_id')->unique()->count();
-        $sedangBekerja = $mappedAttendances->where('has_checkout', false)->pluck('pegawai_id')->unique()->count();
-        $sudahCheckOut = $mappedAttendances->where('has_checkout', true)->pluck('pegawai_id')->unique()->count();
-        $wfoCount = $mappedAttendances->where('skema', 'WFO')->pluck('pegawai_id')->unique()->count();
-        $wfhCount = $mappedAttendances->whereIn('skema', ['WFH', 'WFC'])->pluck('pegawai_id')->unique()->count();
+        // 6. Global Summary counts (strictly 1 count per unique employee)
+        $totalHadir = $mappedAttendances->count();
+        $sedangBekerja = $mappedAttendances->where('has_checkout', false)->count();
+        $sudahCheckOut = $mappedAttendances->where('has_checkout', true)->count();
+        $wfoCount = $mappedAttendances->where('skema', 'WFO')->count();
+        $wfhCount = $mappedAttendances->whereIn('skema', ['WFH', 'WFC'])->count();
 
         // Sakit & Izin
         $sakitCount = DB::table('pengajuan')
@@ -247,7 +298,7 @@ class TvDashboardController extends Controller
 
         $belumHadir = max(0, $totalPegawai - $totalHadir - $sakitCount - $izinCount);
 
-        // Dynamically group attendances for EVERY branch in the database
+        // 7. Dynamically group attendances for EVERY branch in the database
         $branchCards = [];
         foreach ($branches as $branch) {
             $branchId = (string)$branch->lokasi_id;
