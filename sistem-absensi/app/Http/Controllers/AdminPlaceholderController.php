@@ -150,15 +150,26 @@ class AdminPlaceholderController extends Controller
 
     public function tambahRole(Request $request)
     {
-        $request->validate([
-            'nama_role' => 'required|string|max:100|unique:role,nama_role',
-            'deskripsi' => 'nullable|string|max:255',
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'nama_role' => 'required|string|min:2|max:50|unique:role,nama_role',
+            'deskripsi' => 'nullable|string|max:200',
         ], [
             'nama_role.required' => 'Nama role wajib diisi.',
-            'nama_role.max'      => 'Nama role maksimal 100 karakter.',
+            'nama_role.min'      => 'Nama role minimal 2 karakter.',
+            'nama_role.max'      => 'Nama role maksimal 50 karakter.',
             'nama_role.unique'   => 'Nama role sudah terdaftar, silakan gunakan nama lain.',
-            'deskripsi.max'      => 'Deskripsi role maksimal 255 karakter.',
+            'deskripsi.max'      => 'Deskripsi role maksimal 200 karakter.',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('admin.tampilan-branding', [
+                    'tab' => 'roles',
+                ])
+                ->withErrors($validator, 'tambah_role')
+                ->withInput()
+                ->with('error', $validator->errors()->first());
+        }
 
         try {
             $role = \App\Models\Role::create([
@@ -180,12 +191,13 @@ class AdminPlaceholderController extends Controller
                     'tab' => 'roles',
                     'role_id' => $role->role_id,
                 ])
-                ->with('success', "Role \"{$role->nama_role}\" berhasil ditambahkan. Silakan atur hak akses privilege untuk role ini.");
+                ->with('success', "Role master \"{$role->nama_role}\" berhasil ditambahkan. Silakan atur hak akses privilege untuk role ini.");
         } catch (\Exception $e) {
             return redirect()
                 ->route('admin.tampilan-branding', [
                     'tab' => 'roles',
                 ])
+                ->withInput()
                 ->with('error', 'Gagal menambahkan role: ' . $e->getMessage());
         }
     }
