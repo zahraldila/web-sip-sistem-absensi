@@ -27,7 +27,8 @@ class DashboardControllers extends Controller
 
         $wfoCount = Attendance::whereDate('tanggal_absensi', $today)
             ->where('skema_kerja', 'WFO')
-            ->count();
+            ->distinct('pegawai_id')
+            ->count('pegawai_id');
 
         $wfhWfcCount = Attendance::whereDate('tanggal_absensi', $today)
             ->whereIn('skema_kerja', ['WFH', 'WFC'])
@@ -141,7 +142,16 @@ class DashboardControllers extends Controller
             $rows = Attendance::select(
                     DB::raw('DATE(tanggal_absensi) as tgl'),
                     $tipeExpr,
-                    DB::raw('COUNT(*) as total')
+                    DB::raw("CASE
+                        WHEN (CASE
+                            WHEN skema_kerja IN ('WFH','WFC') THEN 'WFH/WFC'
+                            WHEN status_kehadiran = 'Izin'   THEN 'Izin'
+                            WHEN status_kehadiran = 'Alfa'   THEN 'Alfa'
+                            WHEN skema_kerja = 'Dinas'       THEN 'Dinas'
+                            ELSE skema_kerja
+                        END) = 'WFO' THEN COUNT(DISTINCT pegawai_id)
+                        ELSE COUNT(*)
+                    END as total")
                 )
                 ->whereBetween('tanggal_absensi', [$start->toDateString(), $end->toDateString()])
                 ->groupBy('tgl', 'tipe')
@@ -171,7 +181,16 @@ class DashboardControllers extends Controller
             $rows = Attendance::select(
                     $tipeExpr,
                     DB::raw('EXTRACT(WEEK FROM tanggal_absensi) as minggu_ke'),
-                    DB::raw('COUNT(*) as total')
+                    DB::raw("CASE
+                        WHEN (CASE
+                            WHEN skema_kerja IN ('WFH','WFC') THEN 'WFH/WFC'
+                            WHEN status_kehadiran = 'Izin'   THEN 'Izin'
+                            WHEN status_kehadiran = 'Alfa'   THEN 'Alfa'
+                            WHEN skema_kerja = 'Dinas'       THEN 'Dinas'
+                            ELSE skema_kerja
+                        END) = 'WFO' THEN COUNT(DISTINCT CONCAT(pegawai_id, '_', DATE(tanggal_absensi)))
+                        ELSE COUNT(*)
+                    END as total")
                 )
                 ->whereBetween('tanggal_absensi', [$start->toDateString(), $end->toDateString()])
                 ->groupBy('tipe', 'minggu_ke')
@@ -207,7 +226,16 @@ class DashboardControllers extends Controller
             $rows = Attendance::select(
                     $tipeExpr,
                     DB::raw('EXTRACT(MONTH FROM tanggal_absensi) as bulan_ke'),
-                    DB::raw('COUNT(*) as total')
+                    DB::raw("CASE
+                        WHEN (CASE
+                            WHEN skema_kerja IN ('WFH','WFC') THEN 'WFH/WFC'
+                            WHEN status_kehadiran = 'Izin'   THEN 'Izin'
+                            WHEN status_kehadiran = 'Alfa'   THEN 'Alfa'
+                            WHEN skema_kerja = 'Dinas'       THEN 'Dinas'
+                            ELSE skema_kerja
+                        END) = 'WFO' THEN COUNT(DISTINCT CONCAT(pegawai_id, '_', DATE(tanggal_absensi)))
+                        ELSE COUNT(*)
+                    END as total")
                 )
                 ->whereYear('tanggal_absensi', $year)
                 ->groupBy('tipe', 'bulan_ke')
