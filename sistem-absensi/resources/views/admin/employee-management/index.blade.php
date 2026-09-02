@@ -602,6 +602,7 @@
                 roleSuccess: '',
                 isSavingDivision: false,
                 isSavingRole: false,
+                isSavingEmployee: false,
                 exportSuccessMessage: '',
                 exportErrorMessage: '',
                 detailModalOpen: false,
@@ -703,6 +704,7 @@
                         this.previewObjectUrl = null;
                     }
 
+                    this.isSavingEmployee = false;
                     this.clearErrors();
                     this.modalOpen = true;
                 },
@@ -747,10 +749,12 @@
                         this.previewObjectUrl = null;
                     }
 
+                    this.isSavingEmployee = false;
                     this.clearErrors();
                     this.modalOpen = true;
                 },
                 closeModal() {
+                    this.isSavingEmployee = false;
                     this.clearErrors();
                     this.modalOpen = false;
                 },

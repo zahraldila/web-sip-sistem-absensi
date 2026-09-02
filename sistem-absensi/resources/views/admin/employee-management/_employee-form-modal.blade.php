@@ -284,10 +284,10 @@
                     Batal
                 </button>
                 <button type="button"
-                    @click.prevent="if (validateForm()) { document.getElementById('employeeForm').submit(); }"
-                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm min-w-[100px]">
-                    <span x-text="isEdit ? 'Simpan Perubahan' : 'Simpan'">Simpan</span>
-                </button>
+                    x-bind:disabled="isSavingEmployee"
+                    @click.prevent="if (isSavingEmployee) return; if (validateForm()) { isSavingEmployee = true; document.getElementById('employeeForm').submit(); } else { isSavingEmployee = false; }"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-hover shadow-sm min-w-[100px]"
+                    x-text="isSavingEmployee ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Simpan')">Simpan</button>
             </div>
         </div>
     </div>
