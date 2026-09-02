@@ -572,16 +572,16 @@
                     $roleIcon = $isSuper ? 'fa-shield-halved' : ($isHR ? 'fa-user-tie' : ($isDir ? 'fa-building-user' : ($isPegawai ? 'fa-users' : 'fa-id-badge')));
                 @endphp
                 <div @click="selectRole({{ $roleItem->role_id }})"
-                     class="relative flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 hover:shadow-md cursor-pointer"
+                     class="relative flex flex-col justify-between p-5 rounded-2xl border text-left transition-all duration-200 hover:shadow-md cursor-pointer overflow-hidden min-w-0"
                      :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-blue-50/70 border-primary ring-2 ring-primary/20 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'">
                     
-                    <div>
+                    <div class="min-w-0">
                         <div class="flex items-center justify-between gap-2 mb-3">
-                            <span class="h-10 w-10 rounded-xl flex items-center justify-center text-base"
+                            <span class="h-10 w-10 rounded-xl flex items-center justify-center text-base flex-shrink-0"
                                   :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600'">
                                 <i class="fa-solid {{ $roleIcon }}"></i>
                             </span>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 flex-shrink-0">
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg"
                                       :class="currentRoleId === {{ $roleItem->role_id }} ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'">
                                     {{ $roleItem->akun_count ?? 0 }} Akun
@@ -602,8 +602,8 @@
                             </div>
                         </div>
 
-                        <h3 class="text-base font-bold text-slate-900 leading-snug">{{ $roleItem->nama_role }}</h3>
-                        <p class="text-xs text-slate-500 mt-1">
+                        <h3 class="text-base font-bold text-slate-900 leading-snug break-words hyphens-auto line-clamp-2" title="{{ $roleItem->nama_role }}">{{ $roleItem->nama_role }}</h3>
+                        <p class="text-xs text-slate-500 mt-1 break-words line-clamp-3 overflow-hidden">
                             @if($isSuper)
                             Akses sistem penuh dan konfigurasi master.
                             @elseif($isHR)
@@ -1050,28 +1050,86 @@
                             <p class="text-xs text-slate-400 mt-0.5">Buat role baru dan konfigurasikan hak akses privilege-nya</p>
                         </div>
                     </div>
-                    <button @click="showTambahRoleModal = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-50 transition">
+                    <button @click="showTambahRoleModal = false; roleValidationError = ''; hasServerRoleErrors = false;" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-50 transition">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
 
-                <form action="{{ route('admin.settings.roles.tambah') }}" method="POST" @submit="if (isSavingRole) { $event.preventDefault(); return false; } isSavingRole = true;" class="mt-5 space-y-4">
+                <form action="{{ route('admin.settings.roles.tambah') }}" method="POST" novalidate
+                      @submit="
+                        roleValidationError = '';
+                        if (!formRole.nama_role || !formRole.nama_role.trim()) {
+                            $event.preventDefault();
+                            roleValidationError = 'Nama role wajib diisi.';
+                            return false;
+                        }
+                        if (formRole.nama_role.trim().length > 50) {
+                            $event.preventDefault();
+                            roleValidationError = 'Nama role maksimal 50 karakter.';
+                            return false;
+                        }
+                        if (formRole.deskripsi && formRole.deskripsi.trim().length > 200) {
+                            $event.preventDefault();
+                            roleValidationError = 'Deskripsi role maksimal 200 karakter.';
+                            return false;
+                        }
+                        if (isSavingRole) { 
+                            $event.preventDefault(); 
+                            return false; 
+                        } 
+                        isSavingRole = true;
+                      " 
+                      class="mt-5 space-y-4">
                     @csrf
+
+                    {{-- Client-side & Backend Validation Error Box inside Modal --}}
+                    <div x-show="roleValidationError" x-cloak class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm flex-shrink-0"></i>
+                        <span x-text="roleValidationError"></span>
+                    </div>
+
+                    @if($errors->tambah_role->any())
+                    <div x-show="hasServerRoleErrors" x-cloak class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm flex-shrink-0"></i>
+                        <span>{{ $errors->tambah_role->first() }}</span>
+                    </div>
+                    @endif
 
                     {{-- Nama Role --}}
                     <div>
-                        <label class="text-xs font-bold text-slate-700">Nama Role <span class="text-rose-500">*</span></label>
-                        <input type="text" name="nama_role" x-model="formRole.nama_role" required maxlength="100"
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-700">Nama Role <span class="text-rose-500">*</span></label>
+                            <span class="text-[11px] font-semibold text-slate-400" x-text="(formRole.nama_role ? formRole.nama_role.length : 0) + '/50'"></span>
+                        </div>
+                        <input type="text" name="nama_role" x-model="formRole.nama_role" maxlength="50"
+                               @input="roleValidationError = ''; hasServerRoleErrors = false;"
                                placeholder="Contoh: Supervisor, Finance, Manager"
-                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                               class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                               :class="(roleValidationError || hasServerRoleErrors) ? 'border-rose-300 ring-1 ring-rose-300' : ''">
+                        @error('nama_role', 'tambah_role')
+                        <p x-show="hasServerRoleErrors" x-cloak class="text-xs text-rose-500 font-semibold mt-1.5 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                            <span>{{ $message }}</span>
+                        </p>
+                        @enderror
                     </div>
 
                     {{-- Deskripsi Role --}}
                     <div>
-                        <label class="text-xs font-bold text-slate-700">Deskripsi Role <span class="text-xs text-slate-400 font-normal">(Opsional)</span></label>
-                        <textarea name="deskripsi" x-model="formRole.deskripsi" rows="3" maxlength="255"
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-700">Deskripsi Role <span class="text-xs text-slate-400 font-normal">(Opsional)</span></label>
+                            <span class="text-[11px] font-semibold text-slate-400" x-text="(formRole.deskripsi ? formRole.deskripsi.length : 0) + '/200'"></span>
+                        </div>
+                        <textarea name="deskripsi" x-model="formRole.deskripsi" rows="3" maxlength="200"
+                                  @input="roleValidationError = ''; hasServerRoleErrors = false;"
                                   placeholder="Contoh: Mengelola operasional tim dan menyetujui jadwal"
                                   class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+                        @error('deskripsi', 'tambah_role')
+                        <p x-show="hasServerRoleErrors" x-cloak class="text-xs text-rose-500 font-semibold mt-1.5 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                            <span>{{ $message }}</span>
+                        </p>
+                        @enderror
                     </div>
 
                     {{-- Default Privilege Info Notice --}}
@@ -1082,7 +1140,7 @@
 
                     {{-- Submit Buttons --}}
                     <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                        <button type="button" :disabled="isSavingRole" @click="showTambahRoleModal = false" :class="isSavingRole ? 'opacity-50 cursor-not-allowed' : ''" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <button type="button" :disabled="isSavingRole" @click="showTambahRoleModal = false; roleValidationError = ''; hasServerRoleErrors = false;" :class="isSavingRole ? 'opacity-50 cursor-not-allowed' : ''" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
                             Batal
                         </button>
                         <button type="submit" :disabled="isSavingRole" :class="isSavingRole ? 'opacity-75 cursor-not-allowed' : 'hover:bg-primary/90'" class="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-md transition flex items-center gap-1.5">
@@ -1184,11 +1242,13 @@ document.addEventListener('alpine:init', () => {
         deleteLokasiData: { id: '', nama: '' },
 
         // Role modal states
-        showTambahRoleModal: false,
+        showTambahRoleModal: {{ $errors->tambah_role->any() ? 'true' : 'false' }},
+        hasServerRoleErrors: {{ $errors->tambah_role->any() ? 'true' : 'false' }},
+        roleValidationError: '',
         isSavingRole: false,
         formRole: {
-            nama_role: '',
-            deskripsi: '',
+            nama_role: '{{ old('nama_role') }}',
+            deskripsi: '{{ old('deskripsi') }}',
         },
         showDeleteRoleModal: false,
         isDeletingRole: false,
@@ -1422,6 +1482,8 @@ document.addEventListener('alpine:init', () => {
 
         openModalTambahRole() {
             this.isSavingRole = false;
+            this.roleValidationError = '';
+            this.hasServerRoleErrors = false;
             this.formRole = {
                 nama_role: '',
                 deskripsi: '',
