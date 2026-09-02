@@ -59,6 +59,7 @@ class TvDashboardController extends Controller
             ->leftJoin('jadwal_kerja', 'absensi.jadwal_id', '=', 'jadwal_kerja.jadwal_id')
             ->whereDate('absensi.tanggal_absensi', $date)
             ->whereNotNull('absensi.jam_checkin')
+            ->whereIn(DB::raw('LOWER(TRIM(absensi.status_kehadiran))'), ['hadir', 'terlambat', 'tepat waktu'])
             ->select(
                 'absensi.absensi_id',
                 'absensi.pegawai_id',
@@ -228,7 +229,9 @@ class TvDashboardController extends Controller
             }
 
             $statusKehadiran = 'Tepat Waktu';
-            if ($item->jam_checkin && $item->jam_masuk) {
+            if (strtolower(trim($item->status_kehadiran ?? '')) === 'terlambat') {
+                $statusKehadiran = 'Terlambat';
+            } elseif ($item->jam_checkin && $item->jam_masuk) {
                 $checkInTimeParsed = Carbon::parse($item->jam_checkin)->format('H:i:s');
                 $jamMasukTimeParsed = Carbon::parse($item->jam_masuk)->format('H:i:s');
                 if ($checkInTimeParsed > $jamMasukTimeParsed) {
