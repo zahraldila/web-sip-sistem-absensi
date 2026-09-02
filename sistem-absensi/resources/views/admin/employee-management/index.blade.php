@@ -847,6 +847,14 @@
                         }
                     }
 
+                    // Role Akses — wajib dipilih untuk tambah baru
+                    if (!this.isEdit) {
+                        const roleSelect = form.querySelector('select[name="role"]');
+                        if (roleSelect && !roleSelect.value.trim()) {
+                            showError(roleSelect, 'Role Akses wajib dipilih.');
+                        }
+                    }
+
                     // Scroll ke error pertama jika ada
                     if (!isValid) {
                         const firstError = form.querySelector('.client-error');

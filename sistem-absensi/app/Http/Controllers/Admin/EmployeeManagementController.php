@@ -44,7 +44,7 @@ class EmployeeManagementController extends Controller
             'divisi_id' => 'nullable|integer|exists:master_divisi,divisi_id',
             'jabatan_id' => 'nullable|integer|exists:master_jabatan,jabatan_id',
             'role_id' => 'nullable|integer|exists:role,role_id',
-            'role' => 'nullable|string|max:50',
+            'role' => 'required|string|max:50',
             'username' => ['nullable', 'string', 'max:100', 'unique:akun,username'],
             'password' => 'required|string|min:6|confirmed',
             'status' => 'nullable|string|max:50',
@@ -63,6 +63,7 @@ class EmployeeManagementController extends Controller
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'role.required' => 'Role Akses wajib dipilih.',
             'foto_profile.mimes' => 'Format foto harus berupa JPG, JPEG, atau PNG.',
             'foto_profile.max' => 'Ukuran foto maksimal 2MB.',
         ]);

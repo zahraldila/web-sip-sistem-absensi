@@ -156,9 +156,9 @@
 
                     {{-- Role Akses --}}
                     <div>
-                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Role Akses</label>
+                        <label class="mb-1 block text-xs sm:text-sm font-medium text-slate-700">Role Akses <span class="text-red-500">*</span></label>
                         <select name="role" x-model="form.role"
-                            class="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary">
+                            class="w-full rounded-2xl border @error('role') border-red-400 bg-red-50/20 ring-1 ring-red-300 @else border-slate-300 bg-white focus:border-primary focus:ring-1 focus:ring-primary @enderror px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-slate-900 outline-none transition">
                             <option value="">Pilih Role Akses</option>
                             @if (!empty($filters['master_roles']) && count($filters['master_roles']) > 0)
                                 @foreach ($filters['master_roles'] as $mr)
